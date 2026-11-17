@@ -129,6 +129,18 @@
 .vc-call-button > span { font-size: 10px; line-height: 1.2; }
 #vc-panel .vc-call-button[aria-pressed=true] { background: #483d2b; color: #f5d6ac; }
 #vc-panel .vc-call-button.vc-leave-button { background: #482b28; color: #f6b3aa; }
+.vc-transcript { position: relative; display: flex; flex: 1; min-height: 0; isolation: isolate; overflow: hidden; }
+.vc-transcript::before, .vc-transcript::after {
+  content: ''; position: absolute; inset-inline: 0; height: 20px; z-index: 1;
+  pointer-events: none; opacity: 0; transition: opacity 140ms ease;
+  background: linear-gradient(var(--fade-direction), var(--vc-bg), transparent);
+  -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+  -webkit-mask-image: linear-gradient(var(--fade-direction), black, transparent);
+  mask-image: linear-gradient(var(--fade-direction), black, transparent);
+}
+.vc-transcript::before { top: 0; --fade-direction: to bottom; }
+.vc-transcript::after { bottom: 0; --fade-direction: to top; }
+.vc-more-above::before, .vc-more-below::after { opacity: 1; }
 #vc-panel #vc-msgs { flex: 1; min-height: 0; padding: 14px 20px; }
 .vc-empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; min-height: 0; height: 100%; gap: 8px; padding: 12px 8px; }
 .vc-empty-state > svg { width: 32px !important; height: 32px !important; color: var(--vc-accent); margin-bottom: 4px; }

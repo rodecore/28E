@@ -541,7 +541,7 @@
   };
 
   // The visual layer is independent from Firebase and WebRTC.
-  const VOICE_STYLESHEET = new URL('../css/voice-channel.css?v=20261117_icons', document.currentScript?.src || new URL('assets/js/voice-channel-widget.js', document.baseURI)).href;
+  const VOICE_STYLESHEET = new URL('../css/voice-channel.css?v=20261117_chat', document.currentScript?.src || new URL('assets/js/voice-channel-widget.js', document.baseURI)).href;
 
   const ICONS = {
     close: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="m6 6 12 12M18 6 6 18"/></svg>',
@@ -1457,7 +1457,7 @@
             </div>
           </section>
           <section id="vc-content-chat" class="vc-tab-content" role="tabpanel" aria-labelledby="vc-tab-chat" ${tab !== 'chat' ? 'hidden inert' : ''}>
-            <div id="vc-msgs" class="vc-scroll" role="log" aria-live="polite" aria-label="${_t('vc_chat')}">${this._renderChatMsgs()}</div>
+            <div class="vc-transcript"><div id="vc-msgs" class="vc-scroll" role="log" aria-live="polite" aria-label="${_t('vc_chat')}">${this._renderChatMsgs()}</div></div>
             <div id="vc-chat-typing" class="vc-typing hidden" role="status"></div>
             <div class="vc-chat-composer"><input id="vc-chat-in" aria-label="${_t('vc_chat_ph')}" type="text" placeholder="${_t('vc_chat_ph')}" autocomplete="off" maxlength="2000" enterkeyhint="send" /><button id="vc-chat-send" class="vc-icon-button vc-send-button" aria-label="${_t('room_send')}">${ICONS.arrow}</button></div>
           </section>
@@ -1591,6 +1591,7 @@
       this._dismissParticipantMenu?.();
       if (this._loginPollInt) { clearInterval(this._loginPollInt); this._loginPollInt = null; }
       if (this._loginMembersStop) { this._loginMembersStop(); this._loginMembersStop = null; }
+      this._chatSizeObserver?.disconnect();
       this.panel.innerHTML = tpl;
       this._restoreDrafts();
       this._bindPanelEvents();
@@ -1756,20 +1757,32 @@
         document.getElementById(`vc-tab-${tabs[index]}`)?.focus();
       });
 
+      const log = this.panel.querySelector('#vc-msgs');
+      if (log) {
+        const updateEdges = () => {
+          const overflow = log.scrollHeight - log.clientHeight;
+          log.parentElement.classList.toggle('vc-more-above', log.scrollTop > 1);
+          log.parentElement.classList.toggle('vc-more-below', overflow - log.scrollTop > 1);
+        };
+        log.addEventListener('scroll', updateEdges, { passive: true });
+        this._chatSizeObserver = new ResizeObserver(updateEdges);
+        this._chatSizeObserver.observe(log);
+        updateEdges();
+      }
+
       // Chat send & typing
       const chatSend = document.getElementById('vc-chat-send');
       const chatIn = document.getElementById('vc-chat-in');
       if (chatSend) chatSend.addEventListener('click', () => this._sendChat());
       if (chatIn) {
-        let typingTimer;
         chatIn.addEventListener('input', () => {
           this._playSfx('typing', 0.15);
           if (this.socket && !this._isTyping) {
             this._isTyping = true;
             this.socket.emit('chat_typing', { isTyping: true });
           }
-          clearTimeout(typingTimer);
-          typingTimer = setTimeout(() => {
+          clearTimeout(this._typingTimer);
+          this._typingTimer = setTimeout(() => {
             this._isTyping = false;
             if (this.socket) this.socket.emit('chat_typing', { isTyping: false });
           }, 1500);
@@ -1777,7 +1790,7 @@
         chatIn.addEventListener('keydown', e => { 
           if (e.key === 'Enter') {
             this._sendChat();
-            clearTimeout(typingTimer);
+            clearTimeout(this._typingTimer);
             this._isTyping = false;
             if (this.socket) this.socket.emit('chat_typing', { isTyping: false });
           }
@@ -2011,8 +2024,6 @@
             if (!sessionValid() || !this.connected) return;
             sessionSocket.emit('ring_channel');
             this._inviterName = null;
-            this._chatMsgs = [];
-            this._chatUnread = 0;
             sessionSocket.emit('music_sync_request');
           };
 
@@ -2087,7 +2098,7 @@
 
         // ── CHAT MESSAGE ──────────────────────────────────────────────────
         this.socket.on('chat_message', ({ from, name, text, ts }) => {
-          if (from === this.myId) return; // Ignore self (handled by local echo)
+          if (!sessionValid() || !this.connected || from === this.myId) return; // Ignore self (handled by local echo)
           this._appendChatMsg(from, name, text, ts);
         });
 
@@ -2100,9 +2111,6 @@
               typingEl.textContent = `${name} ${_t('vc_typing')}`;
               typingEl.classList.remove('hidden');
               typingEl.classList.add('block');
-              // Auto-scroll to show typing indicator if at bottom
-              const msgsEl = document.getElementById('vc-msgs');
-              if (msgsEl) msgsEl.scrollTop = msgsEl.scrollHeight;
             } else {
               typingEl.classList.add('hidden');
               typingEl.classList.remove('block');
@@ -2403,6 +2411,7 @@
 
       const msgsEl = document.getElementById('vc-msgs');
       if (msgsEl) {
+        const follow = isMe || msgsEl.scrollHeight - msgsEl.clientHeight - msgsEl.scrollTop <= 2;
         // A tab refresh already rendered this message when its unread count changed.
         if (this._activeTab === 'chat' || isMe) {
           msgsEl.querySelector('[data-chat-empty]')?.remove();
@@ -2410,7 +2419,8 @@
           if (this._activeTab === 'chat') this._animateIn(msgsEl.lastElementChild, { distance: 4 });
         }
         while (msgsEl.querySelectorAll('.vc-chat-msg').length > 50) msgsEl.querySelector('.vc-chat-msg').remove();
-        msgsEl.scrollTop = msgsEl.scrollHeight;
+        if (follow) msgsEl.scrollTop = msgsEl.scrollHeight;
+        msgsEl.parentElement.classList.toggle('vc-more-below', msgsEl.scrollHeight - msgsEl.clientHeight - msgsEl.scrollTop > 1);
       }
 
       if (!isMe) this._playSfx('typing', 0.25);
@@ -3498,6 +3508,18 @@
 
     _cleanup() {
       this._joinAttempt++;
+      this._chatMsgs = [];
+      this._chatUnread = 0;
+      this._isTyping = false;
+      clearTimeout(this._typingTimer);
+      const draft = this.panel.querySelector('#vc-chat-in');
+      if (draft) draft.value = '';
+      delete this._inputDrafts['vc-chat-in'];
+      if (this._vcTitleListener) {
+        document.removeEventListener('visibilitychange', this._vcTitleListener);
+        this._vcTitleListener = null;
+        document.title = '28E';
+      }
       this._speakers.clear();
       this._listObserver?.disconnect();
       clearTimeout(this._micInitTimeout);

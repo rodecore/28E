@@ -173,7 +173,8 @@
       const seenChat = new Set();
       const receiveChat = snap => {
         const message = snap.val();
-        if (!message || seenChat.has(message.seq)) return;
+        // The shared buffer may still contain messages from a previous visit.
+        if (!message || message.ts <= this.member.joinedAt || seenChat.has(message.seq)) return;
         seenChat.add(message.seq); if (seenChat.size > 200) seenChat.delete(seenChat.values().next().value);
         this.deliver('chat_message', message);
       };
