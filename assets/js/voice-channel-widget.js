@@ -541,7 +541,7 @@
   };
 
   // The visual layer is independent from Firebase and WebRTC.
-  const VOICE_STYLESHEET = new URL('../css/voice-channel.css?v=20261117_compact', document.currentScript?.src || new URL('assets/js/voice-channel-widget.js', document.baseURI)).href;
+  const VOICE_STYLESHEET = new URL('../css/voice-channel.css?v=20261117_icons', document.currentScript?.src || new URL('assets/js/voice-channel-widget.js', document.baseURI)).href;
 
   const ICONS = {
     close: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="m6 6 12 12M18 6 6 18"/></svg>',
@@ -1464,9 +1464,9 @@
           <section id="vc-content-music" class="vc-tab-content" role="tabpanel" aria-labelledby="vc-tab-music" ${tab !== 'music' ? 'hidden inert' : ''}><div class="vc-scroll" id="vc-music-inner">${this._renderMusicPanel()}</div></section>
         </div>
         <div class="vc-call-controls" role="group" aria-label="${_t('vc_title')}">
-          <button id="vc-mute" class="vc-call-button" aria-pressed="${this.muted}" aria-label="${_t(this.muted ? 'room_mic_on' : 'room_mic_off')}"><span class="vc-control-icon" aria-hidden="true">${this.muted ? ICONS.micOff : ICONS.mic}</span><span>${_t(this.muted ? 'btn_muted' : 'btn_mic')}</span></button>
-          <button id="vc-dnd" class="vc-call-button" aria-pressed="${this.dnd}" aria-label="${_t(this.dnd ? 'room_undeafen' : 'room_deafen')}"><span class="vc-control-icon" aria-hidden="true">${this.dnd ? ICONS.dnd : ICONS.bell}</span><span>${_t(this.dnd ? 'btn_audio_off' : 'btn_audio')}</span></button>
-          <button id="vc-leave" class="vc-call-button vc-leave-button" title="${_t('room_leave')}" aria-label="${_t('room_leave')}"><span class="vc-control-icon" aria-hidden="true">${ICONS.phone}</span><span>${_t('btn_leave')}</span></button>
+          <button id="vc-mute" class="vc-call-button" aria-pressed="${this.muted}" aria-label="${_t(this.muted ? 'room_mic_on' : 'room_mic_off')}"><span class="vc-control-icon" aria-hidden="true">${this.muted ? ICONS.micOff : ICONS.mic}</span></button>
+          <button id="vc-dnd" class="vc-call-button" aria-pressed="${this.dnd}" aria-label="${_t(this.dnd ? 'room_undeafen' : 'room_deafen')}"><span class="vc-control-icon" aria-hidden="true">${this.dnd ? ICONS.dnd : ICONS.bell}</span></button>
+          <button id="vc-leave" class="vc-call-button vc-leave-button" title="${_t('room_leave')}" aria-label="${_t('room_leave')}"><span class="vc-control-icon" aria-hidden="true">${ICONS.phone}</span></button>
         </div>
       </div>`;
     }
@@ -2303,7 +2303,7 @@
       if (btn) {
         btn.setAttribute('aria-pressed', String(this.muted));
         btn.setAttribute('aria-label', _t(this.muted ? 'room_mic_on' : 'room_mic_off'));
-        btn.innerHTML = `<span class="vc-control-icon" aria-hidden="true">${this.muted ? ICONS.micOff : ICONS.mic}</span><span>${_t(this.muted ? 'btn_muted' : 'btn_mic')}</span>`;
+        btn.innerHTML = `<span class="vc-control-icon" aria-hidden="true">${this.muted ? ICONS.micOff : ICONS.mic}</span>`;
       }
       this._updateUsersDOM();
       this._updateDockState();
@@ -2325,7 +2325,7 @@
       if (btn) {
         btn.setAttribute('aria-pressed', String(this.dnd));
         btn.setAttribute('aria-label', _t(this.dnd ? 'room_undeafen' : 'room_deafen'));
-        btn.innerHTML = `<span class="vc-control-icon" aria-hidden="true">${this.dnd ? ICONS.dnd : ICONS.bell}</span><span>${_t(this.dnd ? 'btn_audio_off' : 'btn_audio')}</span>`;
+        btn.innerHTML = `<span class="vc-control-icon" aria-hidden="true">${this.dnd ? ICONS.dnd : ICONS.bell}</span>`;
       }
       this._updateUsersDOM();
       this._updateDockState();

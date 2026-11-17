@@ -408,9 +408,8 @@ body.vc-open #vc-bar, body.menu-is-open #vc-bar { opacity: 0 !important; pointer
 .vc-tab-indicator { position: absolute; left: 0; bottom: -1px; width: 1px; height: 2px; background: var(--vc-accent); transform-origin: left center; pointer-events: none; }
 .vc-motion-tabs .vc-tab[aria-selected=true]::after { display: none; }
 #vc-panel .vc-call-controls { background: var(--vc-bg); border-top: 1px solid var(--vc-line); padding: 10px 24px 12px; gap: 8px; }
-#vc-panel .vc-call-button { background: transparent; padding: 0 4px; gap: 6px; min-height: 64px; border-radius: 12px; color: var(--vc-muted); }
+#vc-panel .vc-call-button { background: transparent; padding: 0 4px; gap: 0; min-height: 44px; border-radius: 12px; color: var(--vc-muted); }
 #vc-panel .vc-call-button > .vc-control-icon { display: grid; place-items: center; width: 42px; height: 42px; border: 1px solid var(--vc-line); border-radius: 50%; color: var(--vc-text); background: transparent; transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease; }
-#vc-panel .vc-call-button > span:last-child { font-size: 11px; line-height: 1.2; }
 #vc-panel .vc-call-button[aria-pressed=true] { background: transparent; color: var(--vc-accent); }
 #vc-panel .vc-call-button[aria-pressed=true] > .vc-control-icon { background: #322b20; border-color: #6c5433; color: var(--vc-accent); }
 #vc-panel .vc-call-button.vc-leave-button { background: transparent; color: var(--vc-danger); }
@@ -465,7 +464,6 @@ body.vc-open #vc-bar, body.menu-is-open #vc-bar { opacity: 0 !important; pointer
 .vc-chat-composer, #vc-panel #vc-msgs, #vc-panel #vc-music-inner { padding-inline: var(--room-inset); }
 .vc-av .vc-avatar { width: clamp(64px, 10dvh, 96px); height: clamp(64px, 10dvh, 96px); }
 .vc-user:only-child .vc-avatar { width: clamp(84px, 14dvh, 124px); height: clamp(84px, 14dvh, 124px); }
-#vc-panel .vc-call-button > span:last-child { font-size: 13px; }
 #vc-panel .vc-call-button > .vc-control-icon { background: var(--vc-surface); border-color: transparent; }
 #vc-panel .vc-call-button[aria-pressed=true] > .vc-control-icon { background: #483926; }
 #vc-panel .vc-leave-button > .vc-control-icon { background: #492d30; }
