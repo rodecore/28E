@@ -955,6 +955,16 @@
       this.panel.setAttribute('aria-label', _t('vc_title'));
       this.panel.setAttribute('tabindex', '-1');
       this.panel.inert = true;
+      for (const event of ['focusin', 'focusout']) {
+        this.panel.addEventListener(event, e => {
+          const field = e.target;
+          if (!field.matches('input:not([type=hidden])') || !window.gsap || this._reducedMotion.matches) return;
+          field.dataset.vcMotion = '';
+          const color = getComputedStyle(this.panel).getPropertyValue(event === 'focusin' ? '--vc-accent' : '--vc-line').trim();
+          window.gsap.to(field, { borderColor: color, duration: .22, overwrite: 'auto',
+            ...(event === 'focusout' ? { clearProps: 'borderColor' } : {}) });
+        });
+      }
       this.panel.innerHTML = this._tplLogin();
 
       this._bar = document.createElement('div');
@@ -1281,7 +1291,7 @@
       }
       this._animatePanel(willOpen, motionStart);
       if (willOpen) this._animateView(this.panel);
-      else if (this.connected) this._animateIn(this._bar, { distance: 8 });
+      this._syncBarAccessibility();
     }
 
     _syncBarAccessibility() {
@@ -1291,7 +1301,7 @@
       this._bar.inert = !visible;
       this._bar.setAttribute('aria-hidden', String(!visible));
       this._bar.removeAttribute('tabindex');
-      if (appearing) this._animateIn(this._bar, { distance: 8 });
+      if (appearing) this._animateIn(this._bar.children, { distance: 10, duration: .28, stagger: .035 });
     }
 
     open() {
@@ -1331,9 +1341,12 @@
     _animateView(root = this.panel) {
       if (!root || !this.panel.classList.contains('open')) return;
       const active = root.querySelector('.vc-tab-content:not([hidden])');
-      const nodes = active ? [active, root.querySelector('.vc-call-controls')].filter(Boolean)
-        : Array.from(root.querySelector('.vc-screen')?.children || []).filter(node => !node.classList.contains('vc-panel-close'));
-      this._animateIn(nodes.slice(0, 4), { distance: 8, stagger: .03 });
+      const groups = active
+        ? root.querySelectorAll('.vc-room-heading, .vc-tabs, .vc-tab-content:not([hidden]), .vc-call-controls')
+        : root.querySelectorAll('.vc-lobby-intro, .vc-lobby-presence, .vc-lobby-room, .vc-lobby-footer, .vc-state-screen > *');
+      this._animateIn(groups, { distance: 20, duration: .38, stagger: .045 });
+      if (active) this._animateIn(root.querySelectorAll('.vc-tab-content:not([hidden]) .vc-user, .vc-call-button .vc-control-icon'), { distance: 8, scale: .94, stagger: .04 });
+
     }
 
     _animatePanel(open, start) {
@@ -1579,7 +1592,14 @@
         ['vc-bar-dnd', this.dnd, this.dnd ? ICONS.dnd : ICONS.bell, _t(this.dnd ? 'room_undeafen' : 'room_deafen')]
       ]) {
         const button = this._bar.querySelector('#' + id);
-        if (button) { button.setAttribute('aria-pressed', String(pressed)); button.setAttribute('aria-label', label); button.innerHTML = icon; }
+        if (button) {
+          button.setAttribute('aria-label', label);
+          if (button.getAttribute('aria-pressed') !== String(pressed)) {
+            button.setAttribute('aria-pressed', String(pressed));
+            button.innerHTML = icon;
+            this._animateIn(button.firstElementChild, { distance: 0, scale: .72, duration: .28 });
+          }
+        }
       }
       const title = this._bar.querySelector('#vc-bar-title');
       if (title) title.textContent = _t(this.muted ? 'room_mic_off' : this.dnd ? 'room_deafened' : 'dock_active');
@@ -1630,13 +1650,28 @@
     _bindGsapButton(el) {
       if (!el || el._vcPressBound || !window.gsap) return;
       el._vcPressBound = true;
-      const press = down => {
-        if (el.disabled || this._motionKeyboard || this._reducedMotion.matches) return;
+      let hovered = false;
+      const move = pressed => {
+        if (el.disabled || this._reducedMotion.matches) return;
         el.dataset.vcMotion = '';
-        window.gsap.to(el, { scale: down ? .93 : 1, duration: down ? .1 : .16, ease: 'power3.out', overwrite: true, ...(down ? {} : { clearProps: 'transform' }) });
+        window.gsap.to(el, {
+          y: pressed ? 1 : hovered ? -2 : 0, scale: pressed ? .92 : 1,
+          duration: pressed ? .10 : .22, ease: 'power3.out', overwrite: 'auto',
+          ...(!pressed && !hovered ? { clearProps: 'transform' } : {})
+        });
       };
-      el.addEventListener('pointerdown', () => press(true));
-      for (const event of ['pointerup', 'pointercancel', 'pointerleave', 'blur']) el.addEventListener(event, () => press(false));
+      el.addEventListener('pointerenter', e => {
+        if (e.pointerType !== 'mouse') return;
+        hovered = true;
+        move(false);
+      });
+      el.addEventListener('pointerdown', () => move(true));
+      el.addEventListener('pointerup', () => move(false));
+      el.addEventListener('keydown', e => { if (!e.repeat && ['Enter', ' '].includes(e.key)) move(true); });
+      el.addEventListener('keyup', e => { if (['Enter', ' '].includes(e.key)) move(false); });
+      for (const event of ['pointercancel', 'pointerleave', 'blur']) {
+        el.addEventListener(event, () => { hovered = false; move(false); });
+      }
     }
 
     _bindPanelEvents() {
@@ -1938,7 +1973,10 @@
 
     _setErr(msg) {
       const el = document.getElementById('vc-err');
-      if (el) el.textContent = msg;
+      if (el) {
+        el.textContent = msg;
+        this._animateIn(el, { distance: 7 });
+      }
     }
 
     // ── SOCKET ─────────────────────────────────────────────────────────────
@@ -2130,9 +2168,11 @@
           const typingEl = document.getElementById('vc-chat-typing');
           if (typingEl) {
             if (isTyping) {
+              const appearing = typingEl.classList.contains('hidden');
               typingEl.textContent = `${name} ${_t('vc_typing')}`;
               typingEl.classList.remove('hidden');
               typingEl.classList.add('block');
+              if (appearing) this._animateIn(typingEl, { distance: 6 });
             } else {
               typingEl.classList.add('hidden');
               typingEl.classList.remove('block');
@@ -2440,7 +2480,7 @@
         if (this._activeTab === 'chat' || isMe) {
           msgsEl.querySelector('[data-chat-empty]')?.remove();
           msgsEl.insertAdjacentHTML('beforeend', this._chatMessageMarkup({ from, name, text, ts }));
-          if (this._activeTab === 'chat') this._animateIn(msgsEl.lastElementChild, { distance: 4 });
+          if (this._activeTab === 'chat') this._animateIn(msgsEl.lastElementChild, { distance: 12, horizontal: isMe ? 12 : -12, duration: .32 });
         }
         while (msgsEl.querySelectorAll('.vc-chat-msg').length > 50) msgsEl.querySelector('.vc-chat-msg').remove();
         if (follow) msgsEl.scrollTop = msgsEl.scrollHeight;
@@ -2476,7 +2516,7 @@
           <button class="vc-ring-btn ignore" id="vc-ring-ignore">${_t('vc_ring_ignore')}</button>
         </div>`;
       document.body.appendChild(overlay);
-      this._animateIn(overlay, { distance: 8 });
+      this._animateIn(overlay.children, { distance: 12, duration: .32, stagger: .035 });
       overlay.querySelectorAll('button').forEach(button => this._bindGsapButton(button));
 
       // Auto-dismiss after 20 seconds
@@ -2871,6 +2911,8 @@
     _updateMusicUI(direction = 0, pageOnly = false) {
       const body = document.getElementById('vc-music-inner');
       const previousTrack = body?.querySelector('.vc-now-playing')?.dataset.trackId;
+      const previousRows = new Set(Array.from(body?.querySelectorAll('.vc-music-track-rm') || [], row => row.dataset.trackId));
+      const previousPlayback = body?.querySelector('#vc-music-playpause')?.getAttribute('aria-label');
       if (body) {
         this._clearMotion(body);
         this._saveDrafts();
@@ -2898,8 +2940,15 @@
           if (direction) {
             const target = body.querySelector(pageOnly ? '.vc-track-list' : '.vc-music-panel');
             this._animateIn(target, { distance: 0, horizontal: direction * 48, duration: .36 });
+            this._animateIn(body.querySelectorAll('.vc-track-row'), { distance: 8, duration: .25, stagger: .025 });
           }
-          else if (currentTrack && currentTrack.dataset.trackId !== previousTrack) this._animateIn(currentTrack);
+          else {
+            if (currentTrack && currentTrack.dataset.trackId !== previousTrack) this._animateIn(currentTrack.children, { distance: 14, stagger: .045 });
+            const playback = body.querySelector('#vc-music-playpause');
+            if (playback && previousPlayback && playback.getAttribute('aria-label') !== previousPlayback) this._animateIn(playback.firstElementChild, { distance: 0, scale: .72 });
+            const added = Array.from(body.querySelectorAll('.vc-music-track-rm')).filter(row => !previousRows.has(row.dataset.trackId));
+            this._animateIn(added.map(row => row.closest('.vc-track-row')), { distance: 10, stagger: .03 });
+          }
         }
       this._updateMusicIndicator();
     }
@@ -2986,8 +3035,10 @@
           this._catalogPage = 0;
           const body = document.getElementById('vc-music-inner');
           if (body) {
+            this._clearMotion(body);
             body.innerHTML = this._renderMusicPanel();
             this._bindMusicEvents();
+            this._animateIn(body.querySelector('.vc-track-list'), { distance: 5, duration: .18 });
             const inputAgain = document.getElementById('vc-spotlight-search-input');
             if (inputAgain) {
               inputAgain.focus();
@@ -3761,7 +3812,14 @@
 
     _updateAvatar(userId, speaking) {
       const avatar = document.getElementById(`vc-av-${userId}`);
-      if (avatar) avatar.classList.toggle('speaking', speaking);
+      if (avatar && avatar.classList.contains('speaking') !== speaking) {
+        avatar.classList.toggle('speaking', speaking);
+        if (window.gsap && !this._reducedMotion.matches && avatar.getClientRects().length) {
+          avatar.dataset.vcMotion = '';
+          window.gsap.to(avatar, { scale: speaking ? 1.07 : 1, duration: .22, overwrite: 'auto',
+            ...(!speaking ? { clearProps: 'transform' } : {}) });
+        }
+      }
       if (speaking) this._speakers.add(userId); else this._speakers.delete(userId);
       this._updateDockState();
     }
@@ -3813,8 +3871,17 @@
       t.className = `vc-toast ${type}`;
       t.textContent = msg;
       document.body.appendChild(t);
-      requestAnimationFrame(() => t.classList.add('show'));
-      setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 400); }, 3000);
+      if (window.gsap) {
+        t.style.transition = 'none';
+        t.classList.add('show');
+        const reduce = this._reducedMotion.matches;
+        window.gsap.timeline({ onComplete: () => t.remove() })
+          .fromTo(t, { opacity: 0, y: reduce ? 0 : 16 }, { opacity: 1, y: 0, duration: .26, ease: 'power3.out' })
+          .to(t, { opacity: 0, y: reduce ? 0 : 8, duration: .18 }, '+=3');
+      } else {
+        requestAnimationFrame(() => t.classList.add('show'));
+        setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 400); }, 3000);
+      }
       this._playNotif(type);
     }
 
