@@ -541,7 +541,7 @@
   };
 
   // The visual layer is independent from Firebase and WebRTC.
-  const VOICE_STYLESHEET = new URL('../css/voice-channel.css?v=20261117_tabs', document.currentScript?.src || new URL('assets/js/voice-channel-widget.js', document.baseURI)).href;
+  const VOICE_STYLESHEET = new URL('../css/voice-channel.css?v=20261117_visible_motion', document.currentScript?.src || new URL('assets/js/voice-channel-widget.js', document.baseURI)).href;
 
   const ICONS = {
     close: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="m6 6 12 12M18 6 6 18"/></svg>',
@@ -1310,19 +1310,20 @@
 
     _clearMotion(root) {
       if (!root || !window.gsap) return;
+      root.querySelectorAll('.vc-tab-departing').forEach(node => node.classList.remove('vc-tab-departing'));
       const nodes = [root, ...root.querySelectorAll('[data-vc-motion]')];
       window.gsap.killTweensOf(nodes);
       window.gsap.set(nodes, { clearProps: 'transform,opacity' });
     }
 
-    _animateIn(targets, { distance = 6, horizontal = 0, scale = 1, stagger = 0 } = {}) {
+    _animateIn(targets, { distance = 6, horizontal = 0, scale = 1, stagger = 0, duration = .24 } = {}) {
       const nodes = Array.from(targets?.nodeType ? [targets] : targets || []).filter(node => node?.isConnected && !node.closest('[hidden], [inert]'));
-      if (!nodes.length || !window.gsap || this._motionKeyboard) return;
+      if (!nodes.length || !window.gsap) return;
       const reduce = this._reducedMotion.matches;
       nodes.forEach(node => { node.dataset.vcMotion = ''; });
       window.gsap.killTweensOf(nodes);
       window.gsap.fromTo(nodes, { opacity: reduce ? .7 : 0, y: reduce ? 0 : distance, x: reduce ? 0 : horizontal, scale: reduce ? 1 : scale }, {
-        opacity: 1, x: 0, y: 0, scale: 1, duration: reduce ? .12 : .2, stagger: reduce ? 0 : stagger,
+        opacity: 1, x: 0, y: 0, scale: 1, duration: reduce ? .12 : duration, stagger: reduce ? 0 : stagger,
         ease: 'power3.out', overwrite: true, clearProps: 'transform,opacity'
       });
     }
@@ -1359,8 +1360,8 @@
       const rect = active.getBoundingClientRect(), parent = tabs.getBoundingClientRect();
       const end = { x: rect.left - parent.left, width: rect.width };
       window.gsap.killTweensOf(indicator);
-      if (previous && !this._motionKeyboard && !this._reducedMotion.matches) {
-        window.gsap.fromTo(indicator, { x: previous.left - parent.left, width: previous.width }, { ...end, duration: .2, ease: 'power3.out', overwrite: true });
+      if (previous && !this._reducedMotion.matches) {
+        window.gsap.fromTo(indicator, { x: previous.left - parent.left, width: previous.width }, { ...end, duration: .34, ease: 'power2.inOut', overwrite: true });
       } else window.gsap.set(indicator, end);
     }
 
@@ -1632,7 +1633,7 @@
       const press = down => {
         if (el.disabled || this._motionKeyboard || this._reducedMotion.matches) return;
         el.dataset.vcMotion = '';
-        window.gsap.to(el, { scale: down ? .97 : 1, duration: down ? .1 : .16, ease: 'power3.out', overwrite: true, ...(down ? {} : { clearProps: 'transform' }) });
+        window.gsap.to(el, { scale: down ? .93 : 1, duration: down ? .1 : .16, ease: 'power3.out', overwrite: true, ...(down ? {} : { clearProps: 'transform' }) });
       };
       el.addEventListener('pointerdown', () => press(true));
       for (const event of ['pointerup', 'pointercancel', 'pointerleave', 'blur']) el.addEventListener(event, () => press(false));
@@ -1829,13 +1830,27 @@
     _doSwitchTab(tab) {
       const order = ['room', 'chat', 'music'];
       if (this._activeTab === tab || !order.includes(tab)) return;
-      const direction = Math.sign(order.indexOf(tab) - order.indexOf(this._activeTab));
+      const oldTab = this._activeTab;
+      const direction = Math.sign(order.indexOf(tab) - order.indexOf(oldTab));
+      const chatScroll = this.panel.querySelector('#vc-msgs')?.scrollTop || 0;
       const previous = (this.panel.querySelector('.vc-tab-indicator') || this.panel.querySelector('.vc-tab[aria-selected="true"]'))?.getBoundingClientRect();
       this._activeTab = tab;
       if (tab === 'chat') { this._chatUnread = 0; document.title = '28E'; }
       this._updateTabs();
       this._positionTabIndicator(previous);
-      this._animateIn(this.panel.querySelector('.vc-tab-content:not([hidden])'), { horizontal: direction * 14, distance: 0 });
+      const incoming = this.panel.querySelector('#vc-content-' + tab);
+      const outgoing = this.panel.querySelector('#vc-content-' + oldTab);
+      const travel = direction * Math.min(88, this.panel.clientWidth * .19);
+      if (outgoing && window.gsap && !this._reducedMotion.matches) {
+        outgoing.classList.add('vc-tab-departing');
+        outgoing.dataset.vcMotion = '';
+        if (oldTab === 'chat') outgoing.querySelector('#vc-msgs').scrollTop = chatScroll;
+        window.gsap.fromTo(outgoing, { x: 0, opacity: 1 }, {
+          x: -travel, opacity: 0, duration: .24, ease: 'power2.in', clearProps: 'transform,opacity',
+          onComplete: () => outgoing.classList.remove('vc-tab-departing')
+        });
+      }
+      this._animateIn(incoming, { horizontal: travel, distance: 0, duration: .42 });
       this._playSfx('toggleOn', 0.2);
     }
 
@@ -2882,7 +2897,7 @@
         if (body && this._activeTab === 'music' && this.panel.classList.contains('open')) {
           if (direction) {
             const target = body.querySelector(pageOnly ? '.vc-track-list' : '.vc-music-panel');
-            this._animateIn(target, { distance: 0, horizontal: direction * 12 });
+            this._animateIn(target, { distance: 0, horizontal: direction * 48, duration: .36 });
           }
           else if (currentTrack && currentTrack.dataset.trackId !== previousTrack) this._animateIn(currentTrack);
         }
