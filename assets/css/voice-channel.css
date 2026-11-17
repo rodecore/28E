@@ -39,7 +39,7 @@
 #vc-backdrop { position: fixed; inset: 0; background: #0009; z-index: 95; opacity: 0; pointer-events: none; transition: opacity 220ms ease-out; }
 #vc-backdrop.open { opacity: 1; pointer-events: auto; }
 #vc-panel.vc-panel-base {
-  position: fixed; top: 16px; right: 16px; bottom: 16px; width: clamp(464px, 40vw, 608px); max-width: calc(100vw - 32px);
+  position: fixed; top: 16px; right: 16px; bottom: 16px; box-sizing: border-box; width: 440px; max-width: calc(100vw - 32px);
   height: calc(100dvh - 32px); max-height: 800px; margin: auto 0; padding: 0;
   background: var(--vc-bg); border: 1px solid var(--vc-line); border-radius: 20px;
   z-index: 100; overflow: hidden; isolation: isolate;

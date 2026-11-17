@@ -3,7 +3,7 @@
 // Version: 1.0.0
 // ══════════════════════════════════════════════════════════════════════════════
 
-const CACHE_NAME = '28e-pwa-v126';
+const CACHE_NAME = '28e-pwa-v127';
 
 // Recursos esenciales pre-cacheados para arranque instantáneo y offline básico
 const PRECACHE_ASSETS = [
