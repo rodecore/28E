@@ -12,4 +12,4 @@ miniaturas/
 stream-study/
 firebase/
 signaling-server/test/
-*.wav
+/*.wav

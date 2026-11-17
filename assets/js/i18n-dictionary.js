@@ -1728,6 +1728,18 @@ var logDebug = window.logDebug;
 
 
 
+            _aliases: {
+                'hover.wav': 'navegacion.wav',
+                'click.wav': 'seleccionsi.wav',
+                'cerrar.wav': 'flyout.wav',
+                'magic.wav': 'revelacion.wav',
+                'tictac.wav': 'typing.wav'
+            },
+            _resolve: function (soundFile) {
+                const clean = String(soundFile || '').replace(/^sounds\//, '');
+                return this._aliases[clean] || clean;
+            },
+
             // ── All sounds in the project ──
 
             _critical: [
@@ -1738,7 +1750,7 @@ var logDebug = window.logDebug;
 
                 'seleccionno.wav', 'inicio.wav', 'slideralto.wav', 'sliderbajo.wav',
 
-                'incorrect.wav', 'correcto.wav', 'secret.wav', 'hover.wav'
+                'incorrect.wav', 'correcto.wav', 'secret.wav'
 
             ],
 
@@ -1851,13 +1863,11 @@ var logDebug = window.logDebug;
             // Descarga y decodifica un archivo al buffer (idempotente)
 
             _loadBuffer: async function (soundFile) {
-
-                if (this.buffers[soundFile] || !this.ctx) return;
-
+                soundFile = this._resolve(soundFile);
+                if (this.buffers[soundFile] || this._failed?.[soundFile] || !this.ctx) return;
                 try {
-
                     const res = await fetch(`sounds/${soundFile}`);
-
+                    if (!res.ok) { this._failed = this._failed || {}; this._failed[soundFile] = true; return; }
                     const ab = await res.arrayBuffer();
 
                     // decodeAudioData puede fallar si el ctx está suspendido — no pasa nada,
@@ -1875,7 +1885,8 @@ var logDebug = window.logDebug;
             // Reproduce desde buffer WebAudio (latencia ~1ms) o fallback cloneNode
 
             _playBuffer: function (soundFile, volume) {
-
+                soundFile = this._resolve(soundFile);
+                if (this._failed?.[soundFile]) return;
                 if (this.buffers[soundFile] && this.ctx) {
 
                     // WebAudio path — latencia de hardware mínima
@@ -2054,7 +2065,7 @@ var logDebug = window.logDebug;
 
                     this._resume().then(() => this._warmUp());
 
-                    ['click', 'touchstart', 'keydown'].forEach(ev =>
+                    ['pointerdown', 'click', 'touchstart', 'keydown'].forEach(ev =>
 
                         document.removeEventListener(ev, warmup)
 
@@ -2062,7 +2073,7 @@ var logDebug = window.logDebug;
 
                 };
 
-                ['click', 'touchstart', 'keydown'].forEach(ev =>
+                ['pointerdown', 'click', 'touchstart', 'keydown'].forEach(ev =>
 
                     document.addEventListener(ev, warmup, { once: true, passive: true })
 
@@ -4517,7 +4528,7 @@ var logDebug = window.logDebug;
 
 
 
-        const VAULT_HASH = '10c2f3ab8d6d9af72e5a63c161b2f079098e5511272e184262b579148202fcda';
+        let VAULT_HASH = '10c2f3ab8d6d9af72e5a63c161b2f079098e5511272e184262b579148202fcda';
 
 
 

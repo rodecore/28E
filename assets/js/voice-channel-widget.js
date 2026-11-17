@@ -2774,9 +2774,9 @@
         { title: "Pasao De Famarcia", artist: "Lil Naay", src: "radio/Pasao De Famarcia - Lil Naay - SpotubeDL.com.mp3" },
         { title: "Thootie", artist: "Ice Spice ft. Tokischa", src: "radio/Thootie (feat. Tokischa) - Ice Spice - SpotubeDL.com.mp3" },
         { title: "Toto Lindo", artist: "Huan62", src: "radio/Toto Lindo - Huan62 - SpotubeDL.com.mp3" },
-        { title: "Oro Fundido", artist: "Oblivion's Mighty Trash", src: "sounds/Oro Fundido - Oblivion's Mighty Trash - SpotubeDL.com.mp3" },
-        { title: "CRAZY (Live)", artist: "Otis McDonald", src: "sounds/Otis McDonald - CRAZY - Live (SPOTISAVER).mp3" },
-        { title: "O.Sky", artist: "Otis McDonald", src: "sounds/Otis McDonald - O.Sky.mp3" }
+        { title: "Oro Fundido", artist: "Oblivion's Mighty Trash", src: "radio/Oro Fundido - Oblivion's Mighty Trash - SpotubeDL.com.mp3" },
+        { title: "CRAZY (Live)", artist: "Otis McDonald", src: "radio/stream in youtube/Otis McDonald - CRAZY - Live (SPOTISAVER).mp3" },
+        { title: "O.Sky", artist: "Otis McDonald", src: "radio/stream in youtube/Otis McDonald - O.Sky.mp3" }
       ];
     }
 
