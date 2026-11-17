@@ -1315,14 +1315,14 @@
       window.gsap.set(nodes, { clearProps: 'transform,opacity' });
     }
 
-    _animateIn(targets, { distance = 6, stagger = 0 } = {}) {
+    _animateIn(targets, { distance = 6, horizontal = 0, scale = 1, stagger = 0 } = {}) {
       const nodes = Array.from(targets?.nodeType ? [targets] : targets || []).filter(node => node?.isConnected && !node.closest('[hidden], [inert]'));
       if (!nodes.length || !window.gsap || this._motionKeyboard) return;
       const reduce = this._reducedMotion.matches;
       nodes.forEach(node => { node.dataset.vcMotion = ''; });
       window.gsap.killTweensOf(nodes);
-      window.gsap.fromTo(nodes, { opacity: reduce ? .7 : 0, y: reduce ? 0 : distance }, {
-        opacity: 1, y: 0, duration: reduce ? .12 : .2, stagger: reduce ? 0 : stagger,
+      window.gsap.fromTo(nodes, { opacity: reduce ? .7 : 0, y: reduce ? 0 : distance, x: reduce ? 0 : horizontal, scale: reduce ? 1 : scale }, {
+        opacity: 1, x: 0, y: 0, scale: 1, duration: reduce ? .12 : .2, stagger: reduce ? 0 : stagger,
         ease: 'power3.out', overwrite: true, clearProps: 'transform,opacity'
       });
     }
@@ -1502,6 +1502,7 @@
     _bindUserContextMenu(node, u) {
       if (!node || node._ctxBound) return;
       node._ctxBound = true;
+      this._bindGsapButton(node.querySelector('[data-user-options]'));
       const openMenu = event => {
         event.preventDefault();
         this._dismissParticipantMenu?.();
@@ -1514,12 +1515,15 @@
         menu.setAttribute('aria-label', _t('room_options'));
         menu.innerHTML = `<button>${member.localMuted ? ICONS.sound : ICONS.micOff}<span>${_t(member.localMuted ? 'room_local_unmute' : 'room_local_mute')}</span></button>`;
         document.body.appendChild(menu);
+        this._animateIn(menu, { distance: 4, scale: .98 });
+        this._bindGsapButton(menu.querySelector('button'));
         const anchor = trigger?.getBoundingClientRect();
         menu.style.left = Math.max(8, Math.min(event.clientX || anchor?.left || 8, innerWidth - menu.offsetWidth - 8)) + 'px';
         menu.style.top = Math.max(8, Math.min(event.clientY || anchor?.bottom || 8, innerHeight - menu.offsetHeight - 8)) + 'px';
         const dismissOutside = e => { if (!menu.contains(e.target) && !trigger?.contains(e.target)) this._dismissParticipantMenu?.(); };
         const dismiss = (restoreFocus = false) => {
           document.removeEventListener('pointerdown', dismissOutside, true);
+          this._clearMotion(menu);
           menu.remove();
           if (this._dismissParticipantMenu === dismiss) this._dismissParticipantMenu = null;
           if (restoreFocus && trigger?.isConnected && !this.panel.inert) trigger.focus();
@@ -1595,6 +1599,7 @@
       this.panel.innerHTML = tpl;
       this._restoreDrafts();
       this._bindPanelEvents();
+      this.panel.querySelectorAll('button').forEach(button => this._bindGsapButton(button));
       
       if (document.getElementById('vc-join')) {
         const updateConnCount = data => {
@@ -1822,13 +1827,15 @@
     }
 
     _doSwitchTab(tab) {
-      if (this._activeTab === tab || !['room', 'chat', 'music'].includes(tab)) return;
-      const previous = this.panel.querySelector('.vc-tab[aria-selected="true"]')?.getBoundingClientRect();
+      const order = ['room', 'chat', 'music'];
+      if (this._activeTab === tab || !order.includes(tab)) return;
+      const direction = Math.sign(order.indexOf(tab) - order.indexOf(this._activeTab));
+      const previous = (this.panel.querySelector('.vc-tab-indicator') || this.panel.querySelector('.vc-tab[aria-selected="true"]'))?.getBoundingClientRect();
       this._activeTab = tab;
       if (tab === 'chat') { this._chatUnread = 0; document.title = '28E'; }
       this._updateTabs();
       this._positionTabIndicator(previous);
-      this._animateIn(this.panel.querySelector('.vc-tab-content:not([hidden])'), { distance: 6 });
+      this._animateIn(this.panel.querySelector('.vc-tab-content:not([hidden])'), { horizontal: direction * 14, distance: 0 });
       this._playSfx('toggleOn', 0.2);
     }
 
@@ -2312,6 +2319,7 @@
         btn.setAttribute('aria-pressed', String(this.muted));
         btn.setAttribute('aria-label', _t(this.muted ? 'room_mic_on' : 'room_mic_off'));
         btn.innerHTML = `<span class="vc-control-icon" aria-hidden="true">${this.muted ? ICONS.micOff : ICONS.mic}</span>`;
+        this._animateIn(btn.firstElementChild, { distance: 0, scale: .86 });
       }
       this._updateUsersDOM();
       this._updateDockState();
@@ -2334,6 +2342,7 @@
         btn.setAttribute('aria-pressed', String(this.dnd));
         btn.setAttribute('aria-label', _t(this.dnd ? 'room_undeafen' : 'room_deafen'));
         btn.innerHTML = `<span class="vc-control-icon" aria-hidden="true">${this.dnd ? ICONS.dnd : ICONS.bell}</span>`;
+        this._animateIn(btn.firstElementChild, { distance: 0, scale: .86 });
       }
       this._updateUsersDOM();
       this._updateDockState();
@@ -2844,7 +2853,7 @@
       this.panel.querySelectorAll('[data-list-window]').forEach(node => this._listObserver.observe(node));
     }
 
-    _updateMusicUI(animate = false) {
+    _updateMusicUI(direction = 0, pageOnly = false) {
       const body = document.getElementById('vc-music-inner');
       const previousTrack = body?.querySelector('.vc-now-playing')?.dataset.trackId;
       if (body) {
@@ -2871,7 +2880,10 @@
       }
         const currentTrack = body?.querySelector('.vc-now-playing');
         if (body && this._activeTab === 'music' && this.panel.classList.contains('open')) {
-          if (animate) this._animateIn(body.querySelector('.vc-music-panel'), { distance: 5 });
+          if (direction) {
+            const target = body.querySelector(pageOnly ? '.vc-track-list' : '.vc-music-panel');
+            this._animateIn(target, { distance: 0, horizontal: direction * 12 });
+          }
           else if (currentTrack && currentTrack.dataset.trackId !== previousTrack) this._animateIn(currentTrack);
         }
       this._updateMusicIndicator();
@@ -2889,7 +2901,7 @@
 
     _bindMusicEvents() {
       this.panel.querySelectorAll('#vc-music-inner button').forEach(button => this._bindGsapButton(button));
-      this.panel.querySelectorAll('[data-vc-page]').forEach(button => button.addEventListener('click', () => { const key = button.dataset.vcPage === 'queue' ? '_queuePage' : '_catalogPage'; this[key] += Number(button.dataset.direction); this._updateMusicUI(true); }));
+      this.panel.querySelectorAll('[data-vc-page]').forEach(button => button.addEventListener('click', () => { const key = button.dataset.vcPage === 'queue' ? '_queuePage' : '_catalogPage'; const direction = Number(button.dataset.direction); this[key] += direction; this._updateMusicUI(direction, true); }));
       this._bindListSizing();
       const playPause = document.getElementById('vc-music-playpause');
       if (playPause) playPause.addEventListener('click', () => this._musicTogglePlayPause());
@@ -2940,7 +2952,7 @@
       if (spotOpenBtn) {
         spotOpenBtn.addEventListener('click', () => {
           this._musicSpotlightView = true;
-          this._updateMusicUI(true);
+          this._updateMusicUI(1);
         });
       }
 
@@ -2948,7 +2960,7 @@
       if (spotBackBtn) {
         spotBackBtn.addEventListener('click', () => {
           this._musicSpotlightView = false;
-          this._updateMusicUI(true);
+          this._updateMusicUI(-1);
         });
       }
 
@@ -3097,6 +3109,7 @@
       const err = document.getElementById('vc-music-err');
       if (err) {
         err.innerHTML = `<span class="text-amber-400 font-semibold flex items-center justify-center gap-1">✨ ${this._escHtml(msg)}</span>`;
+        this._animateIn(err, { distance: 3 });
         setTimeout(() => { if (err.textContent.includes(msg)) err.innerHTML = ''; }, 4000);
       }
     }
@@ -3105,6 +3118,7 @@
       const err = document.getElementById('vc-music-err');
       if (err) {
         err.textContent = msg;
+        this._animateIn(err, { distance: 3 });
         setTimeout(() => { if (err.textContent === msg) err.textContent = ''; }, 3000);
       }
     }
