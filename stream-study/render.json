@@ -1,0 +1,11 @@
+{
+  "width": 1920,
+  "height": 1080,
+  "fps": 30,
+  "duration": 120,
+  "frames": 3600,
+  "output": "/home/rodezel/Documentos/Twenty Eight Experience/stream-study/yaire-study-1080p.mp4",
+  "source": "DCLF WebGL procedural scene",
+  "renderWidth": 1280,
+  "renderHeight": 720
+}

@@ -26,7 +26,7 @@ Una bóveda digital hiper-personalizada que fusiona ingeniería web de alto rend
   - Reproductor Hi-Fi personalizado con listas de canciones dinámicas ([radio/](radio/)) y efectos sonoros hápticos de interfaz ([sounds/](sounds/)).
   - Canales de voz WebRTC en tiempo real conectándose a `voice.yaire.site`.
   - Minijuegos interactivos (Atrapa Girasoles 2D, Vuelo Hacia Ti, Cartas Ocultas, Adivinanza Musical).
-  - Experiencia 3D inmersiva en Three.js con joystick táctil y recolección de tulipanes ([jardin_de_yaire.html](jardin_de_yaire.html)).
+  - Experiencia 3D inmersiva en Three.js con joystick táctil y recolección de tulipanes ([pages/jardin_de_yaire.html](pages/jardin_de_yaire.html)).
   - Sincronización en tiempo real vía Firebase para estados dinámicos y pantalla de mantenimiento.
   - Soporte multi-idioma nativo (ES, EN, FR, PT, DE).
 - **Restricciones técnicas:**

@@ -2392,7 +2392,13 @@ var logDebug = window.logDebug;
                             action: () => {
                                 if (typeof window.closeMenu === 'function') window.closeMenu(); else toggleMenu();
                                 setTimeout(() => {
-                                    window.open('https://dclf.yaire.site/', '_blank');
+                                    if (typeof window.open28EExperience === 'function') {
+                                        window.open28EExperience('dclf', true);
+                                    } else if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                                        window.open('dclf-lanzamiento.html', '_blank');
+                                    } else {
+                                        window.open('https://dclf.yaire.site/', '_blank');
+                                    }
                                 }, 250);
                             }
                         },

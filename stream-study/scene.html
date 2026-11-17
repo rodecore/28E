@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark"><title>Yaire · Una noche de estudio</title>
+<style>*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#10111a;color:#efe7d4;font-family:system-ui,sans-serif}body{display:grid;place-items:center}main{width:min(100vw,177.777778vh);aspect-ratio:16/9;position:relative}canvas{display:block;width:100%;height:100%}#help{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:12px;padding:12px 16px;background:#191a22ec;border:1px solid #ffffff26;border-radius:14px;font-size:12px}#help[hidden],#error[hidden]{display:none}button{font:inherit;min-height:40px;padding:8px 14px;border:1px solid #ffffff30;border-radius:9px;color:inherit;background:#34313a;cursor:pointer}button:focus-visible{outline:2px solid #eac493;outline-offset:3px}#error{position:fixed;inset:0;display:grid;place-content:center;padding:32px;background:#171823;text-align:center}#error p{max-width:36em;line-height:1.6;color:#bcb7bd}</style></head>
+<body><main aria-label="Yaire estudiando en su cuarto durante una noche de lluvia"><canvas id="world" aria-label="Escena animada en tres dimensiones, en bucle continuo"></canvas></main>
+<div id="help" hidden><span>Yaire · Una noche de estudio</span><button id="pause">Pausar</button><button id="fullscreen">Pantalla completa</button><span>H · ocultar</span></div><div id="error" hidden role="alert"><h1>No se pudo abrir el cuarto.</h1><p id="error-message">Este HTML necesita un navegador con WebGL y aceleración gráfica.</p></div>
+<script>
+'use strict';(()=>{
+/* Standalone stream scene. Mesh/math/buffer renderer and Yaire's visual identity
+   come from dclf.html (Donde crecen las flores). New set, seated pose, lighting
+   and deterministic 120-second study choreography. No game/save initialization,
+   external assets, network calls, libraries, audio or visible stream overlays.
+   Server: open in a WebGL-capable browser at 1920×1080; ?quality=low caps 1280.
+   Keys: Space pause, F fullscreen, H optional controls. ?paused=1 starts paused. */
+const canvas=document.getElementById('world'),query=new URLSearchParams(location.search);
+function fail(message){document.getElementById('error').hidden=false;if(message)document.getElementById('error-message').textContent=message;}
+let gl;try{gl=canvas.getContext('webgl',{alpha:false,antialias:false,powerPreference:'high-performance'});}catch(e){}if(!gl){fail();return;}
+const vs=`attribute vec3 p;attribute vec3 n;attribute vec3 c;uniform mat4 vp;varying vec3 worldPos;varying vec3 normal;varying vec3 color;varying float depth;void main(){worldPos=p;normal=n;color=c;gl_Position=vp*vec4(p,1.);depth=gl_Position.w;}`;
+const fs=`precision mediump float;varying vec3 worldPos;varying vec3 normal;varying vec3 color;varying float depth;uniform float emission;uniform float lamplight;
+void main(){vec3 n=normalize(normal);vec3 lamp=vec3(.58,1.93,-1.68)-worldPos;float d=length(lamp);float warm=max(dot(n,lamp/max(d,.001)),0.);vec3 moon=vec3(-2.0,2.8,-4.0)-worldPos;float md=length(moon);float cool=max(dot(n,moon/max(md,.001)),0.);vec3 screen=vec3(1.65,1.55,-1.82)-worldPos;float sd=length(screen);
+vec3 bedside=vec3(.58,1.93,-1.68)-worldPos;float bd=length(bedside);vec3 light=vec3(.075,.085,.13)+vec3(.95,.53,.28)*.52/(1.+bd*bd*.75)+vec3(1.,.66,.36)*(warm*.95+.20)*lamplight/(1.+d*d*.36)+vec3(.27,.43,.76)*(cool*.75+.12)/(1.+md*md*.09)+vec3(.30,.44,.60)*.13/(1.+sd*sd*.7);
+vec3 lit=color*light;lit=mix(lit,color*1.10,emission);gl_FragColor=vec4(lit,clamp(depth/40.,0.,1.));}`;
+function shader(type,source){const s=gl.createShader(type);gl.shaderSource(s,source);gl.compileShader(s);if(!gl.getShaderParameter(s,gl.COMPILE_STATUS))throw Error(gl.getShaderInfoLog(s));return s;}
+function program(v,f){const p=gl.createProgram();gl.attachShader(p,shader(gl.VERTEX_SHADER,v));gl.attachShader(p,shader(gl.FRAGMENT_SHADER,f));gl.linkProgram(p);if(!gl.getProgramParameter(p,gl.LINK_STATUS))throw Error(gl.getProgramInfoLog(p));return p;}
+let pr;try{pr=program(vs,fs);}catch(e){fail(e.message);return;}
+gl.useProgram(pr);gl.enable(gl.DEPTH_TEST);const at=['p','n','c'].map(n=>gl.getAttribLocation(pr,n)),uv=gl.getUniformLocation(pr,'vp'),emissionU=gl.getUniformLocation(pr,'emission'),lampU=gl.getUniformLocation(pr,'lamplight');
+const C={grass:[.45,.65,.38],soil:[.42,.28,.21],wet:[.27,.21,.17],wood:[.57,.38,.25],tan:[.75,.56,.37],leaf:[.28,.51,.31],lime:[.47,.67,.37],pink:[1,.48,.70],rose:[1,.70,.81],cream:[.98,.91,.76],water:[.26,.69,.84],stone:[.64,.69,.64],yellow:[.97,.79,.38],skin:[.85,.61,.45],hair:[.19,.15,.17],dress:[.87,.39,.60],boot:[.30,.23,.23],dark:[.22,.33,.27]};
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),sub=(a,b)=>a.map((v,i)=>v-b[i]),dot=(a,b)=>a.reduce((v,x,i)=>v+x*b[i],0),cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]],norm=a=>{let d=Math.hypot(...a)||1;return a.map(v=>v/d)};
+function view(e,t){let z=norm(sub(e,t)),x=norm(cross([0,1,0],z)),y=cross(z,x);return [x[0],y[0],z[0],0,x[1],y[1],z[1],0,x[2],y[2],z[2],0,-dot(x,e),-dot(y,e),-dot(z,e),1]}function projection(a,fov=.78){let f=1/Math.tan(fov/2),n=.6,r=40;return [f/a,0,0,0,0,f,0,0,0,0,(r+n)/(n-r),-1,0,0,2*r*n/(n-r),0]}function multiply(a,b){let r=new Float32Array(16);for(let c=0;c<4;c++)for(let i=0;i<4;i++)for(let k=0;k<4;k++)r[c*4+i]+=a[k*4+i]*b[c*4+k];return r}
+class Mesh{constructor(){this.d=[];this.frame=null}v(p,n,c){let f=this.frame;if(f){let px=p[0],py=p[1],pz=p[2];let nx=n[0],ny=n[1],nz=n[2];if(f.sy){py*=f.sy;}if(f.sx){px*=f.sx;pz*=f.sx;}if(f.roll){let cr=Math.cos(f.roll),sr=Math.sin(f.roll);let rx=px*cr-py*sr,ry=px*sr+py*cr;px=rx;py=ry;let rnx=nx*cr-ny*sr,rny=nx*sr+ny*cr;nx=rnx;ny=rny;}if(f.pitch){let cp=Math.cos(f.pitch),sp=Math.sin(f.pitch);let rz=pz*cp-py*sp,ry=pz*sp+py*cp;pz=rz;py=ry;let rnz=nz*cp-ny*sp,rny=nz*sp+ny*cp;nz=rnz;ny=rny;}let co=Math.cos(f.a),si=Math.sin(f.a);p=[f.x+px*co+pz*si,(f.y||0)+py,f.z-px*si+pz*co];n=[nx*co+nz*si,ny,-nx*si+nz*co]}this.d.push(...p,...n,...c)}tri(a,b,c,col){let n=norm(cross(sub(b,a),sub(c,a)));this.v(a,n,col);this.v(b,n,col);this.v(c,n,col)}quad(a,b,c,d,col){this.tri(a,b,c,col);this.tri(a,c,d,col)}box(x,y,z,w,h,d,c){let X=x-w/2,Z=z-d/2,A=x+w/2,B=z+d/2,Y=y+h;this.quad([X,Y,Z],[X,Y,B],[A,Y,B],[A,Y,Z],c);this.quad([X,y,Z],[A,y,Z],[A,y,B],[X,y,B],c);this.quad([X,y,B],[A,y,B],[A,Y,B],[X,Y,B],c);this.quad([A,y,Z],[X,y,Z],[X,Y,Z],[A,Y,Z],c);this.quad([A,y,B],[A,y,Z],[A,Y,Z],[A,Y,B],c);this.quad([X,y,Z],[X,y,B],[X,Y,B],[X,Y,Z],c)}cone(x,y,z,r,R,h,c,n=7){for(let i=0;i<n;i++){let a=i*2*Math.PI/n,b=(i+1)*2*Math.PI/n,p=[x+Math.cos(a)*r,y,z+Math.sin(a)*r],q=[x+Math.cos(b)*r,y,z+Math.sin(b)*r],s=[x+Math.cos(a)*R,y+h,z+Math.sin(a)*R],t=[x+Math.cos(b)*R,y+h,z+Math.sin(b)*R];this.quad(p,s,t,q,c);if(R)this.tri([x,y+h,z],t,s,c)}}blob(x,y,z,rx,ry,rz,c,n=7){for(let j=0;j<4;j++)for(let i=0;i<n;i++){let a=-Math.PI/2+j*Math.PI/4,b=a+Math.PI/4,u=i*2*Math.PI/n,v=u+2*Math.PI/n,p=(t,s)=>[x+rx*Math.cos(t)*Math.cos(s),y+ry*Math.sin(t),z+rz*Math.cos(t)*Math.sin(s)];this.quad(p(a,u),p(b,u),p(b,v),p(a,v),c)}}line(a,b,r,c){let ax=norm(sub(b,a)),u=norm(cross(ax,Math.abs(ax[1])<.9?[0,1,0]:[1,0,0])),v=cross(ax,u),p=(b,t)=>b.map((x,i)=>x+r*(u[i]*Math.cos(t)+v[i]*Math.sin(t)));for(let i=0;i<5;i++){let t=i*2*Math.PI/5,s=t+2*Math.PI/5;this.quad(p(a,t),p(b,t),p(b,s),p(a,s),c)}}}
+const sb=gl.createBuffer(),db=gl.createBuffer();const meshBufferCache=new Map();
+function upload(m,b,usage){
+ gl.bindBuffer(gl.ARRAY_BUFFER,b);
+ if(usage===gl.STATIC_DRAW){gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(m.d),usage);return m.d.length/9;}
+ let entry=meshBufferCache.get(b);
+ if(!entry||entry.array.length<m.d.length){const capacity=Math.max(4096,2**Math.ceil(Math.log2(Math.max(1,m.d.length))));entry={array:new Float32Array(capacity)};meshBufferCache.set(b,entry);gl.bufferData(gl.ARRAY_BUFFER,capacity*4,usage);}
+ entry.array.set(m.d);gl.bufferSubData(gl.ARRAY_BUFFER,0,entry.array.subarray(0,m.d.length));return m.d.length/9;
+}function draw(b,n){gl.bindBuffer(gl.ARRAY_BUFFER,b);at.forEach((a,i)=>{gl.enableVertexAttribArray(a);gl.vertexAttribPointer(a,3,gl.FLOAT,false,36,i*12)});gl.drawArrays(gl.TRIANGLES,0,n)}
+const TAU=Math.PI*2,PERIOD=120;
+const P={wall:[.66,.50,.47],side:[.60,.47,.42],wood:[.53,.32,.20],edge:[.68,.45,.28],floor:[.49,.31,.24],rose:[.68,.35,.40],linen:[.89,.78,.63],sage:[.37,.47,.35],deep:[.16,.20,.22],ink:[.20,.24,.27],paper:[.93,.85,.68],gold:[.85,.58,.26],night:[.035,.055,.13],moon:[.63,.74,.91]};
+const mix=(a,b,t)=>a+(b-a)*t,smooth=t=>{t=clamp(t,0,1);return t*t*(3-2*t)},ramp=(t,a,b)=>smooth((t-a)/(b-a)),mod=(t,p)=>(t%p+p)%p;
+const mixV=(a,b,t)=>a.map((v,i)=>mix(v,b[i],t));
+let seed=28112026;function random(){seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296;}
+const student={x:1.05,z:-.65,a:Math.PI};
+function local(x,y,z){const c=Math.cos(student.a),s=Math.sin(student.a);return[student.x+x*c+z*s,y,student.z-x*s+z*c];}
+function book(m,x,y,z,w,d,h,color){m.box(x,y,z,w,h,d,color);m.box(x,y+.018,z+.012,w*.94,h*.68,d*.96,P.paper);m.box(x,y+h-.018,z,w,.018,d,color);for(let k=0;k<2;k++)m.box(x-w*.27+k*w*.50,y+h,z,.016,.003,d*.94,P.edge);}
+function plant(m,x,y,z,size=1){m.cone(x,y,z,.12*size,.18*size,.25*size,[.66,.36,.25],9);m.cone(x,y+.25*size,z,.178*size,.178*size,.015*size,C.soil,9);for(let j=0;j<7;j++){const a=j/7*TAU,h=(.36+.08*(j%3))*size;const end=[x+Math.sin(a)*.25*size,y+.25*size+h,z+Math.cos(a)*.25*size];m.line([x,y+.22*size,z],end,.011*size,C.leaf);m.blob(...end,.07*size,.16*size,.075*size,j%2?C.leaf:P.sage,5);}}
+function flowerVase(m,x,y,z){m.cone(x,y,z,.075,.10,.22,[.58,.69,.63],8);for(let j=0;j<3;j++){const xx=x+(j-1)*.085,yy=y+.43+j%2*.06; m.line([x,y+.16,z],[xx,yy,z],.008,C.leaf);m.tri([xx,yy-.13,z],[xx-.09,yy-.05,z],[xx,yy-.04,z],C.leaf);for(let k=0;k<5;k++){const a=k/5*TAU;m.blob(xx+Math.cos(a)*.035,yy,z+Math.sin(a)*.035,.042,.065,.042,k%2?C.rose:C.pink,5);}}}
+function wallFrame(m,x,y,w,h){m.box(x,y,-2.84,w,h,.065,P.wood);m.box(x,y+.05,-2.80,w-.09,h-.1,.025,P.paper);}
+const glowMesh=new Mesh();
+function room(){const m=new Mesh();
+ // Set built for a locked three-quarter rear view; original DCLF mesh engine.
+ m.box(.5,-.16,0,10,.16,10,P.floor);
+ for(let i=0;i<26;i++)m.box(-4.35+i*.38,.002,0,.365,.008,9,[.24+(i%3)*.009,.14+(i%3)*.006,.105]);
+ // Genuine opening on left; warm wall and shelving to the right.
+ m.box(.5,0,-3,10,1.12,.18,P.wall);m.box(.5,3.65,-3,10,3.0,.18,P.wall);
+ m.box(-3.95,1.12,-3,1.1,2.53,.18,P.wall);m.box(2.30,1.12,-3,5.6,2.53,.18,P.wall);
+ m.box(5.05,0,3,.18,6.5,12,P.side);m.box(-4.55,0,3,.18,6.5,12,P.side);m.box(.5,4.72,0,10,.12,12,P.side);
+ for(const x of [-3.38,-.50])m.box(x,1.12,-2.86,.075,2.54,.18,P.wood);
+ for(const y of [1.12,3.62])m.box(-1.94,y,-2.84,3.02,.075,.24,P.wood);
+ m.box(-1.94,1.13,-2.81,.055,2.5,.13,P.wood);
+ m.box(-1.94,1.08,-2.72,3.15,.09,.46,P.edge);
+ glowMesh.box(-1.8,0,-8,16,10,.08,P.night);
+ for(let i=0;i<35;i++){const x=-7+i*.35,h=.45+random()*2.6,z=-4.3-random()*2.5;m.box(x,0,z,.28,h,.5,[.035,.05,.075]);for(let r=0;r<7;r++)for(let c=0;c<2;c++)if(random()>.55&&r*.32<h)glowMesh.box(x-.07+c*.13,.15+r*.32,z+.26,.035,.06,.01,[.36,.25,.14]);}
+ // Tall shelving, restrained materials, no competing light sources.
+ for(const y of [1.72,2.65,3.55]){m.box(2.65,y,-2.71,4.1,.065,.48,P.wood);for(let j=0;j<15;j++){const x=.85+j*.24,h=.25+random()*.3;m.box(x,y+.065,-2.7,.13,h,.29,[P.rose,P.deep,P.sage,P.linen,P.wood][j%5]);m.box(x,y+.13,-2.54,.08,.012,.005,P.edge);}}
+ plant(m,3.9,3.62,-2.65,.70);plant(m,.76,2.72,-2.60,.62);
+ // Bed in right foreground, soft layered rose bedding and seams.
+ m.box(3.60,.08,1.40,2.1,.36,3.7,P.wood);m.box(3.60,.44,1.40,2.08,.22,3.65,P.linen);
+ m.box(3.60,.66,1.83,2.1,.14,2.8,P.rose);m.blob(3.60,.81,-.02,.82,.15,.40,P.linen,12);
+ for(let j=0;j<12;j++)m.line([2.58,.81,.48+j*.23],[4.61,.81,.53+j*.23],.006,[.55,.25,.28]);
+ m.box(3.60,.44,-.49,2.18,1.0,.12,P.wood);
+ // Desk faces the back wall. Notebook and hands share the same coordinate frame.
+ m.frame={x:student.x,z:student.z,a:student.a};
+ m.box(0,1.14,.93,2.90,.09,1.13,P.wood);m.box(0,1.23,.93,2.94,.025,1.16,P.edge);
+ for(const x of [-1.29,1.29])for(const z of [.50,1.36])m.box(x,0,z,.07,1.14,.07,P.wood);
+ m.box(0,1.255,.76,.65,.025,.72,P.sage);m.box(0,1.28,.76,.62,.012,.69,P.paper);
+ for(const z of [.60,.89])for(let j=0;j<7;j++)m.line([-.24+j*.075,1.295,z-.08],[-.24+j*.075,1.295,z+.08],.0025,[.40,.34,.26]);
+ m.box(0,.63,0,.65,.11,.65,P.wood);m.box(0,.74,0,.64,.05,.64,P.sage);
+ for(const x of [-.25,.25])for(const z of [-.24,.24])m.box(x,0,z,.055,.63,.055,P.wood);
+ m.box(0,.86,-.30,.65,.35,.055,P.wood);m.box(0,.89,-.265,.54,.25,.02,P.sage);
+ // Articulated lamp with emission on its underside.
+ m.cone(.72,1.26,1.03,.13,.13,.035,P.deep,12);
+ m.line([.72,1.30,1.03],[.95,1.80,1.03],.02,P.deep);m.line([.95,1.80,1.03],[.47,2.02,1.03],.021,P.deep);
+ m.cone(.47,1.91,1.03,.20,.08,.15,P.deep,12);m.frame=null;
+ const lp=local(.47,1.905,1.03);glowMesh.cone(lp[0],lp[1],lp[2],.18,.18,.01,[1,.66,.30],12);
+ const vase=local(-.76,1.26,1.05);flowerVase(m,...vase);
+ const books=local(1.10,1.26,.95);book(m,...books,.45,.60,.07,P.deep);book(m,books[0],books[1]+.07,books[2],.42,.57,.06,P.rose);
+ plant(m,-.34,3.62,-2.70,.55);
+ // Modest contact shading is baked into the floor geometry.
+ m.blob(1.05,.014,-.65,.52,.008,.49,[.10,.065,.055],16);
+ return upload(m,sb,gl.STATIC_DRAW);
+}
+const staticCount=room(),glowBuffer=gl.createBuffer(),glowCount=upload(glowMesh,glowBuffer,gl.STATIC_DRAW);
+const blinkTimes=[3.2,8.7,14,20.8,26.2,33.5,40.5,46.8,53,59.9,66.2,72.7,80,86.5,92,98.2,105.3,111.4,117.1];
+function poseAt(t){const phase=t/PERIOD*TAU,breath=Math.sin(phase*24)*.012,turn=ramp(t,42,43.5)*(1-ramp(t,47,48)),page=ramp(t,43,47),look=ramp(t,79,82)*(1-ramp(t,87,90)),reach=ramp(t,93.5,95)*(1-ramp(t,103,104.5)),sip=ramp(t,95,97)*(1-ramp(t,100.5,103));let blink=0;for(const b of blinkTimes)blink=Math.max(blink,Math.max(0,1-Math.abs(t-b)/.105));return{phase,breath,turn,page,look,reach,sip,blink,writing:(1-turn)*(1-look)*(1-reach)};}
+function adjustHead(m,start,tilt,yaw,bob){const c=Math.cos(tilt),s=Math.sin(tilt),cy=Math.cos(yaw),sy=Math.sin(yaw),a=student.a,ca=Math.cos(a),sa=Math.sin(a),pivot=1.38+bob;
+ for(let i=start;i<m.d.length;i+=9){const dx=m.d[i]-student.x,dz=m.d[i+2]-student.z,lx=dx*ca-dz*sa,lz=dx*sa+dz*ca,ly=m.d[i+1]-pivot;const py=ly*c-lz*s,pz=ly*s+lz*c,px=lx*cy+pz*sy,z=-lx*sy+pz*cy;m.d[i]=student.x+px*ca+z*sa;m.d[i+1]=pivot+py;m.d[i+2]=student.z-px*sa+z*ca;const nx=m.d[i+3]*ca-m.d[i+5]*sa,ny=m.d[i+4],nz=m.d[i+3]*sa+m.d[i+5]*ca,ny2=ny*c-nz*s,nz2=ny*s+nz*c,nx2=nx*cy+nz2*sy,nz3=-nx*sy+nz2*cy;m.d[i+3]=nx2*ca+nz3*sa;m.d[i+4]=ny2;m.d[i+5]=-nx2*sa+nz3*ca;}
+}
+function drawStudent(m,p){
+ const b=p.breath;m.frame={x:student.x,z:student.z,a:student.a};
+ // The game's rose skirt, cream blouse, warm skin and ponytail, in a seated rig.
+ for(const x of [-.13,.13]){m.line([x,.77,.02],[x,.69,.38],.075,C.skin);m.line([x,.69,.38],[x,.19,.43],.055,C.skin);m.box(x,.075,.46,.15,.11,.24,P.rose);m.box(x,.17,.42,.115,.06,.14,P.linen);}
+ m.cone(0,.69,.14,.31,.24,.32,C.dress,9);m.box(0,.76,.26,.48,.07,.38,C.dress);
+ m.box(0,1.00+b,0,.40,.31,.28,C.cream);m.cone(0,.98+b,0,.235,.19,.08,C.cream,8);m.blob(0,1.35+b,0,.08,.08,.08,C.skin,8);
+ const write=[.16+Math.sin(p.phase*180)*.016*p.writing,1.305+Math.sin(p.phase*360)*.003*p.writing,.76+Math.cos(p.phase*180)*.012*p.writing];
+ const taking=[.39,1.35,.80],atFace=[.16,1.49,.27];let right=mixV(write,mixV(taking,atFace,p.sip),p.reach);
+ if(p.turn>.001){right=mixV(right,[.17+Math.cos(p.page*Math.PI)*.10,1.31+Math.sin(p.page*Math.PI)*.25,.77],p.turn);}
+ const restLeft=[-.18,1.305,.76],left=mixV(restLeft,[-.19,1.32,.73],p.turn);
+ const rElbow=mixV([.31,1.14+b,.31],[.36,1.30,.12],p.sip);
+ for(const [side,elbow,hand] of [[-1,[-.31,1.14+b,.32],left],[1,rElbow,right]]){m.line([side*.23,1.26+b,0],elbow,.060,C.cream);m.line(elbow,hand,.043,C.skin);m.blob(...hand,.041,.026,.035,C.skin,6);}
+ if(p.reach<.6&&p.turn<.5){const tip=[right[0]-.025,1.295,right[2]+.026];m.line([tip[0]-.045,tip[1]+.155,tip[2]-.04],tip,.009,P.gold);m.line(tip,[tip[0]-.004,tip[1]-.012,tip[2]+.004],.004,P.ink);}
+ const headStart=m.d.length;
+ m.blob(0,1.62+b,.01,.25,.28,.23,C.skin,8);
+ m.blob(0,1.73+b,-.05,.27,.21,.24,C.hair,8);m.blob(0,1.53+b,-.23,.17,.26,.14,C.hair,7);
+ m.blob(-.11,1.59+b,-.225,.06,.04,.04,C.rose,5);m.blob(.02,1.59+b,-.245,.055,.04,.04,C.pink,5);
+ for(const x of [-.085,.085]){const h=mix(.033,.003,p.blink);m.box(x,1.62+b,.221,.030,h,.016,[.18,.15,.15]);if(p.blink<.65)m.box(x-.003,1.63+b,.231,.008,.009,.006,C.cream);}
+ m.blob(0,1.565+b,.238,.025,.030,.025,C.skin,5);m.box(0,1.505+b,.217,.046,.012,.013,C.rose);
+ adjustHead(m,headStart,mix(.14,-.015,p.look)*(1-p.sip*.75),p.look*.44,b);
+ m.frame=null;
+ return{right,pose:p};
+}
+function cup(m,p){const center=mixV([.27,1.24,.80],[.07,1.38,.27],p.sip),q=local(...center);m.frame={x:q[0],y:q[1],z:q[2],a:student.a,roll:-p.sip*.13};
+ m.cone(0,0,0,.09,.105,.17,[.64,.75,.65],12);m.cone(0,.172,0,.094,.094,.008,[.20,.12,.09],12);
+ const points=[[.09,.04,0],[.16,.045,0],[.19,.09,0],[.16,.14,0],[.10,.14,0]];for(let i=0;i<points.length-1;i++)m.line(points[i],points[i+1],.018,[.64,.75,.65]);
+ // A few slim curls of steam, always bounded and periodic.
+ for(let j=0;j<2;j++)for(let k=0;k<7;k++){const u=k/7,v=(k+1)/7,a=p.phase*36+j*2.4;const point=s=>[Math.sin(a+s*6)*.025,.19+s*.28,Math.cos(a+s*4)*.018];m.line(point(u),point(v),.0024,[.50,.47,.43]);}
+ m.frame=null;
+}
+function pageTurn(m,p){if(p.turn<.001)return;const a=p.page*Math.PI;m.frame={x:student.x,z:student.z,a:student.a};
+ const pt=(x,z)=>[x,1.296+Math.sin(a)*z,.76-Math.cos(a)*z];
+ m.quad(pt(-.30,0),pt(.30,0),pt(.30,.32),pt(-.30,.32),P.paper);m.frame=null;}
+const dynamicMesh=new Mesh();
+function dynamicRoom(t){const m=dynamicMesh;m.d.length=0;m.frame=null;const p=poseAt(t);drawStudent(m,p);cup(m,p);pageTurn(m,p);
+ for(let j=0;j<54;j++){const x=-3.32+mod(j*.619,2.74),u=mod(t/PERIOD*(48+j%4*12)+j*.137,1),y=1.18+(1-u)*2.38;m.line([x,y,-2.96],[x+.009,y+.085,-2.96],.0028,[.22,.32,.46]);}
+ return m;}
+// The original renderer writes linear depth into the offscreen alpha channel.
+// A restrained finish keeps the stream stable: no grain, flashing or cutaways.
+const postVS='attribute vec2 position;varying vec2 tex;void main(){tex=position*.5+.5;gl_Position=vec4(position,0.,1.);}';
+const postFS=`precision mediump float;uniform sampler2D image;uniform vec2 resolution;varying vec2 tex;void main(){vec4 source=texture2D(image,tex);vec3 color=source.rgb;vec2 step=1.5/resolution;vec3 bloom=vec3(0.);bloom+=max(texture2D(image,tex+step*vec2(1.,0.)).rgb-.65,0.);bloom+=max(texture2D(image,tex+step*vec2(-1.,0.)).rgb-.65,0.);bloom+=max(texture2D(image,tex+step*vec2(0.,1.)).rgb-.65,0.);bloom+=max(texture2D(image,tex+step*vec2(0.,-1.)).rgb-.65,0.);color+=bloom*.11;color*=1.12;color=(color*(2.51*color+.03))/(color*(2.43*color+.59)+.14);color=pow(max(color,0.),vec3(.88));vec2 q=tex*2.-1.;color*=1.-.12*dot(q*.66,q*.66);gl_FragColor=vec4(color,1.);}`;
+let post;try{post=program(postVS,postFS);}catch(e){fail(e.message);return;}
+const postPos=gl.getAttribLocation(post,'position'),postImage=gl.getUniformLocation(post,'image'),postSize=gl.getUniformLocation(post,'resolution'),quad=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,quad);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,-1,1,1,-1,1,1]),gl.STATIC_DRAW);
+const framebuffer=gl.createFramebuffer(),texture=gl.createTexture(),depth=gl.createRenderbuffer(),depthTextureExtension=gl.getExtension('WEBGL_depth_texture'),depthTexture=depthTextureExtension?gl.createTexture():null;let width=0,height=0,playhead=0,paused=query.get('paused')==='1'||query.has('capture'),lost=false,frameID=0,lastTime=performance.now(),lastPaint=-1;
+function resize(){const r=canvas.getBoundingClientRect(),cap=query.get('quality')==='low'?1280:1920,scale=Math.min(devicePixelRatio||1,1.5,cap/Math.max(r.width,1)),w=Math.max(2,Math.round(r.width*scale)),h=Math.max(2,Math.round(r.height*scale));if(width===w&&height===h)return;width=canvas.width=w;height=canvas.height=h;
+ gl.bindTexture(gl.TEXTURE_2D,texture);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,w,h,0,gl.RGBA,gl.UNSIGNED_BYTE,null);gl.bindFramebuffer(gl.FRAMEBUFFER,framebuffer);gl.framebufferTexture2D(gl.FRAMEBUFFER,gl.COLOR_ATTACHMENT0,gl.TEXTURE_2D,texture,0);
+ if(depthTexture){gl.bindTexture(gl.TEXTURE_2D,depthTexture);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.NEAREST);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.NEAREST);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);gl.texImage2D(gl.TEXTURE_2D,0,gl.DEPTH_COMPONENT,w,h,0,gl.DEPTH_COMPONENT,gl.UNSIGNED_INT,null);gl.framebufferTexture2D(gl.FRAMEBUFFER,gl.DEPTH_ATTACHMENT,gl.TEXTURE_2D,depthTexture,0);}else{gl.bindRenderbuffer(gl.RENDERBUFFER,depth);gl.renderbufferStorage(gl.RENDERBUFFER,gl.DEPTH_COMPONENT16,w,h);gl.framebufferRenderbuffer(gl.FRAMEBUFFER,gl.DEPTH_ATTACHMENT,gl.RENDERBUFFER,depth);}
+ if(gl.checkFramebufferStatus(gl.FRAMEBUFFER)!==gl.FRAMEBUFFER_COMPLETE)throw Error('No se pudo crear el encuadre del cuarto.');gl.bindFramebuffer(gl.FRAMEBUFFER,null);
+}
+function cameraAt(t){const a=t/PERIOD*TAU;return{eye:[3.8,2.60,5.5],target:[.35,1.75,-1.15],fov:.72};}
+function renderAt(t){if(lost)return;resize();const cam=cameraAt(t);gl.bindFramebuffer(gl.FRAMEBUFFER,framebuffer);gl.viewport(0,0,width,height);gl.useProgram(pr);gl.enable(gl.DEPTH_TEST);gl.clearColor(.045,.045,.075,1);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);gl.uniformMatrix4fv(uv,false,multiply(projection(width/height,cam.fov),view(cam.eye,cam.target)));gl.uniform1f(lampU,1.8);gl.uniform1f(emissionU,0);draw(sb,staticCount);const count=upload(dynamicRoom(t),db,gl.DYNAMIC_DRAW);draw(db,count);gl.uniform1f(emissionU,.88);draw(glowBuffer,glowCount);
+ gl.bindFramebuffer(gl.FRAMEBUFFER,null);gl.disable(gl.DEPTH_TEST);gl.useProgram(post);gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,texture);gl.uniform1i(postImage,0);gl.uniform2f(postSize,width,height);gl.bindBuffer(gl.ARRAY_BUFFER,quad);gl.enableVertexAttribArray(postPos);gl.vertexAttribPointer(postPos,2,gl.FLOAT,false,0,0);gl.drawArrays(gl.TRIANGLES,0,6);
+}
+function loop(now){frameID=requestAnimationFrame(loop);const dt=Math.max(0,(now-lastTime)/1000);lastTime=now;if(paused||lost)return;playhead=mod(playhead+Math.min(dt,.25),PERIOD);if(now-lastPaint<1000/30-.5)return;lastPaint=now;renderAt(playhead);}
+function syncControls(){document.getElementById('pause').textContent=paused?'Reproducir':'Pausar';document.getElementById('pause').setAttribute('aria-pressed',String(paused));}
+document.getElementById('pause').onclick=()=>{paused=!paused;lastTime=performance.now();syncControls();};
+document.getElementById('fullscreen').onclick=async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else await document.documentElement.requestFullscreen();}catch(e){}};
+document.addEventListener('keydown',e=>{if(e.target.closest('button')&&(e.code==='Space'||e.code==='Enter'))return;if(e.code==='Space'){e.preventDefault();document.getElementById('pause').click();}else if(e.code==='KeyF')document.getElementById('fullscreen').click();else if(e.code==='KeyH')document.getElementById('help').hidden=!document.getElementById('help').hidden;});
+document.addEventListener('visibilitychange',()=>{lastTime=performance.now();});window.addEventListener('resize',()=>{if(paused)renderAt(playhead);});window.addEventListener('pagehide',()=>cancelAnimationFrame(frameID));
+canvas.addEventListener('webglcontextrestored',()=>location.reload());
+canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();lost=true;paused=true;syncControls();fail('Se perdió el contexto gráfico. Recarga este HTML para continuar.');});
+// Local inspection interface for deterministic capture and server integration.
+window.__studyCinema={duration:PERIOD,seek(t){paused=true;playhead=mod(Number(t)||0,PERIOD);renderAt(playhead);syncControls();},play(){paused=false;lastTime=performance.now();syncControls();},state(){return{time:playhead,paused,width,height,glError:gl.getError(),pose:poseAt(playhead),staticVertices:staticCount,streamOverlayVisible:!document.getElementById('help').hidden};}};
+try{renderAt(0);syncControls();frameID=requestAnimationFrame(loop);}catch(e){console.error(e);fail('No se pudo dibujar el cuarto: '+e.message);}
+})();
+</script></body></html>

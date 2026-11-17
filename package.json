@@ -40,7 +40,7 @@
           ]
         }
       ],
-      "icon": "tulip.ico"
+      "icon": "icons/tulip.ico"
     },
     "nsis": {
       "oneClick": false,
@@ -48,8 +48,8 @@
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
       "shortcutName": "28E - Donde crecen las flores",
-      "installerIcon": "tulip.ico",
-      "uninstallerIcon": "tulip.ico",
+      "installerIcon": "icons/tulip.ico",
+      "uninstallerIcon": "icons/tulip.ico",
       "installerSidebar": "assets/installer/installer_sidebar.bmp",
       "uninstallerSidebar": "assets/installer/installer_sidebar.bmp",
       "installerHeader": "assets/installer/installer_header.bmp",
@@ -60,7 +60,7 @@
       "dclf.html",
       "main.js",
       "gsap.min.js",
-      "tulip.ico",
+      "icons/**/*",
       "fonts/**/*",
       "sounds/**/*",
       "radio/**/*",
@@ -70,8 +70,7 @@
       "gallery/**/*",
       "assets/**/*",
       "*.mp3",
-      "*.wav",
-      "dclf_game.ico"
+      "*.wav"
     ],
     "directories": {
       "output": "release"

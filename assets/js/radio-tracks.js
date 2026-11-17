@@ -2,6 +2,7 @@
                 
                 function normalizeAudioSrc(url) {
                     if (!url) return url;
+                    if (url.startsWith('radio/') || url.startsWith('sounds/')) return url;
                     if (url.includes('/radio/')) {
                         return 'radio/' + url.split('/radio/').pop();
                     }
@@ -24,9 +25,9 @@
                     { title: "Pasao De Famarcia", artist: "Lil Naay", src: "radio/Pasao De Famarcia - Lil Naay - SpotubeDL.com.mp3" },
                     { title: "Thootie", artist: "Ice Spice ft. Tokischa", src: "radio/Thootie (feat. Tokischa) - Ice Spice - SpotubeDL.com.mp3" },
                     { title: "Toto Lindo", artist: "Huan62", src: "radio/Toto Lindo - Huan62 - SpotubeDL.com.mp3" },
-                    { title: "Oro Fundido", artist: "Oblivion's Mighty Trash", src: "sounds/Oro Fundido - Oblivion's Mighty Trash - SpotubeDL.com.mp3" },
-                    { title: "CRAZY (Live)", artist: "Otis McDonald", src: "sounds/Otis McDonald - CRAZY - Live (SPOTISAVER).mp3" },
-                    { title: "O.Sky", artist: "Otis McDonald", src: "sounds/Otis McDonald - O.Sky.mp3" }
+                    { title: "Oro Fundido", artist: "Oblivion's Mighty Trash", src: "radio/Oro Fundido - Oblivion's Mighty Trash - SpotubeDL.com.mp3" },
+                    { title: "CRAZY (Live)", artist: "Otis McDonald", src: "radio/stream in youtube/Otis McDonald - CRAZY - Live (SPOTISAVER).mp3" },
+                    { title: "O.Sky", artist: "Otis McDonald", src: "radio/stream in youtube/Otis McDonald - O.Sky.mp3" }
                 ];
                 let currentSpotTrack = 0;
                 let spotAudio = new Audio();
@@ -70,95 +71,83 @@
                     } catch (e) { }
                 };
 
-                // ── 28E RADIO HLS ENGINE (AUDIO PURO AAC 128K 24/7 EN VIVO) ──
-                const RADIO_HLS_URL = 'https://dandori-radio28e-alexa.hf.space/gradio_api/file=/tmp/hls/live.m3u8';
-                let radioAudio = null;
-                let radioHls = null;
-                let radioVolume = 1.0;
-
-                function getRadioAudio() {
-                    if (radioAudio) return radioAudio;
-                    radioAudio = new Audio();
-                    radioAudio.preload = 'none';
-                    radioAudio.volume = radioVolume;
-
-                    radioAudio.addEventListener('playing', () => {
-                        if (spotlightMode === 'radio') {
-                            isSpotPlaying = true;
-                            spotlightUpdateUI();
-                            if (currentRadioState && currentRadioState.title) {
-                                document.title = `28E Radio · ${currentRadioState.title}`;
-                            } else {
-                                document.title = '28E · Radio en Vivo';
-                            }
-                        }
-                    });
-
-                    radioAudio.addEventListener('pause', () => {
-                        if (spotlightMode === 'radio') {
-                            isSpotPlaying = false;
-                            spotlightUpdateUI();
-                            document.title = '28E';
-                        }
-                    });
-
-                    radioAudio.addEventListener('error', (e) => {
-                        console.warn('Radio audio error:', e);
-                        if (spotlightMode === 'radio') {
-                            isSpotPlaying = false;
-                            spotlightUpdateUI();
-                        }
-                    });
-
-                    return radioAudio;
+                // ── YOUTUBE LIVE STREAM RADIO ENGINE (AUDIO PURO + METADATOS EN VIVO) ──
+                const YOUTUBE_STREAM_ID = 'MSL-lLkRbjU';
+                let ytRadioPlayer = null;
+                let ytRadioReady = false;
+                function loadYouTubeAPI(callback) {
+                    if (window.YT && window.YT.Player) {
+                        callback();
+                        return;
+                    }
+                    const existing = document.querySelector('script[src*="youtube.com/iframe_api"]');
+                    if (!existing) {
+                        const tag = document.createElement('script');
+                        tag.src = 'https://www.youtube.com/iframe_api';
+                        const firstScriptTag = document.getElementsByTagName('script')[0];
+                        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+                    }
+                    const prevCb = window.onYouTubeIframeAPIReady;
+                    window.onYouTubeIframeAPIReady = () => {
+                        if (typeof prevCb === 'function') prevCb();
+                        callback();
+                    };
                 }
 
-                function setupHlsRadio() {
-                    const audio = getRadioAudio();
-
-                    // 1. Native HLS (Safari iOS / macOS)
-                    if (audio.canPlayType('application/vnd.apple.mpegurl')) {
-                        if (audio.src !== RADIO_HLS_URL) {
-                            audio.src = RADIO_HLS_URL;
+                function initYouTubeRadio(autoplay = false) {
+                    if (ytRadioPlayer && typeof ytRadioPlayer.playVideo === 'function') {
+                        if (autoplay) {
+                            try { ytRadioPlayer.playVideo(); } catch (e) { }
                         }
-                        return true;
+                        return;
                     }
 
-                    // 2. HLS.js (Chrome, Firefox, Android, Edge)
-                    if (window.Hls && window.Hls.isSupported()) {
-                        if (!radioHls) {
-                            radioHls = new window.Hls({
-                                enableWorker: true,
-                                lowLatencyMode: true,
-                                liveSyncDurationCount: 2,
-                                maxLiveSyncPlaybackRate: 1.1,
-                                maxBufferLength: 4
-                            });
-                            radioHls.attachMedia(audio);
-                            radioHls.on(window.Hls.Events.MEDIA_ATTACHED, () => {
-                                radioHls.loadSource(RADIO_HLS_URL);
-                            });
-                            radioHls.on(window.Hls.Events.ERROR, (event, data) => {
-                                if (data && data.fatal) {
-                                    switch (data.type) {
-                                        case window.Hls.ErrorTypes.NETWORK_ERROR:
-                                            radioHls.startLoad();
-                                            break;
-                                        case window.Hls.ErrorTypes.MEDIA_ERROR:
-                                            radioHls.recoverMediaError();
-                                            break;
-                                        default:
-                                            radioHls.destroy();
-                                            radioHls = null;
-                                            break;
+                    loadYouTubeAPI(() => {
+                        if (ytRadioPlayer) return;
+                        try {
+                            ytRadioPlayer = new YT.Player('spotlight-yt-player', {
+                                videoId: YOUTUBE_STREAM_ID,
+                                playerVars: {
+                                    autoplay: autoplay ? 1 : 0,
+                                    controls: 0,
+                                    playsinline: 1,
+                                    rel: 0,
+                                    modestbranding: 1,
+                                    origin: window.location.origin
+                                },
+                                events: {
+                                    onReady: (event) => {
+                                        ytRadioReady = true;
+                                        const volSlider = document.getElementById('spotlight-radio-volume');
+                                        if (volSlider && typeof event.target.getVolume === 'function') {
+                                            try {
+                                                const curVol = event.target.getVolume();
+                                                volSlider.value = curVol;
+                                                volSlider.style.background = `linear-gradient(to right, #ffffff 0%, #ffffff ${curVol}%, rgba(255, 255, 255, 0.2) ${curVol}%, rgba(255, 255, 255, 0.2) 100%)`;
+                                            } catch (e) { }
+                                        }
+                                        if (autoplay || (isSpotPlaying && spotlightMode === 'radio')) {
+                                            try { event.target.playVideo(); } catch (e) { }
+                                        }
+                                    },
+                                    onStateChange: (event) => {
+                                        if (spotlightMode !== 'radio') return;
+                                        if (event.data === YT.PlayerState.PLAYING) {
+                                            isSpotPlaying = true;
+                                            spotlightUpdateUI();
+                                            document.title = currentRadioState && currentRadioState.title ? `28E Radio · ${currentRadioState.title}` : '28E · Radio en Vivo';
+                                        } else if (event.data === YT.PlayerState.PAUSED || event.data === YT.PlayerState.ENDED) {
+                                            isSpotPlaying = false;
+                                            spotlightUpdateUI();
+                                            document.title = '28E';
+                                        }
                                     }
                                 }
                             });
+                        } catch (err) {
+                            console.error('Error initializing YouTube Radio player:', err);
                         }
-                        return true;
-                    }
-
-                    return false;
+                    });
                 }
 
                 function updateRadioTrackUI(state) {
@@ -188,7 +177,7 @@
                                 title: titleText,
                                 artist: artistText,
                                 album: '28E Radio',
-                                artwork: [{ src: 'tulip.ico?v=3', sizes: '512x512', type: 'image/x-icon' }]
+                                artwork: [{ src: 'icons/tulip.ico?v=3', sizes: '512x512', type: 'image/x-icon' }]
                             });
                         }
                     }
@@ -196,11 +185,11 @@
                     if (state.title && state.artist) {
                         fetchSpotlightArtwork({ title: state.title, artist: state.artist }).then(url => {
                             if (spotlightMode === 'radio') {
-                                updateAllArtwork(url || 'tulip.ico?v=3');
+                                updateAllArtwork(url || 'icons/tulip.ico?v=3');
                             }
                         });
                     } else {
-                        updateAllArtwork('tulip.ico?v=3');
+                        updateAllArtwork('icons/tulip.ico?v=3');
                     }
                 }
 
@@ -221,49 +210,31 @@
                 }
                 subscribeToRadioState();
 
-                function startHlsRadio() {
-                    if (typeof spotAudio !== 'undefined' && spotAudio) {
-                        try { spotAudio.pause(); } catch (e) { }
-                    }
-
-                    setupHlsRadio();
-                    const audio = getRadioAudio();
-                    audio.volume = radioVolume;
-
+                function startYouTubeRadio() {
+                    if (spotAudio) spotAudio.pause();
                     isSpotPlaying = true;
                     spotlightUpdateUI();
-                    if (currentRadioState && currentRadioState.title) {
-                        document.title = `28E Radio · ${currentRadioState.title}`;
+                    document.title = currentRadioState && currentRadioState.title ? `28E Radio · ${currentRadioState.title}` : '28E · Radio en Vivo';
+
+                    if (ytRadioPlayer && typeof ytRadioPlayer.playVideo === 'function') {
+                        try { ytRadioPlayer.playVideo(); } catch (e) { }
                     } else {
-                        document.title = '28E · Radio en Vivo';
-                    }
-
-                    if (radioHls && radioHls.media && audio.paused) {
-                        radioHls.startLoad();
-                    }
-
-                    const p = audio.play();
-                    if (p !== undefined) {
-                        p.catch(err => {
-                            console.warn('Radio playback waiting or autoplay prevented:', err);
-                        });
+                        initYouTubeRadio(true);
                     }
                 }
 
-                function stopHlsRadio() {
+                function stopYouTubeRadio() {
                     isSpotPlaying = false;
                     spotlightUpdateUI();
                     document.title = '28E';
 
-                    if (radioAudio) {
-                        try { radioAudio.pause(); } catch (e) { }
+                    if (ytRadioPlayer && typeof ytRadioPlayer.pauseVideo === 'function') {
+                        try { ytRadioPlayer.pauseVideo(); } catch (e) { }
                     }
                 }
 
-                function startYouTubeRadio() { startHlsRadio(); }
-                function stopYouTubeRadio() { stopHlsRadio(); }
-                function startFirebaseRadio() { startHlsRadio(); }
-                function stopFirebaseRadio() { stopHlsRadio(); }
+                function startFirebaseRadio() { startYouTubeRadio(); }
+                function stopFirebaseRadio() { stopYouTubeRadio(); }
                 let spotlightMode = 'music'; // 'music' or 'radio'
                 let isSpotPlaying = false;
                 let isSpotlightExpanded = false;
@@ -734,13 +705,13 @@
                                     title: rTitle,
                                     artist: rArtist,
                                     album: '28E Radio',
-                                    artwork: [{ src: 'tulip.ico?v=3', sizes: '512x512', type: 'image/x-icon' }]
+                                    artwork: [{ src: 'icons/tulip.ico?v=3', sizes: '512x512', type: 'image/x-icon' }]
                                 });
                             }
                         } else {
                             document.title = `${track.title}`;
                             if ('mediaSession' in navigator) {
-                                const art = currentArtworkSrc || 'tulip.ico?v=3';
+                                const art = currentArtworkSrc || 'icons/tulip.ico?v=3';
                                 navigator.mediaSession.metadata = new MediaMetadata({
                                     title: track.title,
                                     artist: track.artist,
@@ -861,9 +832,14 @@
                 function spotlightToggleMute() {
                     let isMutedNow = false;
                     if (spotlightMode === 'radio') {
-                        if (radioAudio) {
-                            radioAudio.muted = !radioAudio.muted;
-                            isMutedNow = radioAudio.muted;
+                        if (ytRadioPlayer && typeof ytRadioPlayer.isMuted === 'function') {
+                            if (ytRadioPlayer.isMuted()) {
+                                ytRadioPlayer.unMute();
+                                isMutedNow = false;
+                            } else {
+                                ytRadioPlayer.mute();
+                                isMutedNow = true;
+                            }
                         }
                     } else {
                         if (!spotAudio) return;
@@ -894,10 +870,13 @@
                 
                 function handleRadioVolume(val) {
                     const num = parseInt(val, 10);
-                    radioVolume = Math.max(0, Math.min(1, num / 100));
-                    if (radioAudio) {
-                        radioAudio.volume = radioVolume;
-                        if (num > 0) radioAudio.muted = false;
+                    if (ytRadioPlayer && typeof ytRadioPlayer.setVolume === 'function') {
+                        try {
+                            ytRadioPlayer.setVolume(num);
+                            if (num > 0 && typeof ytRadioPlayer.isMuted === 'function' && ytRadioPlayer.isMuted()) {
+                                ytRadioPlayer.unMute();
+                            }
+                        } catch (e) { }
                     }
                     const slider = document.getElementById('spotlight-radio-volume');
                     if (slider) {
@@ -962,11 +941,7 @@
                     } else {
                         // Activate Radio UI (Apple-Style Live Radio Experience)
                         if (spotAudio) spotAudio.pause();
-                        if (isSpotPlaying) {
-                            startHlsRadio();
-                        } else {
-                            setupHlsRadio();
-                        }
+                        initYouTubeRadio(isSpotPlaying);
 
                         if (viewMusic) viewMusic.style.display = 'none';
                         if (viewRadio) {
@@ -995,15 +970,17 @@
                             if (compactArtist) compactArtist.innerHTML = `<span class="inline-flex items-center gap-1.5 text-rose-400 font-medium"><span class="w-1.5 h-1.5 rounded-full bg-rose-500 shrink-0 inline-block"></span>En vivo</span>`;
                             if (radioTitle) radioTitle.textContent = '28E Radio';
                             if (radioArtist) radioArtist.textContent = 'Transmisión en Vivo';
-                            updateAllArtwork('tulip.ico?v=3');
+                            updateAllArtwork('icons/tulip.ico?v=3');
                         }
 
                         // Sync volume slider
                         const volSlider = document.getElementById('spotlight-radio-volume');
-                        if (volSlider) {
-                            const curVol = radioAudio ? Math.round(radioAudio.volume * 100) : Math.round(radioVolume * 100);
-                            volSlider.value = curVol;
-                            volSlider.style.background = `linear-gradient(to right, #ffffff 0%, #ffffff ${curVol}%, rgba(255, 255, 255, 0.2) ${curVol}%, rgba(255, 255, 255, 0.2) 100%)`;
+                        if (volSlider && ytRadioPlayer && typeof ytRadioPlayer.getVolume === 'function') {
+                            try {
+                                const curVol = ytRadioPlayer.getVolume();
+                                volSlider.value = curVol;
+                                volSlider.style.background = `linear-gradient(to right, #ffffff 0%, #ffffff ${curVol}%, rgba(255, 255, 255, 0.2) ${curVol}%, rgba(255, 255, 255, 0.2) 100%)`;
+                            } catch (e) { }
                         }
                     }
                 }

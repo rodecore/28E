@@ -1,0 +1,24 @@
+{
+  "first": {
+    "width": 1280,
+    "height": 720,
+    "time": 15.0287,
+    "paused": false,
+    "ready": 4,
+    "quality": {
+      "total": 455,
+      "dropped": 0
+    }
+  },
+  "after": {
+    "width": 1280,
+    "height": 720,
+    "time": 1.425,
+    "paused": false,
+    "ready": 4,
+    "quality": {
+      "total": 563,
+      "dropped": 0
+    }
+  }
+}

@@ -40,7 +40,7 @@ echo "Presiona Ctrl+C para detener."
 echo ""
 
 while true; do
-    ffmpeg -re -stream_loop -1 -i "$DIR/16-9_1080p.mp4" \
+    ffmpeg -re -stream_loop -1 -i "$DIR/videos/16-9_1080p.mp4" \
            -stream_loop -1 -f concat -safe 0 -i "$DIR/scripts/radio_playlist.txt" \
            -map 0:v:0 -map 1:a:0 \
            -vf "scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2,format=yuv420p" \

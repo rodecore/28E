@@ -48,7 +48,7 @@
         };
     </script>
     <script src="./assets/js/safe-html.js?v=20261114"></script>
-    <script src="./assets/js/firebase-voice-transport.js?v=20261114_firebase"></script>
+    <script src="./assets/js/firebase-voice-transport.js?v=20261117_music_session"></script>
     <script>
         const escapeAdminHtml = window.yaireSafeHtml.text;
         const adminImageUrl = window.yaireSafeHtml.image;
@@ -1791,9 +1791,9 @@
                         class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-500 to-purple-600 animate-pulse">
                     </div>
                     <div class="flex flex-col md:flex-row items-center gap-6">
-                        <img id="dj-current-art" src="/tulip.ico"
+                        <img id="dj-current-art" src="/icons/tulip.ico"
                             class="w-32 h-32 rounded-xl object-cover shadow-lg border border-white/10" alt="Artwork"
-                            onerror="this.src='https://www.yaire.site/tulip.ico?v=3'">
+                            onerror="this.src='https://www.yaire.site/icons/tulip.ico?v=3'">
                         <div class="flex-1 text-center md:text-left">
                             <div class="flex flex-wrap gap-2 mb-3">
                                 <span id="dj-status-badge"
@@ -2502,6 +2502,7 @@
             { title: "Bendiciones", artist: "Lawd Ito, Tilden Parc", src: "radio/ES_Bendiciones - Lawd Ito.mp3" },
             { title: "No Hay Trabajo", artist: "Lawd Ito", src: "radio/ES_No Hay Trabajo - Lawd Ito.mp3" },
             { title: "Treat Me This Way (AI Rework)", artist: "Rodezel", src: "radio/1777594789237_f228324448.mp3" },
+            { title: "Bajo La Lluvia", artist: "Rodezel", src: "radio/Bajo La Lluvia - Rodezel.mp3" },
             { title: "O.Sky", artist: "Otis McDonald", src: "sounds/Otis McDonald - O.Sky.mp3" },
             { title: "Sweet Escape", artist: "KmPl3x", src: "radio/1789029901492_Kmpl3x_-_Sweet_Escape__Instrumental_.mp3" },
             { title: "Joe Louis", artist: "Otis McDonald", src: "sounds/ost/Otis McDonald - Joe Louis.mp3" },
@@ -2519,7 +2520,12 @@
             { title: "Purple Flowers", artist: "Filthy The Kid, Lawd Ito", src: "radio/ES_Purple Flowers - Filthy The Kid.mp3" },
             { title: "Suéltame", artist: "Lawd Ito", src: "radio/ES_Sueltame - Lawd Ito.mp3" },
             { title: "Caro", artist: "Lawd Ito", src: "radio/ES_Caro - Lawd Ito.mp3" },
-            { title: "Peachy", artist: "half.cool", src: "radio/Peachy - half.cool.mp3" }
+            { title: "Peachy", artist: "half.cool", src: "radio/Peachy - half.cool.mp3" },
+            { title: "Identify", artist: "28E Radio", src: "radio/28E_ID_01.mp3" },
+            { title: "Identify", artist: "28E Radio", src: "radio/28E_ID_02.mp3" },
+            { title: "Identify", artist: "28E Radio", src: "radio/28E_ID_03.mp3" },
+            { title: "Identify", artist: "28E Radio", src: "radio/28E_ID_04.mp3" },
+            { title: "Identify", artist: "28E Radio", src: "radio/28E_ID_05.mp3" }
         ];
 
         let currentSongs = [];
@@ -4455,7 +4461,7 @@
         function openMaintPreview() {
             const type = document.getElementById('maint-type').value;
             const date = document.getElementById('maint-date').value || '';
-            const url = `https://www.yaire.site/maintenance.html?preview=true&type=${type}&date=${encodeURIComponent(date)}`;
+            const url = `https://www.yaire.site/mantenimiento.html?preview=true&type=${type}&date=${encodeURIComponent(date)}`;
             window.open(url, '_blank');
         }
 
@@ -5486,7 +5492,7 @@
                 cover = await searchDeezer(thirdQ, null);
             }
 
-            cover = cover || 'https://www.yaire.site/tulip.ico?v=3';
+            cover = cover || 'https://www.yaire.site/icons/tulip.ico?v=3';
             spotArtworkCache[key] = cover;
             return cover;
         }

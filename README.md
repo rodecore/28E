@@ -52,7 +52,10 @@ El proyecto fue creado como una sorpresa especial que se desbloqueó oficialment
 ├── mantenimiento.html   # Interfaz de reserva / cuenta regresiva (histórica)
 ├── radio/               # Pistas de música en alta fidelidad
 ├── sounds/              # Efectos de sonido de la interfaz (clics, hovers, éxito)
-└── tulip.ico            # Favicon de la marca
+├── pages/               # Páginas secundarias (jardín, privacidad, prototipos)
+├── icons/               # Iconos y favicons
+├── assets/              # CSS, JS, logos e imágenes
+└── videos/              # Videos e ident de TV
 ```
 
 ## 🚀 Desarrollo Local

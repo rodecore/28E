@@ -12,8 +12,8 @@ if not exist "%~dp0radio" (
     exit /b 1
 )
 
-if not exist "%~dp016-9_1080p.mp4" (
-    echo [ERROR] No se encontro el video de fondo 16-9_1080p.mp4.
+if not exist "%~dp0videos\16-9_1080p.mp4" (
+    echo [ERROR] No se encontro el video de fondo videos\16-9_1080p.mp4.
     pause
     exit /b 1
 )
@@ -35,7 +35,7 @@ echo Presiona Ctrl+C para detener la emision.
 echo.
 
 :STREAM_LOOP
-ffmpeg -re -stream_loop -1 -i "%~dp016-9_1080p.mp4" -stream_loop -1 -f concat -safe 0 -i "%~dp0scripts\radio_playlist.txt" -map 0:v:0 -map 1:a:0 -vf "scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2,format=yuv420p" -c:v libx264 -preset veryfast -b:v 3000k -maxrate 3500k -bufsize 6000k -pix_fmt yuv420p -g 60 -c:a aac -b:a 256k -ar 44100 -f flv "rtmp://a.rtmp.youtube.com/live2/%STREAM_KEY%"
+ffmpeg -re -stream_loop -1 -i "%~dp0videos\16-9_1080p.mp4" -stream_loop -1 -f concat -safe 0 -i "%~dp0scripts\radio_playlist.txt" -map 0:v:0 -map 1:a:0 -vf "scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2,format=yuv420p" -c:v libx264 -preset veryfast -b:v 3000k -maxrate 3500k -bufsize 6000k -pix_fmt yuv420p -g 60 -c:a aac -b:a 256k -ar 44100 -f flv "rtmp://a.rtmp.youtube.com/live2/%STREAM_KEY%"
 
 echo.
 echo [ALERTA] La conexion se interrumpio. Reconectando en 5 segundos...

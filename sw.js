@@ -11,7 +11,7 @@ const PRECACHE_ASSETS = [
   './index.html',
   './manifest.json',
   './styles.css',
-  './tulip.ico',
+  './icons/tulip.ico',
   './icons/icon-192.png',
   './icons/icon-512.png',
   './icons/icon-maskable-192.png',

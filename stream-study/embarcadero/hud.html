@@ -1,0 +1,1301 @@
+<!DOCTYPE html>
+<html lang="es" class="notranslate">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="google" content="notranslate">
+    <title>28E · El embarcadero de las glicinas</title>
+    <link rel="icon" type="image/x-icon" href="../../icons/dclf_game.ico?v=1">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..600&family=Inter:wght@700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="../../fonts/fonts.css">
+    <style>
+        /* Tipografía Oficial 28E (Sebenta) */
+        @font-face {
+            font-family: 'Sebenta';
+            font-style: normal;
+            font-weight: 500;
+            font-display: swap;
+            src: url('../../fonts/Sebenta-Medium.woff2') format('woff2'),
+                 url('fonts/Sebenta-Medium.woff2') format('woff2'),
+                 url('https://cdn.epidemicsound.com/fonts/Sebenta-Medium.woff2') format('woff2');
+        }
+        @font-face {
+            font-family: 'Sebenta';
+            font-style: italic;
+            font-weight: 500;
+            font-display: swap;
+            src: url('../../fonts/Sebenta-MediumItalic.woff2') format('woff2'),
+                 url('fonts/Sebenta-MediumItalic.woff2') format('woff2'),
+                 url('https://cdn.epidemicsound.com/fonts/Sebenta-MediumItalic.woff2') format('woff2');
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        html {
+            font-size: clamp(13px, 1.354167vw, 32px);
+        }
+
+        html,
+        body {
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            background: #05060d;
+            color: #ffffff;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body.stream-kiosk,
+        body.stream-kiosk * {
+            cursor: none !important;
+        }
+
+        /* Fondo de video prerenderizado 30 FPS */
+        .video-bg {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            overflow: hidden;
+            background: #05060d;
+        }
+
+        .video-bg video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            border: 0;
+            pointer-events: none;
+        }
+
+        /* Velos direccionales suaves: mantienen luminoso el centro y aseguran contraste en bordes */
+        .video-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 2;
+            pointer-events: none;
+            background:
+                radial-gradient(ellipse 36% 24% at 92% 6%, rgba(4, 3, 14, 0.42) 0%, transparent 100%),
+                linear-gradient(to bottom, rgba(4, 3, 14, 0.54) 0%, rgba(4, 3, 14, 0.16) 19%, transparent 35%),
+                linear-gradient(to top, rgba(4, 3, 14, 0.72) 0%, rgba(4, 3, 14, 0.36) 22%, transparent 42%);
+        }
+
+        /* Lienzo HUD */
+        .stage {
+            position: relative;
+            z-index: 10;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 2.25rem 3.1rem;
+        }
+
+        /* ─── Encabezado ─── */
+        .header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 2rem;
+        }
+
+        .brand-logo {
+            font-family: 'Inter', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-size: 1.95rem;
+            font-weight: 900;
+            letter-spacing: -0.055em;
+            line-height: 1;
+            color: #ffffff;
+            text-shadow: 0 3px 16px rgba(0, 0, 0, 0.72);
+            padding-top: 0.08rem;
+        }
+
+        /* ─── Contador Superior: Días | HH : MM : SS ─── */
+        .countdown-container {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .countdown-eyebrow {
+            font-size: 0.66rem;
+            font-weight: 600;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.82);
+            margin-bottom: 0.52rem;
+            text-shadow: 0 2px 12px rgba(0, 0, 0, 0.85);
+        }
+
+        .cd-row {
+            display: flex;
+            align-items: stretch;
+            font-variant-numeric: tabular-nums;
+            font-feature-settings: 'tnum' 1;
+        }
+
+        .cd-days-wrap {
+            display: flex;
+            align-items: baseline;
+            gap: 0.42rem;
+            align-self: center;
+            padding-bottom: 0.12rem;
+        }
+
+        .cd-days-val {
+            font-size: 2.05rem;
+            font-weight: 700;
+            line-height: 0.95;
+            letter-spacing: -0.025em;
+            color: #ffffff;
+            text-shadow: 0 3px 16px rgba(0, 0, 0, 0.85);
+        }
+
+        .cd-days-unit {
+            font-size: 1.02rem;
+            font-weight: 400;
+            color: rgba(255, 255, 255, 0.90);
+            text-shadow: 0 2px 12px rgba(0, 0, 0, 0.85);
+        }
+
+        .cd-divider {
+            width: 1px;
+            background: rgba(255, 255, 255, 0.36);
+            margin: 0.08rem 1.05rem;
+            align-self: stretch;
+            flex-shrink: 0;
+        }
+
+        .cd-hms-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.35rem;
+        }
+
+        .cd-col {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 2.1rem;
+        }
+
+        .cd-val {
+            font-size: 1.42rem;
+            font-weight: 700;
+            line-height: 1;
+            letter-spacing: -0.02em;
+            color: #ffffff;
+            text-shadow: 0 3px 16px rgba(0, 0, 0, 0.85);
+        }
+
+        .cd-sep {
+            font-size: 1.28rem;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.86);
+            line-height: 0.92;
+            padding: 0 0.04rem;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+        }
+
+        .cd-label {
+            font-size: 0.50rem;
+            font-weight: 600;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.78);
+            margin-top: 0.34rem;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.88);
+        }
+
+        /* ─── Zona Inferior: Cuadrícula Editorial ─── */
+        .bottom-wrap {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            grid-template-rows: auto auto;
+            column-gap: 2.5rem;
+            row-gap: 1.05rem;
+            align-items: start;
+            width: 100%;
+        }
+
+        .music-block {
+            grid-column: 1;
+            grid-row: 1;
+            min-width: 0;
+            max-width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            border-left: 2px solid rgba(255, 255, 255, 0.72);
+            padding: 0.08rem 0 0.1rem 0.85rem;
+        }
+
+        .song-title {
+            font-family: 'Sebenta', 'Fraunces', Georgia, 'Times New Roman', serif;
+            font-size: 1.62rem;
+            font-weight: 500;
+            font-synthesis: none;
+            text-rendering: geometricPrecision;
+            line-height: 1.12;
+            letter-spacing: 0.005em;
+            color: #ffffff;
+            text-shadow: 0 2px 14px rgba(0, 0, 0, 0.72);
+            max-width: 100%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            transition: opacity 0.3s ease;
+        }
+
+        .song-artist {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-size: 0.84rem;
+            font-weight: 400;
+            line-height: 1.3;
+            color: rgba(255, 255, 255, 0.72);
+            text-shadow: 0 2px 12px rgba(0, 0, 0, 0.82);
+            margin-top: 0.24rem;
+            max-width: 100%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            transition: opacity 0.3s ease;
+        }
+
+        /* Bloque Reloj y Clima (Derecha arriba, alineado con Música) */
+        .clock-col {
+            grid-column: 2;
+            grid-row: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            text-align: right;
+            padding-top: 0.22rem;
+        }
+
+        .target-stamp {
+            font-size: 0.86rem;
+            color: rgba(255, 255, 255, 0.86);
+            text-shadow: 0 2px 12px rgba(0, 0, 0, 0.85);
+            font-variant-numeric: tabular-nums;
+            font-feature-settings: 'tnum' 1;
+            white-space: nowrap;
+        }
+
+        .clock-date {
+            color: rgba(255, 255, 255, 0.74);
+            font-weight: 400;
+        }
+
+        .clock-sep {
+            color: rgba(255, 255, 255, 0.50);
+            font-weight: 400;
+            margin: 0 0.22rem;
+        }
+
+        .clock-time {
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .weather-stamp {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.26rem;
+            margin-top: 0.32rem;
+            font-size: 0.86rem;
+            color: rgba(255, 255, 255, 0.86);
+            text-shadow: 0 2px 12px rgba(0, 0, 0, 0.85);
+            white-space: nowrap;
+            transition: opacity 0.35s ease;
+        }
+
+        .weather-stamp[hidden] {
+            display: none;
+        }
+
+        .wx-ico {
+            width: 1.24em;
+            height: 1.24em;
+            flex-shrink: 0;
+            margin-right: 0.14rem;
+            color: rgba(255, 255, 255, 0.86);
+        }
+
+        .wx-city {
+            color: rgba(255, 255, 255, 0.74);
+            font-weight: 400;
+        }
+
+        .wx-sep {
+            color: rgba(255, 255, 255, 0.50);
+            margin: 0 0.08rem;
+        }
+
+        .wx-temp {
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        /* Cintillo de Noticias (Fila inferior lineal) */
+        .news-line {
+            grid-column: 1 / -1;
+            grid-row: 2;
+            min-width: 0;
+        }
+
+        .news-row {
+            display: flex;
+            align-items: baseline;
+            gap: 0.62rem;
+            overflow: hidden;
+            white-space: nowrap;
+            transition: opacity 0.28s ease, transform 0.34s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .news-cat {
+            font-size: 0.66rem;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.74);
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.85);
+            flex-shrink: 0;
+        }
+
+        .news-sep {
+            color: rgba(255, 255, 255, 0.34);
+            font-size: 0.76rem;
+            font-weight: 300;
+            flex-shrink: 0;
+        }
+
+        .news-title {
+            font-size: 0.76rem;
+            font-weight: 500;
+            line-height: 1.45;
+            color: rgba(255, 255, 255, 0.92);
+            text-shadow: 0 2px 12px rgba(0, 0, 0, 0.9);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* Responsive Mobile */
+        @media (max-width: 768px) {
+            html {
+                font-size: 16px;
+            }
+
+            .stage {
+                padding: 1.5rem 1.25rem;
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .bottom-wrap {
+                grid-template-columns: minmax(0, 1fr);
+                row-gap: 0.85rem;
+            }
+
+            .clock-col {
+                grid-column: 1;
+                grid-row: 2;
+                align-items: flex-start;
+                text-align: left;
+                padding-top: 0;
+            }
+
+            .news-line {
+                grid-row: 3;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Fondo animado prerenderizado (30 FPS exactos en bucle cerrado) -->
+    <div class="video-bg">
+        <video id="bg-video" src="embarcadero.mp4" autoplay muted loop playsinline preload="auto"></video>
+    </div>
+
+    <!-- Velos direccionales para contraste editorial -->
+    <div class="video-overlay"></div>
+
+    <!-- HUD Principal -->
+    <div class="stage">
+
+        <!-- Header: Logo + Contador -->
+        <header class="header">
+            <div class="brand-logo">28E</div>
+
+            <div id="countdown-root" class="countdown-container">
+                <div class="countdown-eyebrow">Apertura de la Web</div>
+                <div class="cd-row">
+                    <div class="cd-days-wrap">
+                        <span id="cd-d" class="cd-days-val">00</span>
+                        <span id="cd-d-unit" class="cd-days-unit">días</span>
+                    </div>
+                    <div class="cd-divider" aria-hidden="true"></div>
+                    <div class="cd-hms-row">
+                        <div class="cd-col">
+                            <span id="cd-h" class="cd-val">00</span>
+                            <span class="cd-label">Horas</span>
+                        </div>
+                        <span class="cd-sep">:</span>
+                        <div class="cd-col">
+                            <span id="cd-m" class="cd-val">00</span>
+                            <span class="cd-label">Min</span>
+                        </div>
+                        <span class="cd-sep">:</span>
+                        <div class="cd-col">
+                            <span id="cd-s" class="cd-val">00</span>
+                            <span class="cd-label">Seg</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Zona Inferior: Música + Reloj/Clima + Noticias -->
+        <div class="bottom-wrap">
+            <div class="music-block" id="music-info">
+                <div id="music-title" class="song-title">Radio 28E</div>
+                <div id="music-artist" class="song-artist">Selección 28E</div>
+            </div>
+
+            <div class="clock-col">
+                <div id="live-clock" class="target-stamp">
+                    <span class="clock-date">---, - ---</span><span class="clock-sep">·</span><span
+                        class="clock-time">--:-- --</span>
+                </div>
+                <div id="live-weather" class="weather-stamp" hidden></div>
+            </div>
+
+            <div class="news-line" id="news-line">
+                <div class="news-row" id="news-row">
+                    <span id="news-cat" class="news-cat">INFO</span>
+                    <span class="news-sep">|</span>
+                    <span id="news-title" class="news-title">Sintonízanos donde estés desde TuneIn buscando Twenty Eight Experience Radio</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="radio-status" role="status" hidden style="position:fixed;left:1.5rem;top:6rem;z-index:20;max-width:32rem;padding:.6rem .8rem;background:#241c2e;color:white;font:14px system-ui"></div>
+
+    <!-- Reproductor de música continuo -->
+    <audio id="audio-elem" preload="auto"></audio>
+
+    <script src="news-cache.js"></script>
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js';
+        import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js';
+        import { getDatabase, ref, onValue, set } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-database.js';
+
+        const Q = new URLSearchParams(window.location.search);
+        const BASE = window.location.pathname.includes('/stream-study/embarcadero/') ? '../../' : '';
+        const IS_EMITTER = Q.has('emit');
+        if (Q.has('stream') || IS_EMITTER) {
+            document.body.classList.add('stream-kiosk');
+        }
+
+        // ── 1. Contador exacto al 00:00:00 del 21 de Noviembre (Hora oficial Venezuela UTC-4) ──
+        let TARGET_DATE = new Date('2026-11-21T00:00:00-04:00');
+
+        const elD = document.getElementById('cd-d');
+        const elDUnit = document.getElementById('cd-d-unit');
+        const elH = document.getElementById('cd-h');
+        const elM = document.getElementById('cd-m');
+        const elS = document.getElementById('cd-s');
+        const elClock = document.getElementById('live-clock');
+
+        const clockFormatter = new Intl.DateTimeFormat('en-US', {
+            timeZone: 'America/Caracas',
+            weekday: 'short',
+            day: 'numeric',
+            month: 'numeric',
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true
+        });
+        const WEEKDAYS_ES = { Sun: 'Dom', Mon: 'Lun', Tue: 'Mar', Wed: 'Mié', Thu: 'Jue', Fri: 'Vie', Sat: 'Sáb' };
+        const MONTHS_ES = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+
+        let serverTimeOffset = 0;
+        let streamLatencyMs = IS_EMITTER || Q.has('stream') ? 8000 : 0;
+        let lastClockMarkup = '';
+
+        function tick() {
+            const nowMs = Date.now() + serverTimeOffset + streamLatencyMs;
+            const now = new Date(nowMs);
+
+            if (elClock) {
+                const parts = clockFormatter.formatToParts(now);
+                const getP = (type) => parts.find(p => p.type === type)?.value || '';
+                const wDay = WEEKDAYS_ES[getP('weekday')] || getP('weekday');
+                const dayNum = getP('day');
+                const monthName = MONTHS_ES[(parseInt(getP('month'), 10) || 1) - 1];
+                const hourVal = getP('hour');
+                const minVal = getP('minute');
+                const dayPeriod = (getP('dayPeriod') || '').toUpperCase().replace(/\./g, '').replace(/\s+/g, '');
+                const nextMarkup = `<span class="clock-date">${wDay}, ${dayNum} ${monthName}</span><span class="clock-sep">·</span><span class="clock-time">${hourVal}:${minVal} ${dayPeriod}</span>`;
+                if (nextMarkup !== lastClockMarkup) {
+                    lastClockMarkup = nextMarkup;
+                    elClock.innerHTML = nextMarkup;
+                }
+            }
+
+            const diff = TARGET_DATE.getTime() - nowMs;
+            if (diff <= 0) {
+                if (elD && elD.textContent !== '00') elD.textContent = '00';
+                if (elH && elH.textContent !== '00') elH.textContent = '00';
+                if (elM && elM.textContent !== '00') elM.textContent = '00';
+                if (elS && elS.textContent !== '00') elS.textContent = '00';
+                return;
+            }
+
+            const daysNum = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const dStr = String(daysNum).padStart(2, '0');
+            const hStr = String(Math.floor((diff / (1000 * 60 * 60)) % 24)).padStart(2, '0');
+            const mStr = String(Math.floor((diff / (1000 * 60)) % 60)).padStart(2, '0');
+            const sStr = String(Math.floor((diff / 1000) % 60)).padStart(2, '0');
+
+            if (elD && elD.textContent !== dStr) elD.textContent = dStr;
+            if (elDUnit) {
+                const unitTxt = daysNum === 1 ? 'día' : 'días';
+                if (elDUnit.textContent !== unitTxt) elDUnit.textContent = unitTxt;
+            }
+            if (elH && elH.textContent !== hStr) elH.textContent = hStr;
+            if (elM && elM.textContent !== mStr) elM.textContent = mStr;
+            if (elS && elS.textContent !== sStr) elS.textContent = sStr;
+        }
+
+        setInterval(tick, 100);
+        tick();
+
+        // ── 2. Conexión Realtime a 28E Radio (Sincronizado vía Firebase) ──
+        const firebaseConfig = {
+            apiKey: "AIzaSyDFkuktrXnsV9-jg2bv5dpJQRR-he8PT3g",
+            authDomain: "yaire-591ca.firebaseapp.com",
+            databaseURL: "https://yaire-591ca-default-rtdb.firebaseio.com",
+            projectId: "yaire-591ca",
+            storageBucket: "yaire-591ca.firebasestorage.app",
+            messagingSenderId: "450381430658",
+            appId: "1:450381430658:web:262d1bb7b1732c3990d99b"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        onValue(ref(db, 'radio_state/targetDate'), snap => {
+            const val = snap.val();
+            if (val) {
+                const parsed = new Date(val);
+                if (!isNaN(parsed.getTime())) {
+                    TARGET_DATE = parsed;
+                    tick();
+                }
+            }
+        });
+
+        onValue(ref(db, 'radio_state/streamLatencyMs'), snap => {
+            if (!(IS_EMITTER || Q.has('stream'))) return;
+            const val = Number(snap.val());
+            if (!isNaN(val) && val >= 0 && val <= 30000) {
+                streamLatencyMs = val;
+                tick();
+            }
+        });
+
+        let initialReloadToken = null;
+        onValue(ref(db, 'radio_state/reloadToken'), snap => {
+            const token = snap.val();
+            if (initialReloadToken === null) {
+                initialReloadToken = token || 0;
+            } else if (token && token !== initialReloadToken && IS_EMITTER) {
+                window.location.reload();
+            }
+        });
+
+        const baseSongs = [
+            { title: "Wonderful", artist: "Otis McDonald", src: "sounds/ost/Otis McDonald - Wonderful.mp3", duration: 167.0 },
+            { title: "MAS PERREO", artist: "Lawd Ito", src: "radio/stream in youtube/ES_MAS PERREO - Lawd Ito.mp3", duration: 173.3 },
+            { title: "Find Your Lane", artist: "Otis McDonald", src: "radio/stream in youtube/Otis McDonald - Find Your Lane.mp3", duration: 159.2 },
+            { title: "CRAZY (Live)", artist: "Otis McDonald", src: "radio/stream in youtube/Otis McDonald - CRAZY - Live (SPOTISAVER).mp3", duration: 124.1 },
+            { title: "Tokyo Magic", artist: "Lawd Ito", src: "radio/stream in youtube/ES_Tokyo Magic - Lawd Ito.mp3", duration: 179.2 },
+            { title: "Here If You're Going My Way", artist: "Otis McDonald", src: "radio/stream in youtube/Here, If You're Going - Otis McDonald.mp3", duration: 108.8 },
+            { title: "Body, Mind & Soul", artist: "Otis McDonald", src: "radio/stream in youtube/Otis McDonald - Body, Mind & Soul.mp3", duration: 250.3 },
+            { title: "My Everything", artist: "Otis McDonald", src: "sounds/ost/Otis McDonald - My Everything.mp3", duration: 156.9 },
+            { title: "Atacha", artist: "Lawd Ito", src: "radio/stream in youtube/ES_Atacha - Lawd Ito.mp3", duration: 195.0 },
+            { title: "Paulo Coelho", artist: "Otis McDonald, Mani Draper", src: "radio/stream in youtube/Otis McDonald - Paulo Coelho.mp3", duration: 149.1 },
+            { title: "Menea", artist: "Master One, Lawd Ito", src: "radio/stream in youtube/ES_Menea - Master One.mp3", duration: 198.8 },
+            { title: "Sin Pensar", artist: "Lawd Ito, Mercedes Gala", src: "radio/stream in youtube/ES_Sin Pensar - Lawd Ito.mp3", duration: 184.6 },
+            { title: "Eres Mía", artist: "Lawd Ito", src: "radio/stream in youtube/ES_Eres Mia - Lawd Ito.mp3", duration: 167.0 },
+            { title: "Cheers to Frank", artist: "Otis McDonald", src: "radio/stream in youtube/Otis McDonald - Cheers to Frank.mp3", duration: 177.5 },
+            { title: "Loko", artist: "Lawd Ito, Nicolas Rengifo", src: "radio/1792559637795_ES_Loko_-_Lawd_Ito.mp3", duration: 166.0 },
+            { title: "Tulipanes Pa' Yaire", artist: "Rodezel", src: "radio/stream in youtube/Tulipanes Pa' Yaire - Rodezel.mp3", duration: 177.2 },
+            { title: "Entre Tú y Yo", artist: "Nico Rengifo", src: "radio/stream in youtube/ES_Entre Tu y Yo - Nico Rengifo.mp3", duration: 177.7 },
+            { title: "Finally the Air Is Cool", artist: "Otis McDonald", src: "radio/stream in youtube/Otis McDonald - Finally the Air Is Cool.mp3", duration: 166.2 },
+            { title: "As Long As You Love Me", artist: "Otis McDonald", src: "radio/stream in youtube/As long as you love me - Otis McDonald.mp3", duration: 141.2 },
+            { title: "Ella", artist: "Lawd Ito, Bambi Haze, Frontera Bugalú", src: "radio/stream in youtube/ES_Ella - Lawd Ito.mp3", duration: 181.3 },
+            { title: "Purple Flowers", artist: "Filthy The Kid, Lawd Ito", src: "radio/stream in youtube/ES_Purple Flowers - Filthy The Kid.mp3", duration: 193.3 },
+            { title: "Quemao", artist: "Lawd Ito", src: "radio/stream in youtube/ES_Quemao - Lawd Ito.mp3", duration: 173.0 },
+            { title: "The Lights", artist: "Lawd Ito", src: "radio/stream in youtube/ES_The Lights - Lawd Ito.mp3", duration: 177.2 },
+            { title: "Suéltame", artist: "Lawd Ito", src: "radio/stream in youtube/ES_Sueltame - Lawd Ito.mp3", duration: 179.5 },
+            { title: "Feel Right", artist: "Otis McDonald, The Kount, Sndtrak", src: "radio/stream in youtube/Otis McDonald - Feel Right (feat. The Kount & Sndtrak).mp3", duration: 191.6 },
+            { title: "Introduction", artist: "Otis McDonald", src: "radio/stream in youtube/Otis McDonald - Introduction.mp3", duration: 198.6 },
+            { title: "Caro", artist: "Lawd Ito", src: "radio/stream in youtube/ES_Caro - Lawd Ito.mp3", duration: 168.0 },
+            { title: "Tikiti", artist: "Lawd Ito", src: "radio/stream in youtube/ES_Tikiti - Lawd Ito.mp3", duration: 170.1 },
+            { title: "Bajo La Lluvia", artist: "Rodezel", src: "radio/Bajo La Lluvia - Rodezel.mp3", duration: 166.9 },
+            { title: "Peachy", artist: "half.cool", src: "radio/stream in youtube/Peachy - half.cool.mp3", duration: 98.5 },
+            { title: "GWTF", artist: "Lawd Ito", src: "radio/stream in youtube/ES_GWTF - Lawd Ito.mp3", duration: 190.8 },
+            { title: "Ever Felt, Pt. 1", artist: "Otis McDonald", src: "radio/stream in youtube/Otis McDonald - Ever Felt, Pt. 1.mp3", duration: 143.9 },
+            { title: "Belén", artist: "Lawd Ito", src: "radio/stream in youtube/ES_Belen - Lawd Ito.mp3", duration: 204.0 },
+            { title: "At the Top of the World", artist: "LaKesha Nugent", src: "radio/stream in youtube/ES_At the Top of the World - LaKesha Nugent.mp3", duration: 187.2 },
+            { title: "Sacatela", artist: "Lawd Ito", src: "radio/stream in youtube/ES_Sacatela - Lawd Ito.mp3", duration: 172.5 },
+            { title: "The H3 Theme", artist: "Otis McDonald", src: "radio/stream in youtube/Otis McDonald - The H3 Theme.mp3", duration: 195.8 },
+            { title: "Pathways", artist: "Otis McDonald, Wil Blades", src: "radio/stream in youtube/Otis McDonald - Pathways (feat. Wil Blades).mp3", duration: 214.9 },
+            { title: "Cafecito", artist: "Lawd Ito", src: "radio/stream in youtube/ES_Cafecito - Lawd Ito.mp3", duration: 176.8 },
+            { title: "Pink Guava", artist: "Lawd Ito", src: "radio/stream in youtube/ES_Pink Guava - Lawd Ito.mp3", duration: 175.1 },
+            { title: "Involved", artist: "Otis McDonald, Mani Draper", src: "radio/stream in youtube/Otis McDonald - Involved.mp3", duration: 171.7 },
+            { title: "While Siena Sings", artist: "Otis McDonald", src: "radio/stream in youtube/Otis McDonald - While Siena Sings.mp3", duration: 219.5 },
+            { title: "Sangria", artist: "Lawd Ito", src: "radio/stream in youtube/ES_Sangria - Lawd Ito.mp3", duration: 210.6 },
+            { title: "Vela", artist: "Lawd Ito", src: "radio/stream in youtube/ES_Vela - Lawd Ito.mp3", duration: 182.1 },
+            { title: "Bendiciones", artist: "Lawd Ito, Tilden Parc", src: "radio/stream in youtube/ES_Bendiciones - Lawd Ito.mp3", duration: 220.6 },
+            { title: "SUNLIGHT", artist: "Otis McDonald", src: "radio/stream in youtube/Otis McDonald - SUNLIGHT.mp3", duration: 194.7 },
+            { title: "No Hay Trabajo", artist: "Lawd Ito", src: "radio/stream in youtube/ES_No Hay Trabajo - Lawd Ito.mp3", duration: 168.6 },
+            { title: "Goin Strait", artist: "Fasion", src: "radio/stream in youtube/ES_Goin Strait - Fasion.mp3", duration: 156.9 },
+            { title: "Survive", artist: "Otis McDonald", src: "radio/stream in youtube/Otis McDonald - Survive.mp3", duration: 158.3 },
+            { title: "Treat Me This Way (AI Rework)", artist: "Rodezel", src: "radio/1777594789237_f228324448.mp3", duration: 254.6 },
+            { title: "Joe Louis", artist: "Otis McDonald", src: "sounds/ost/Otis McDonald - Joe Louis.mp3", duration: 182.7 },
+            { title: "Fireworks", artist: "Otis McDonald", src: "radio/stream in youtube/Otis McDonald - Fireworks.mp3", duration: 173.8 },
+            { title: "But We're Family", artist: "Otis McDonald", src: "sounds/ost/Otis McDonald - But We're Family.mp3", duration: 219.3 },
+            { title: "Magic, Pt. 2", artist: "Otis McDonald", src: "sounds/ost/Otis McDonald - I Got Your Back.mp3", duration: 225.7 },
+            { title: "I Wish I Knew", artist: "Otis McDonald, Joni Inez", src: "radio/stream in youtube/I Wish I Knew - Otis McDonald.mp3", duration: 165.6 },
+            { title: "Hide from the Heavy", artist: "Otis McDonald", src: "radio/stream in youtube/Otis McDonald - Hide from the Heavy.mp3", duration: 159.5 },
+            { title: "Forever Young", artist: "Otis McDonald", src: "radio/stream in youtube/Forever Young - Otis McDonald.mp3", duration: 161.8 },
+            { title: "Pressure", artist: "Otis McDonald", src: "radio/stream in youtube/Pressure - Otis McDonald.mp3", duration: 158.3 },
+            { title: "Winter Time is Near", artist: "TrackTribe, Otis McDonald", src: "radio/stream in youtube/TrackTribe - Winter Time is Near (feat. Otis McDonald).mp3", duration: 198.7 },
+            { title: "Side Steppin'", artist: "Otis McDonald", src: "radio/stream in youtube/Side Steppin' - Otis McDonald.mp3", duration: 165.5 },
+            { title: "Truckee, CA", artist: "Otis McDonald", src: "radio/stream in youtube/Truckee - Otis McDonald.mp3", duration: 168.8 },
+            { title: "Complicate Ya", artist: "Otis McDonald", src: "radio/stream in youtube/Complicate ya - Otis McDonald.mp3", duration: 166.5 },
+            { title: "RAGE", artist: "Otis McDonald", src: "radio/stream in youtube/Otis McDonald - RAGE.mp3", duration: 183.4 },
+            { title: "Treat Me This Way", artist: "Otis McDonald", src: "radio/stream in youtube/Treat me this way - Otis McDonald.mp3", duration: 125.3 },
+            { title: "Yesterday", artist: "Otis McDonald", src: "radio/stream in youtube/Yesterday - Otis McDonald.mp3", duration: 169.7 },
+            { title: "Be There", artist: "Otis McDonald", src: "radio/stream in youtube/Otis McDonald - Be There.mp3", duration: 206.5 },
+            { title: "BirdBrainz", artist: "Otis McDonald", src: "radio/stream in youtube/BirdBrainz - Otis McDonald.mp3", duration: 134.0 },
+            { title: "BirdBrainz II", artist: "Otis McDonald", src: "radio/stream in youtube/BirdBrainz II - Otis McDonald.mp3", duration: 169.9 },
+            { title: "ALTITUDE", artist: "BLUE STEEL", src: "radio/stream in youtube/ES_ALTITUDE - BLUE STEEL.mp3", duration: 169.8 },
+            { title: "That Slapper", artist: "Otis McDonald", src: "radio/stream in youtube/That Slapper - Otis McDonald.mp3", duration: 198.4 },
+            { title: "Holiday", artist: "Otis McDonald", src: "radio/stream in youtube/Otis McDonald - Holiday.mp3", duration: 450.7 },
+            { title: "3rdeyeblimp", artist: "Otis McDonald", src: "radio/stream in youtube/3rdEyeBlimp - Otis McDonald.mp3", duration: 157.8 },
+            { title: "Fly Away", artist: "Otis McDonald", src: "radio/stream in youtube/Fly Away - Otis McDonald.mp3", duration: 165.1 },
+            { title: "Wait for You", artist: "Otis McDonald", src: "radio/stream in youtube/Otis McDonald - Wait for You.mp3", duration: 192.5 },
+            { title: "Stay", artist: "Otis McDonald", src: "radio/stream in youtube/Stay - Otis McDonald.mp3", duration: 118.6 },
+            { title: "Eres", artist: "Rodezel", src: "radio/stream in youtube/Eres - Rodezel.mp3", duration: 200.0 },
+            { title: "Other Way", artist: "Otis McDonald", src: "radio/stream in youtube/Other Way - Otis McDonald.mp3", duration: 114.7 },
+            { title: "Gold", artist: "Ooyy, Janset", src: "radio/stream in youtube/ES_Gold - Ooyy.mp3", duration: 187.8 },
+            { title: "Ever Felt, Pt. 2", artist: "Otis McDonald", src: "radio/stream in youtube/Otis McDonald - Ever Felt, Pt. 2.mp3", duration: 140.0 },
+            { title: "Behind These Closed Doors", artist: "Otis McDonald", src: "radio/stream in youtube/Behind Closed Doors - Otis McDonald.mp3", duration: 128.5 },
+            { title: "A Legacy Endures", artist: "Otis McDonald", src: "sounds/ost/Otis McDonald - A Legacy Endures.mp3", duration: 299.7 },
+            { title: "Good Time", artist: "Otis McDonald", src: "radio/stream in youtube/Otis McDonald - Good Time.mp3", duration: 269.8 },
+            { title: "A Legacy Lived", artist: "Otis McDonald", src: "sounds/ost/Otis McDonald - A Legacy Lived.mp3", duration: 307.2 },
+            { title: "ELEVATION", artist: "BLUE STEEL", src: "radio/stream in youtube/ES_ELEVATION - BLUE STEEL.mp3", duration: 192.4 },
+            { title: "A Legacy Understood", artist: "Otis McDonald", src: "sounds/ost/Otis McDonald - A Legacy Understood.mp3", duration: 404.4 },
+            { title: "Don't Show Your Face", artist: "Otis McDonald", src: "radio/stream in youtube/Otis McDonald - Don't Show Your Face.mp3", duration: 151.4 },
+            { title: "LUDICROUS", artist: "BLUE STEEL", src: "radio/stream in youtube/ES_LUDICROUS - BLUE STEEL.mp3", duration: 149.6 },
+            { title: "It Slowly Started to Fade Away", artist: "Otis McDonald", src: "sounds/ost/Otis McDonald - It Slowly Started to Fade Away.mp3", duration: 506.4 },
+            { title: "Holiday (reprise)", artist: "Otis McDonald", src: "radio/stream in youtube/Otis McDonald - Holiday (reprise).mp3", duration: 169.6 }
+        ];
+
+        const radioIdents = [
+            { title: "Identify", artist: "28E Radio", src: "radio/28E_ID_01.mp3", duration: 10.0 },
+            { title: "Identify", artist: "28E Radio", src: "radio/28E_ID_02.mp3", duration: 10.0 },
+            { title: "Identify", artist: "28E Radio", src: "radio/28E_ID_03.mp3", duration: 15.0 },
+            { title: "Identify", artist: "28E Radio", src: "radio/28E_ID_04.mp3", duration: 6.0 },
+            { title: "Identify", artist: "28E Radio", src: "radio/28E_ID_05.mp3", duration: 3.7 }
+        ];
+        const identOrder = [3, 4, 2, 0, 1, 4, 2, 3, 1, 0, 2, 4, 1, 3, 0, 4, 3, 2, 0, 1, 3, 4];
+        const radioTracks = [];
+        for (let i = 0, identStep = 0; i < baseSongs.length; i++) {
+            radioTracks.push(baseSongs[i]);
+            if ((i + 1) % 4 === 0) {
+                radioTracks.push(radioIdents[identOrder[identStep % identOrder.length]]);
+                identStep++;
+            }
+        }
+
+        const audio = document.getElementById('audio-elem');
+        const elSongTitle = document.getElementById('music-title');
+        const elSongArtist = document.getElementById('music-artist');
+        const nextAudioPreloader = new Audio();
+        nextAudioPreloader.preload = 'auto';
+
+        let currentRadioState = null;
+        let currentTrackIdx = -1;
+        let hasInitialSynced = false;
+        let activeMetaHandler = null;
+        let endedTimer = null;
+        let musicFadeTimer = null;
+        let pendingSongTitle = null;
+        let pendingSongArtist = null;
+
+        function resolveSrc(relSrc) {
+            return BASE ? (BASE + relSrc) : relSrc;
+        }
+
+        onValue(ref(db, '.info/serverTimeOffset'), snap => {
+            serverTimeOffset = snap.val() || 0;
+        });
+
+        // Un mismo archivo conserva su identidad aunque cambie de carpeta o llegue como URL.
+        function trackFilename(src) {
+            if (!src) return '';
+            try {
+                return decodeURIComponent(new URL(src, document.baseURI).pathname.split('/').pop());
+            } catch (_) {
+                return '';
+            }
+        }
+
+        function findTrackIndex(src, hintIdx) {
+            const filename = trackFilename(src);
+            if (Number.isInteger(hintIdx) && radioTracks[hintIdx] &&
+                (!src || trackFilename(radioTracks[hintIdx].src) === filename)) {
+                return hintIdx;
+            }
+            const idx = radioTracks.findIndex(track => trackFilename(track.src) === filename);
+            return idx >= 0 ? idx : 0;
+        }
+
+        function resolveLiveTrack(startTrackSrc, startTimeMs, nowMs, hintIdx) {
+            let idx = findTrackIndex(startTrackSrc, hintIdx);
+            const cycleSeconds = radioTracks.reduce((total, track) => total + track.duration, 0);
+            let elapsed = Math.max(0, (nowMs - startTimeMs) / 1000) % cycleSeconds;
+            while (elapsed >= radioTracks[idx].duration) {
+                elapsed -= radioTracks[idx].duration;
+                idx = (idx + 1) % radioTracks.length;
+            }
+            return {
+                track: radioTracks[idx],
+                idx,
+                seekTime: elapsed,
+                virtualStartTime: nowMs - Math.round(elapsed * 1000)
+            };
+        }
+
+        function preloadNextTrack(idx) {
+            if (idx < 0 || !radioTracks.length) return;
+            const nextTrack = radioTracks[(idx + 1) % radioTracks.length];
+            if (nextTrack && nextTrack.src) {
+                const localSrc = resolveSrc(nextTrack.src);
+                const targetUrl = new URL(localSrc, document.baseURI).href;
+                if (nextAudioPreloader.src !== targetUrl) {
+                    nextAudioPreloader.src = localSrc;
+                    nextAudioPreloader.load();
+                }
+            }
+        }
+
+        function updateNowPlayingUI(track) {
+            if (!track || (!elSongTitle && !elSongArtist)) return;
+
+            const nextTitle = track.title || '';
+            const nextArtist = track.artist || 'Selección 28E';
+            const curTitle = elSongTitle ? elSongTitle.textContent : '';
+            const curArtist = elSongArtist ? elSongArtist.textContent : '';
+
+            if (!musicFadeTimer && curTitle === nextTitle && curArtist === nextArtist) return;
+            if (musicFadeTimer && pendingSongTitle === nextTitle && pendingSongArtist === nextArtist) return;
+
+            if (musicFadeTimer) {
+                clearTimeout(musicFadeTimer);
+                musicFadeTimer = null;
+            }
+
+            pendingSongTitle = nextTitle;
+            pendingSongArtist = nextArtist;
+
+            if (elSongTitle) elSongTitle.style.opacity = '0';
+            if (elSongArtist) elSongArtist.style.opacity = '0';
+
+            musicFadeTimer = setTimeout(() => {
+                musicFadeTimer = null;
+                pendingSongTitle = null;
+                pendingSongArtist = null;
+
+                if (elSongTitle) elSongTitle.textContent = nextTitle;
+                if (elSongArtist) elSongArtist.textContent = nextArtist;
+                if (elSongTitle) void elSongTitle.offsetWidth;
+                if (elSongTitle) elSongTitle.style.opacity = '1';
+                if (elSongArtist) elSongArtist.style.opacity = '1';
+            }, 300);
+        }
+
+        const statusElement = document.getElementById('radio-status');
+        const statusMessages = new Map();
+        function reportRadioStatus(key, message = '') {
+            if (message) statusMessages.set(key, message);
+            else statusMessages.delete(key);
+            statusElement.textContent = [...statusMessages.values()].join(' ');
+            statusElement.hidden = statusMessages.size === 0;
+        }
+
+        const auth = getAuth(app);
+        const requiresPublisherAuth = Q.get('auth') !== 'optional';
+        let pendingPublication = null;
+        let publishing = false;
+
+        async function publishRadioState(state) {
+            if (!IS_EMITTER) return;
+            pendingPublication = state;
+            if (!auth.currentUser && requiresPublisherAuth) {
+                reportRadioStatus('publication', 'Emisor sin sesión. Inicia sesión en el panel de administración desde este mismo navegador y origen.');
+                return;
+            }
+            if (publishing) return;
+            publishing = true;
+            try {
+                while (pendingPublication && (auth.currentUser || !requiresPublisherAuth)) {
+                    const latest = pendingPublication;
+                    pendingPublication = null;
+                    await set(ref(db, 'radio_state/current'), latest);
+                }
+                reportRadioStatus('publication');
+            } catch (error) {
+                // Conservar el estado más reciente para reintentar tras reconectar.
+                pendingPublication = currentRadioState;
+                console.error('No se pudo publicar el estado de Radio 28E', error);
+                reportRadioStatus('publication', 'No se pudo sincronizar el emisor. Revisa su sesión y los permisos de Firebase.');
+            } finally {
+                publishing = false;
+            }
+        }
+
+        if (IS_EMITTER) {
+            onAuthStateChanged(auth, () => {
+                if (currentRadioState) publishRadioState(currentRadioState);
+            });
+            onValue(ref(db, '.info/connected'), snapshot => {
+                if (snapshot.val() && pendingPublication) publishRadioState(currentRadioState);
+            });
+            setInterval(() => {
+                if (pendingPublication && (auth.currentUser || !requiresPublisherAuth)) publishRadioState(currentRadioState);
+            }, 15000);
+        }
+
+        function playAudio() {
+            audio.play().then(() => reportRadioStatus('playback')).catch(error => {
+                if (error.name === 'AbortError') return;
+                console.error('No se pudo iniciar el audio', error);
+                reportRadioStatus('playback', error.name === 'NotAllowedError'
+                    ? 'Pulsa la pantalla para activar el audio.'
+                    : 'No se pudo reproducir la pista. Reintentando con la siguiente.');
+                if (error.name !== 'NotAllowedError') scheduleAdvance(1000);
+            });
+        }
+
+        function loadAndPlayTrack(idx, seekTime = 0, allowSeek = false) {
+            const track = radioTracks[idx];
+            if (!track || !track.src) return;
+            clearTimeout(endedTimer);
+            endedTimer = null;
+            currentTrackIdx = idx;
+            updateNowPlayingUI(track);
+            preloadNextTrack(idx);
+
+            if (activeMetaHandler) audio.removeEventListener('loadedmetadata', activeMetaHandler);
+            activeMetaHandler = null;
+
+            const startPlayback = () => {
+                if (currentRadioState?.isPlaying === false) return;
+                if (allowSeek && Number.isFinite(audio.duration)) {
+                    const target = Math.max(0, Math.min(seekTime, audio.duration - 0.05));
+                    if (Math.abs(audio.currentTime - target) > 1.5) {
+                        try { audio.currentTime = target; } catch (_) { }
+                    }
+                }
+                playAudio();
+            };
+            const localSrc = resolveSrc(track.src);
+            if (audio.src !== new URL(localSrc, document.baseURI).href) {
+                audio.src = localSrc;
+                activeMetaHandler = () => {
+                    audio.removeEventListener('loadedmetadata', activeMetaHandler);
+                    activeMetaHandler = null;
+                    startPlayback();
+                };
+                audio.addEventListener('loadedmetadata', activeMetaHandler);
+                audio.load();
+            } else if (audio.readyState >= 1 && !audio.error) {
+                startPlayback();
+            } else {
+                activeMetaHandler = () => {
+                    audio.removeEventListener('loadedmetadata', activeMetaHandler);
+                    activeMetaHandler = null;
+                    startPlayback();
+                };
+                audio.addEventListener('loadedmetadata', activeMetaHandler);
+                audio.load();
+            }
+        }
+
+        function scheduleAdvance(delay = 200) {
+            if (endedTimer || !hasInitialSynced || currentRadioState?.isPlaying === false) return;
+            endedTimer = setTimeout(() => {
+                endedTimer = null;
+                if (currentRadioState?.isPlaying !== false) advanceTrack();
+            }, delay);
+        }
+
+        function advanceTrack() {
+            const curIdx = currentTrackIdx >= 0 ? currentTrackIdx : 0;
+            const nextIdx = (curIdx + 1) % radioTracks.length;
+            const track = radioTracks[nextIdx];
+            currentRadioState = {
+                title: track.title,
+                artist: track.artist,
+                src: track.src,
+                trackIdx: nextIdx,
+                startTime: Date.now() + serverTimeOffset,
+                isPlaying: true,
+                source: 'auto'
+            };
+            loadAndPlayTrack(nextIdx);
+            publishRadioState(currentRadioState);
+        }
+
+        function syncTrack(state) {
+            if (!state || typeof state.src !== 'string') return;
+            const previous = currentRadioState;
+            // Una confirmación antigua de nuestra escritura puede llegar tras el siguiente tema.
+            if (IS_EMITTER && publishing && previous?.source === 'auto' &&
+                state.source === 'auto' && previous.startTime > state.startTime) return;
+            currentRadioState = state;
+            pendingPublication = null;
+
+            if (state.isPlaying === false) {
+                clearTimeout(endedTimer);
+                endedTimer = null;
+                updateNowPlayingUI(radioTracks[findTrackIndex(state.src, state.trackIdx)]);
+                audio.pause();
+                return;
+            }
+
+            // El emisor recibe su propia escritura. Evitar reiniciar una pista en curso.
+            if (IS_EMITTER && hasInitialSynced && previous?.isPlaying !== false &&
+                previous?.src === state.src && previous?.startTime === state.startTime) return;
+
+            const now = Date.now() + serverTimeOffset;
+            const startTime = Number.isFinite(state.startTime) ? state.startTime : now;
+            const resolved = resolveLiveTrack(state.src, startTime, now, state.trackIdx);
+            hasInitialSynced = true;
+            loadAndPlayTrack(resolved.idx, resolved.seekTime, true);
+
+            if (IS_EMITTER && (trackFilename(resolved.track.src) !== trackFilename(state.src) ||
+                Math.abs(resolved.virtualStartTime - startTime) > 1500)) {
+                currentRadioState = {
+                    title: resolved.track.title,
+                    artist: resolved.track.artist,
+                    src: resolved.track.src,
+                    trackIdx: resolved.idx,
+                    startTime: resolved.virtualStartTime,
+                    isPlaying: true,
+                    source: 'auto'
+                };
+                publishRadioState(currentRadioState);
+            }
+        }
+
+        onValue(ref(db, 'radio_state/current'), snapshot => {
+            syncTrack(snapshot.val());
+        }, error => {
+            console.error('No se pudo leer el estado de Radio 28E', error);
+            reportRadioStatus('connection', 'No se pudo leer la radio desde Firebase.');
+        });
+
+        fetch('https://yaire-591ca-default-rtdb.firebaseio.com/radio_state/current.json')
+            .then(response => {
+                if (!response.ok) throw new Error('HTTP ' + response.status);
+                return response.json();
+            })
+            .then(state => {
+                if (!hasInitialSynced && !currentRadioState && state) syncTrack(state);
+            })
+            .catch(error => console.error('Lectura inicial de Radio 28E fallida', error));
+
+        audio.addEventListener('ended', () => scheduleAdvance());
+        audio.addEventListener('error', () => {
+            reportRadioStatus('playback', 'No se pudo cargar la pista. Pasando a la siguiente.');
+            scheduleAdvance(1000);
+        });
+        setInterval(() => {
+            if (audio.ended || audio.error) scheduleAdvance(1000);
+        }, 2500);
+
+        // ── 3. Cintillo de Noticias en Vivo (Opción A: Editorial Crónica) ──
+        const elNewsRow = document.getElementById('news-row');
+        const elNewsCat = document.getElementById('news-cat');
+        const elNewsTitle = document.getElementById('news-title');
+
+        const RADIO_PROMOS = [
+            { category: 'INFO', title: 'Sintonízanos donde estés desde TuneIn buscando Twenty Eight Experience Radio', promotion: true },
+            { category: 'INFO', title: 'Si tienes una Alexa cerca, solo dile: “Alexa, reproduce Radio Veintiocho”', promotion: true }
+        ];
+        const NEWS_MAX_HOURS = {
+            'INTERNACIONAL': 28, 'VENEZUELA': 32, 'REP. DOMINICANA': 32,
+            'ECONOMÍA': 36, 'TECNOLOGÍA': 42, 'CULTURA & MÚSICA': 48, 'GAMING': 48, 'DEPORTES': 30
+        };
+        function classifyNewsItem(item) {
+            if (!item || typeof item.title !== 'string') return item;
+            const gaming = /\b(videojuegos?|gameplay|dlc|firefight|playstation|xbox|nintendo|steam|fortnite|minecraft|pubg|half-life|halo:\s*campaign|halo\s+campaign|the outer worlds)\b/i.test(item.title) ||
+                ['Eurogamer.es', 'Gamereactor.es'].includes(item.source);
+            if (gaming && item.category !== 'UN DÍA COMO HOY') {
+                return { ...item, category: 'GAMING' };
+            }
+            return item;
+        }
+
+        const cachedNews = (window.__radioNewsCache?.items || []).map(classifyNewsItem);
+        let newsList = [];
+        let newsIdx = 0;
+        let promoIdx = 0;
+        let newsSincePromo = 0;
+        let currentNewsItem = null;
+        let receivedNewsSnapshot = false;
+        let newsTimer = null;
+        let newsFadeTimer = null;
+
+        function isNewsFresh(item) {
+            if (!item || typeof item.title !== 'string' || !item.title.trim()) return false;
+            const now = Date.now() + serverTimeOffset;
+            const explicitExpiry = Date.parse(item.expiresAt);
+            if (item.category === 'UN DÍA COMO HOY') return Number.isFinite(explicitExpiry) && explicitExpiry > now;
+            const maxHours = NEWS_MAX_HOURS[item.category];
+            const published = Date.parse(item.publishedAt);
+            if (!maxHours || !Number.isFinite(published) || published > now + 2 * 3600000) return false;
+            const expiry = Math.min(published + maxHours * 3600000,
+                Number.isFinite(explicitExpiry) ? explicitExpiry : Infinity);
+            return now < expiry;
+        }
+
+        function scheduleNextNews(durationMs = 14000) {
+            if (newsTimer) clearTimeout(newsTimer);
+            newsTimer = setTimeout(cycleNews, durationMs);
+        }
+
+        function renderNewsItem(item, fade = true) {
+            if (!item || !elNewsTitle) return;
+            if (newsFadeTimer) {
+                clearTimeout(newsFadeTimer);
+                newsFadeTimer = null;
+            }
+            const apply = () => {
+                if (!item.promotion && !isNewsFresh(item)) {
+                    cycleNews(false);
+                    return;
+                }
+                currentNewsItem = item;
+                const cat = item.category || 'ACTUALIDAD';
+                if (elNewsCat) elNewsCat.textContent = cat;
+
+                const cleanText = (item.title || '').trim().replace(/\.+$/, '');
+                const isEphemeris = cat.toUpperCase().includes('DÍA');
+                elNewsTitle.textContent = cleanText;
+
+                const isLong = cleanText.length > 70 || isEphemeris;
+                scheduleNextNews(isLong ? 16000 : 13000);
+
+                if (elNewsRow) {
+                    if (fade) {
+                        elNewsRow.style.transition = 'none';
+                        elNewsRow.style.transform = 'translateY(5px)';
+                        elNewsRow.style.opacity = '0';
+                        void elNewsRow.offsetWidth;
+                        elNewsRow.style.transition = '';
+                    }
+                    elNewsRow.style.transform = 'translateY(0)';
+                    elNewsRow.style.opacity = '1';
+                }
+            };
+            if (fade && elNewsRow) {
+                elNewsRow.style.opacity = '0';
+                elNewsRow.style.transform = 'translateY(-4px)';
+                newsFadeTimer = setTimeout(() => {
+                    newsFadeTimer = null;
+                    apply();
+                }, 260);
+            } else {
+                apply();
+            }
+        }
+
+        function cycleNews(fade = true) {
+            const fresh = newsList.filter(isNewsFresh);
+            reportRadioStatus('news', fresh.length ? '' : 'Noticias pendientes de actualización.');
+            if (fresh.length === 0 || newsSincePromo >= Math.min(8, fresh.length)) {
+                const promo = RADIO_PROMOS[promoIdx % RADIO_PROMOS.length];
+                promoIdx++;
+                newsSincePromo = 0;
+                renderNewsItem(promo, fade);
+                return;
+            }
+            const item = fresh[newsIdx % fresh.length];
+            newsIdx = (newsIdx + 1) % fresh.length;
+            newsSincePromo++;
+            renderNewsItem(item, fade);
+        }
+
+        function acceptNews(data) {
+            const incoming = Array.isArray(data) ? data : Object.values(data || {});
+            const fresh = incoming.map(classifyNewsItem).filter(isNewsFresh);
+            newsList = fresh.length ? fresh : cachedNews.filter(isNewsFresh);
+            newsIdx = 0;
+            newsSincePromo = 0;
+            cycleNews(false);
+        }
+
+        onValue(ref(db, 'radio_state/news/items'), snapshot => {
+            receivedNewsSnapshot = true;
+            acceptNews(snapshot.val());
+        }, error => console.error('No se pudo actualizar el cintillo', error));
+
+        fetch('https://yaire-591ca-default-rtdb.firebaseio.com/radio_state/news/items.json')
+            .then(response => {
+                if (!response.ok) throw new Error('HTTP ' + response.status);
+                return response.json();
+            })
+            .then(data => {
+                if (!receivedNewsSnapshot) acceptNews(data);
+            })
+            .catch(error => console.error('Lectura inicial de noticias fallida', error));
+
+        acceptNews(cachedNews);
+        setInterval(() => {
+            if (currentNewsItem && !currentNewsItem.promotion && !isNewsFresh(currentNewsItem)) {
+                cycleNews(false);
+            }
+        }, 1000);
+
+        window.addEventListener('click', () => {
+            if (audio.paused && (!currentRadioState || currentRadioState.isPlaying !== false)) {
+                playAudio();
+            }
+        }, { passive: true });
+
+        // ── 4. Clima en vivo (Open-Meteo) ──
+        const WEATHER_CITIES = [
+            { name: 'Caracas', lat: 10.4806, lon: -66.9036 },
+            { name: 'Santo Domingo', lat: 18.4861, lon: -69.9312 }
+        ];
+        const WEATHER_CFG = { everyMs: 15 * 60 * 1000, rotateMs: 15000 };
+        const elWeather = document.getElementById('live-weather');
+        const WX_ICONS = {
+            sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+            moon: '<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>',
+            cloud: '<path d="M18 10h-1.3A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/>',
+            rain: '<path d="M16 13v8M8 13v8M12 15v8M20 16.6A5 5 0 0 0 18 7h-1.3A8 8 0 1 0 4 15.3"/>',
+            storm: '<path d="M19 16.9A5 5 0 0 0 18 7h-1.3a8 8 0 1 0-11.6 9M13 11l-4 6h6l-4 6"/>',
+            snow: '<path d="M20 17.6A5 5 0 0 0 18 8h-1.3A8 8 0 1 0 4 16.3M8 16h.01M8 20h.01M12 18h.01M12 22h.01M16 16h.01M16 20h.01"/>',
+            fog: '<path d="M3 8h18M5 12h14M3 16h18"/>'
+        };
+        function describeWeather(code, isDay) {
+            if (code === 0) return isDay ? ['sun', 'Despejado'] : ['moon', 'Despejado'];
+            if (code === 1) return isDay ? ['sun', 'Mayormente despejado'] : ['moon', 'Mayormente despejado'];
+            if (code === 2) return ['cloud', 'Parcialmente nublado'];
+            if (code === 3) return ['cloud', 'Nublado'];
+            if (code === 45 || code === 48) return ['fog', 'Niebla'];
+            if (code >= 51 && code <= 57) return ['rain', 'Llovizna'];
+            if ((code >= 61 && code <= 67) || (code >= 80 && code <= 82)) return ['rain', code >= 80 ? 'Chubascos' : 'Lluvia'];
+            if ((code >= 71 && code <= 77) || code === 85 || code === 86) return ['snow', 'Nieve'];
+            if (code >= 95) return ['storm', 'Tormenta'];
+            return ['cloud', 'Nublado'];
+        }
+        let weatherData = [];
+        let weatherIdx = 0;
+        let lastWeatherMarkup = '';
+
+        function weatherMarkup(w) {
+            const [icon] = describeWeather(w.code, w.isDay);
+            return `<svg class="wx-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${WX_ICONS[icon]}</svg><span class="wx-city">${w.name}</span><span class="wx-sep">·</span><span class="wx-temp">${w.temp} °C</span>`;
+        }
+
+        function showWeather(fade) {
+            if (!elWeather || weatherData.length === 0) return;
+            const markup = weatherMarkup(weatherData[weatherIdx % weatherData.length]);
+            if (markup === lastWeatherMarkup) return;
+            const apply = () => {
+                lastWeatherMarkup = markup;
+                elWeather.innerHTML = markup;
+                elWeather.hidden = false;
+                elWeather.style.opacity = '1';
+            };
+            if (fade && !elWeather.hidden) {
+                elWeather.style.opacity = '0';
+                setTimeout(apply, 350);
+            } else {
+                apply();
+            }
+        }
+
+        async function updateWeather() {
+            if (!elWeather) return;
+            try {
+                const ctrl = new AbortController();
+                const to = setTimeout(() => ctrl.abort(), 8000);
+                const lats = WEATHER_CITIES.map(c => c.lat).join(',');
+                const lons = WEATHER_CITIES.map(c => c.lon).join(',');
+                const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lats}&longitude=${lons}&current=temperature_2m,weather_code,is_day&timezone=auto`, { signal: ctrl.signal, cache: 'no-store' });
+                clearTimeout(to);
+                const json = await res.json();
+                const list = Array.isArray(json) ? json : [json];
+                const fresh = [];
+                list.forEach((r, i) => {
+                    const c = r && r.current;
+                    if (c && typeof c.temperature_2m === 'number' && WEATHER_CITIES[i]) {
+                        fresh.push({ name: WEATHER_CITIES[i].name, temp: Math.round(c.temperature_2m), code: c.weather_code, isDay: c.is_day === 1 });
+                    }
+                });
+                if (fresh.length > 0) {
+                    weatherData = fresh;
+                    showWeather(false);
+                }
+            } catch (_) { }
+        }
+        updateWeather();
+        setInterval(updateWeather, WEATHER_CFG.everyMs);
+        setInterval(() => {
+            if (weatherData.length > 1) {
+                weatherIdx = (weatherIdx + 1) % weatherData.length;
+                showWeather(true);
+            }
+        }, WEATHER_CFG.rotateMs);
+    </script>
+</body>
+
+</html>

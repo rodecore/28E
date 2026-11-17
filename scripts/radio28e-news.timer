@@ -1,0 +1,12 @@
+[Unit]
+Description=28E Radio — Ejecutar actualizador de noticias cada 1 hora
+
+[Timer]
+OnBootSec=30s
+OnUnitActiveSec=1h
+AccuracySec=1min
+Persistent=true
+Unit=radio28e-news.service
+
+[Install]
+WantedBy=timers.target

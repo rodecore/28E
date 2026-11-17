@@ -35,7 +35,7 @@ app.whenReady().then(async () => {
     const fps = 30;
     const durationSeconds = 30; // 30 segundos de bucle fluido
     const totalFrames = Math.round(durationSeconds * fps); // 900 frames
-    const outMp4 = path.resolve(__dirname, '..', '16-9_1080p.mp4');
+    const outMp4 = path.resolve(__dirname, '..', 'videos', '16-9_1080p.mp4');
 
     console.log(`Renderizando fondo Yaire: 1920x1080 @ ${fps}fps (${durationSeconds}s, ${totalFrames} frames) -> ${outMp4}`);
 

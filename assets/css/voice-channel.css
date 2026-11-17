@@ -1,4 +1,18 @@
 /* 28E · Voice room. Scoped to the channel; the surrounding site keeps its own visual system. */
+@font-face {
+  font-family: 'Sebenta';
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: swap;
+  src: url('../../fonts/Sebenta-Medium.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Sebenta';
+  font-style: italic;
+  font-weight: 400 600;
+  font-display: swap;
+  src: url('../../fonts/Sebenta-MediumItalic.woff2') format('woff2');
+}
 #vc-panel, #vc-ring-overlay, #vc-bar {
   --vc-bg: #171719;
   --vc-surface: #222225;
@@ -10,6 +24,7 @@
   --vc-accent-ink: #272016;
   --vc-success: #9ccc9d;
   --vc-danger: #f1a29a;
+  --vc-display: 'Sebenta', Georgia, serif;
   color: var(--vc-text);
   font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
   font-size: 14px;
@@ -50,7 +65,7 @@
 .vc-screen { display: flex; flex-direction: column; height: 100%; min-height: 0; }
 #vc-panel .vc-icon-button { display: inline-flex; align-items: center; justify-content: center; flex: 0 0 auto; width: 44px; height: 44px; padding: 10px; background: transparent; border: 0; border-radius: 12px; color: var(--vc-muted); }
 .vc-lobby { display: flex; flex-direction: column; flex: 1; min-height: 0; padding: 14px 24px 8px; }
-.vc-lobby-intro h1 { max-width: 300px; font-size: 30px; line-height: 1.15; font-weight: 600; letter-spacing: -.035em; text-wrap: balance; }
+.vc-lobby-intro h1 { max-width: 310px; font-family: var(--vc-display); font-size: 32px; line-height: 1.08; font-weight: 500; letter-spacing: -.024em; text-wrap: balance; }
 .vc-lobby-intro p { max-width: 290px; color: var(--vc-muted); font-size: 14px; line-height: 1.65; margin-top: 10px !important; }
 .vc-lobby-presence { display: flex; align-items: center; justify-content: center; gap: 12px; flex-shrink: 0; margin: auto 0 0; padding: 20px 0 16px; }
 .vc-avatar { position: relative; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; width: 40px; height: 40px; border-radius: 50%; background: #343c2b; color: #d5dfc7; font-size: 14px; font-weight: 600; overflow: hidden; }
@@ -61,7 +76,7 @@
 .vc-avatar-vacant > svg { width: 30px !important; height: 30px !important; }
 .vc-presence-connector { width: 28px; border-top: 1px dashed #575c4e; }
 .vc-lobby-room { text-align: center; padding-bottom: 12px; margin-bottom: auto; }
-.vc-lobby-room h2 { font-size: 18px; font-weight: 600; letter-spacing: -.02em; }
+.vc-lobby-room h2 { font-family: var(--vc-display); font-size: 21px; line-height: 1.15; font-weight: 500; letter-spacing: -.02em; }
 .vc-lobby-room > p { color: var(--vc-muted); font-size: 12px; margin-top: 6px !important; }
 .vc-presence-status { display: flex; align-items: center; justify-content: center; gap: 7px; color: var(--vc-muted); font-size: 12px; min-height: 22px; margin-top: 12px; }
 .vc-status-dot { display: inline-block; width: 6px; height: 6px; flex-shrink: 0; border-radius: 50%; background: var(--vc-muted); }
@@ -81,7 +96,7 @@
 .vc-error { color: var(--vc-danger); font-size: 12px; text-align: center; line-height: 1.6; margin-top: 12px !important; }
 .vc-error:empty { display: none; }
 .vc-state-screen { display: flex; flex: 1; min-height: 0; align-items: center; justify-content: center; flex-direction: column; padding: 28px; text-align: center; gap: 18px; }
-.vc-state-screen h1 { font-size: 26px; font-weight: 600; line-height: 1.2; letter-spacing: -.025em; }
+.vc-state-screen h1 { font-family: var(--vc-display); font-size: 28px; font-weight: 500; line-height: 1.12; letter-spacing: -.022em; }
 .vc-state-screen p { color: var(--vc-muted); max-width: 280px; font-size: 14px; line-height: 1.7; }
 .vc-state-screen .vc-primary, .vc-state-screen .vc-secondary { margin-top: 12px; }
 .vc-state-symbol { display: grid; place-items: center; width: 80px; height: 80px; background: var(--vc-surface); border-radius: 50%; }
@@ -92,7 +107,7 @@
 @keyframes vc-spin { to { transform: rotate(360deg); } }
 .vc-spin { width: 20px; height: 20px; border: 2px solid currentColor; border-top-color: transparent; border-radius: 50%; animation: vc-spin 1s linear infinite; }
 .vc-room-heading { padding: 26px 28px 16px; display: grid; grid-template-columns: minmax(0, 1fr) auto 44px; align-items: center; gap: 4px 8px; flex-shrink: 0; }
-.vc-room-heading h1 { font-size: 28px; line-height: 1.2; font-weight: 600; letter-spacing: -.03em; }
+.vc-room-heading h1 { font-family: var(--vc-display); font-size: 29px; line-height: 1.1; font-weight: 500; letter-spacing: -.024em; }
 .vc-room-status { margin-top: 6px !important; display: flex; align-items: center; gap: 6px; font-size: 14px; }
 .vc-heading-count { font-size: 13px; color: var(--vc-muted); margin-left: 6px; font-variant-numeric: tabular-nums; }
 .vc-timer { font-size: 15px; color: var(--vc-muted); font-variant-numeric: tabular-nums; padding-top: 7px; }
@@ -147,7 +162,7 @@
 #vc-panel #vc-msgs { flex: 1; min-height: 0; padding: 14px 20px; }
 .vc-empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; min-height: 0; height: 100%; gap: 8px; padding: 12px 8px; }
 .vc-empty-state > svg { width: 32px !important; height: 32px !important; color: var(--vc-accent); margin-bottom: 4px; }
-.vc-empty-state h2 { font-weight: 500; font-size: 18px; letter-spacing: -.025em; line-height: 1.3; max-width: 240px; text-wrap: balance; }
+.vc-empty-state h2 { font-family: var(--vc-display); font-weight: 500; font-size: 21px; letter-spacing: -.02em; line-height: 1.2; max-width: 240px; text-wrap: balance; }
 .vc-empty-state p { font-size: 13px; color: var(--vc-muted); line-height: 1.7; max-width: 240px; }
 .vc-chat-msg { display: flex; align-items: flex-start; flex-direction: column; margin-bottom: 8px; }
 .vc-chat-meta { display: flex; gap: 8px; align-items: baseline; margin: 0 3px 6px; }
@@ -208,7 +223,7 @@
 #vc-ring-overlay { position: fixed; z-index: 99999; width: min(340px, calc(100vw - 32px)); top: 20px; left: 50%; transform: translateX(-50%); background: var(--vc-surface); border: 1px solid var(--vc-line); border-radius: 16px; text-align: center; padding: 16px 20px; }
 .vc-ring-label, .vc-ring-sub { color: var(--vc-muted); font-size: 12px; }
 .vc-ring-avatar { width: 64px; height: 64px; border-radius: 50%; background: #343c2b; color: #d5dfc7; display: grid; place-items: center; font-size: 20px; margin: 20px auto 12px; }
-.vc-ring-name { font-size: 18px; font-weight: 600; overflow-wrap: anywhere; margin-bottom: 6px; }
+.vc-ring-name { font-family: var(--vc-display); font-size: 21px; line-height: 1.15; font-weight: 500; letter-spacing: -.02em; overflow-wrap: anywhere; margin-bottom: 6px; }
 .vc-ring-btns { display: flex; gap: 10px; margin-top: 0; }
 .vc-ring-btn { flex: 1; min-height: 44px; border: 0; border-radius: 10px; background: var(--vc-raised); color: var(--vc-text); font-weight: 500; }
 .vc-ring-btn.join { background: var(--vc-accent); color: var(--vc-accent-ink); }

@@ -1,0 +1,16 @@
+[Unit]
+Description=28E Radio — Actualizador horario de noticias en vivo (Opción A Gemini + RSS)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/radio28e/current
+EnvironmentFile=-/opt/radio28e/news.env
+ExecStart=/usr/bin/python3 /opt/radio28e/current/scripts/sync_live_news.py --once
+StandardOutput=journal
+StandardError=journal
+TimeoutStartSec=90
+
+[Install]
+WantedBy=multi-user.target

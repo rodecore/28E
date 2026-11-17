@@ -16,13 +16,13 @@ function createDevServer({ auth = createAuth(), port = 5500 } = {}) {
   app.use('/admin/assets', express.static(path.join(root, 'admin/assets'), { dotfiles: 'deny', index: false }));
   app.use((req, res, next) => { res.setHeader('Cache-Control', 'no-store'); next(); });
   // Expose public resources only; never serve the repository, credentials or server source.
-  for (const folder of ['assets', 'fonts', 'sounds', 'radio', 'images', 'icons', 'gallery', 'lasfotos', 'videos']) {
+  for (const folder of ['assets', 'fonts', 'sounds', 'radio', 'images', 'icons', 'gallery', 'lasfotos', 'videos', 'pages']) {
     app.use('/' + folder, express.static(path.join(root, folder), { dotfiles: 'deny', index: false }));
   }
   const pages = ['index.html', 'dclf.html', 'tv.html', 'wrapped.html', 'maintenance.html',
-    'mantenimiento.html', 'radio-stream.html', 'privacy.html'];
+    'mantenimiento.html', 'radio-stream.html'];
   for (const file of [...pages, 'styles.css', 'gsap.min.js', 'manifest.json', 'sw.js',
-    'favicon.ico', 'favicon.png', 'tulip.ico', 'dclf_game.ico', 'icon.png', 'config.json']) {
+    'favicon.ico', 'config.json']) {
     app.get('/' + file, (req, res) => res.sendFile(path.join(root, file)));
   }
   app.get('/', (req, res) => res.sendFile(path.join(root, 'index.html')));

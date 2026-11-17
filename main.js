@@ -10880,15 +10880,15 @@ function createWindow() {
     minWidth: 800,
     minHeight: 600,
     title: "28E: Donde crecen las flores",
-    icon: path.join(__dirname, "dclf_game.ico"),
+    icon: path.join(__dirname, "icons", "dclf_game.ico"),
     backgroundColor: "#accfd2",
     autoHideMenuBar: true,
     show: false,
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
-      webSecurity: false,
-      // Allows loading local audio and assets without CORS blocks
+      webSecurity: true,
+      sandbox: true,
       devTools: false
     }
   });

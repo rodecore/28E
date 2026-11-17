@@ -22,8 +22,8 @@ videos/*
 !videos/28E_Entertainment_Intro_1080p_Final.mp4
 !videos/28e_tv_ident_1080p.mp4
 *.mp4
-!16-9_1080p.mp4
-!liquid-glass-logo-16x9-2560x1440-60fps.mp4
+# 16-9_1080p.mp4 (streaming) vive en videos/ y no se versiona por tamano
+!assets/video/liquid-glass-logo-16x9-2560x1440-60fps.mp4
 !videos/28E_Entertainment_Intro_1080p_Final.mp4
 !videos/28e_tv_ident_1080p.mp4
 !videos/bumpers/*.mp4
@@ -61,3 +61,17 @@ __pycache__/
 # Firebase emulator state and logs
 *-debug.log
 .firebase/
+
+# Archivo local de backups y material historico (no versionado)
+_archive/
+
+# Estado local del cintillo
+.cache/radio-news/
+
+# Masters y muestras locales de estudio (versionados como MP3 optimizados)
+save me instrumental.wav
+twenty sample*
+Bajo La Lluvia.mp3
+Logo_rode_transparente_2048.png
+miniaturas/
+docs/design/mockup-definitivo.png

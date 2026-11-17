@@ -27,7 +27,7 @@ const svgFlow = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 244 80" fi
 
 // 3. Canal 03: DCLF TV
 const svgDclf = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 356 80" fill="none">
-  <!-- Official 3D Island from tulip.ico -->
+  <!-- Official 3D Island from icons/tulip.ico -->
   <image href="data:image/png;base64,${tulipBase64}" x="6" y="10" height="60" width="60" preserveAspectRatio="xMidYMid meet"/>
   <!-- Original 28E Mark -->
   <image href="data:image/png;base64,${markBase64}" x="76" y="20" height="40" width="109" preserveAspectRatio="xMidYMid meet"/>

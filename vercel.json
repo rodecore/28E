@@ -28,7 +28,7 @@
       ]
     },
     {
-      "source": "/(tv|dclf)",
+      "source": "/(tv|dclf|dclf-lanzamiento)",
       "headers": [
         {
           "key": "Cache-Control",
@@ -186,6 +186,26 @@
         }
       ],
       "destination": "https://tv.yaire.site/",
+      "permanent": false
+    },
+    {
+      "source": "/privacy",
+      "destination": "/pages/privacy",
+      "permanent": false
+    },
+    {
+      "source": "/privacy.html",
+      "destination": "/pages/privacy.html",
+      "permanent": false
+    },
+    {
+      "source": "/jardin_de_yaire",
+      "destination": "/pages/jardin_de_yaire",
+      "permanent": false
+    },
+    {
+      "source": "/jardin_de_yaire.html",
+      "destination": "/pages/jardin_de_yaire.html",
       "permanent": false
     }
   ]

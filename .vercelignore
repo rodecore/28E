@@ -4,3 +4,12 @@
 scratch/
 .impeccable/
 .agents/
+
+# Local archive and design documentation
+_archive/
+docs/
+miniaturas/
+stream-study/
+firebase/
+signaling-server/test/
+*.wav

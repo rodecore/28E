@@ -3,6 +3,23 @@
   const ROOM = 'voiceRooms/principal';
   const emptyMusic = () => ({ queue: [], state: { currentIndex: -1, isPlaying: false, startedAt: 0, pausedTime: 0 } });
   const normalizeMusic = value => ({ ...emptyMusic(), ...value, queue: Array.isArray(value?.queue) ? value.queue.filter(Boolean) : Object.values(value?.queue || {}), state: { ...emptyMusic().state, ...value?.state } });
+  // Existing track IDs are Firebase push keys. Their first eight digits encode
+  // creation time, so queues written before session filtering also expire.
+  function trackTime(id) {
+    const digits = '-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz';
+    if (typeof id !== 'string' || !/^[-_a-zA-Z0-9]{20}$/.test(id)) return 0;
+    let time = 0;
+    for (const digit of id.slice(0, 8)) time = time * 64 + digits.indexOf(digit);
+    return time;
+  }
+  function musicForMembers(value, members) {
+    const music = normalizeMusic(value);
+    const queue = music.queue.filter(track => members.some(member =>
+      track.addedBy === member.id || trackTime(track.id) > member.joinedAt));
+    if (queue.length === music.queue.length) return music;
+    const currentIndex = queue.indexOf(music.queue[music.state.currentIndex]);
+    return { ...music, queue, state: currentIndex < 0 ? emptyMusic().state : { ...music.state, currentIndex } };
+  }
   function mediaUrl(value) {
     if (typeof value !== 'string' || value.length > 2048) return '';
     try { const url = new URL(value); return url.protocol === 'https:' && !url.username && !url.password ? url.href : ''; } catch { return ''; }
@@ -125,6 +142,19 @@
         throw new Error('Canal lleno (máx. 4 usuarios).');
       } finally { this.joining = false; }
     }
+    async advanceOrphanedTrack() {
+      const advance = value => {
+        const music = musicForMembers(value, this.members);
+        if (!music.queue.length || music.state.currentIndex >= 0 || !value?.state?.isPlaying) return;
+        return reduceMusic(music, 'music_play_index', { index: 0 }, this.member, this.now(), this.sdk.push(this.ref('musicRevisions')).key);
+      };
+      if (this.rawMusic?.state?.isPlaying && this.joined && !this.closed) {
+        const visible = musicForMembers(this.rawMusic, this.members);
+        if (visible.queue.length && visible.state.currentIndex < 0) {
+          await this.sdk.runTransaction(this.ref('music'), advance, { applyLocally: false });
+        }
+      }
+    }
     listen() {
       const listen = (path, callback) => this.memberStops.push(this.sdk.onValue(this.ref(path), callback, error => this.fail(error)));
       listen('members', snap => {
@@ -139,6 +169,7 @@
           }
         }
         for (const old of previous) if (!next.some(member => member.id === old.id)) this.deliver('user_left', { userId: old.id });
+        if (previous.some(old => !next.some(member => member.id === old.id))) this.advanceOrphanedTrack().catch(error => this.fail(error));
         this.deliver('channel_users', { users: next });
       });
       const inbox = this.sdk.query(this.ref('signals/' + this.id), this.sdk.orderByKey(), this.sdk.limitToLast(128));
@@ -173,7 +204,8 @@
       const seenChat = new Set();
       const receiveChat = snap => {
         const message = snap.val();
-        if (!message || seenChat.has(message.seq)) return;
+        // The shared buffer may still contain messages from a previous visit.
+        if (!message || message.ts <= this.member.joinedAt || seenChat.has(message.seq)) return;
         seenChat.add(message.seq); if (seenChat.size > 200) seenChat.delete(seenChat.values().next().value);
         this.deliver('chat_message', message);
       };
@@ -181,7 +213,9 @@
       this.memberStops.push(this.sdk.onChildChanged(chat, receiveChat, error => this.fail(error)));
       listen('music', snap => {
         const initial = !this.musicLoaded; this.musicLoaded = true;
-        const previous = normalizeMusic(this.music), music = normalizeMusic(snap.val()); this.music = music;
+        this.rawMusic = snap.val();
+        if (initial) this.advanceOrphanedTrack().catch(error => this.fail(error));
+        const previous = normalizeMusic(this.music), music = musicForMembers(snap.val(), [this.member]); this.music = music;
         const track = music.queue[music.state.currentIndex], oldTrack = previous.queue[previous.state.currentIndex];
         this.deliver('music_queue_update', { queue: music.queue, state: music.state });
         if (initial) return;
@@ -218,13 +252,18 @@
         const seq = counter.snapshot.val();
         await this.sdk.set(this.ref('chat/' + (seq % 100)), { seq, from: this.id, uid: this.user.uid, name: this.member.displayName, text: payload.text.trim().slice(0, 500), ts: this.sdk.serverTimestamp() });
       } else if (event === 'music_sync_request') {
-        const music = normalizeMusic((await this.sdk.get(this.ref('music'))).val());
+        const music = musicForMembers((await this.sdk.get(this.ref('music'))).val(), [this.member]);
         const currentTrack = music.queue[music.state.currentIndex] || null;
         this.deliver('music_sync', { queue: music.queue, state: music.state, currentTrack,
           currentTime: music.state.isPlaying ? Math.max(0, (this.now() - music.state.startedAt) / 1000) : music.state.pausedTime });
       } else if (event.startsWith('music_')) {
         const revision = this.sdk.push(this.ref('musicRevisions')).key, now = this.now();
-        await this.sdk.runTransaction(this.ref('music'), value => reduceMusic(value, event, payload, this.member, now, revision), { applyLocally: false });
+        await this.sdk.runTransaction(this.ref('music'), value => {
+          // Drop songs from ended sessions on the next addition, before deciding
+          // whether the new song should start or wait behind a live track.
+          const base = event === 'music_add' ? musicForMembers(value, this.members) : value;
+          return reduceMusic(base, event, payload, this.member, now, revision);
+        }, { applyLocally: false });
       }
     }
     async fail(error, event = 'connect_error') {

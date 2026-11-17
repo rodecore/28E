@@ -18,7 +18,7 @@
             } catch (e) { }
         })();
     </script>
-    <link rel="icon" type="image/x-icon" href="dclf_game.ico?v=1">
+    <link rel="icon" type="image/x-icon" href="icons/dclf_game.ico?v=1">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -698,96 +698,114 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // Setlist oficial de la radio (78 pistas sincronizadas con el stream)
-        const radioTracks = [
+        // Setlist oficial de la radio (88 canciones + 22 idents = 110 pistas sincronizadas)
+        const baseSongs = [
             { title: "Wonderful", artist: "Otis McDonald", src: "sounds/ost/Otis McDonald - Wonderful.mp3", duration: 167.0 },
-            { title: "MAS PERREO", artist: "Lawd Ito", src: "radio/ES_MAS PERREO - Lawd Ito.mp3", duration: 173.3 },
-            { title: "Find Your Lane", artist: "Otis McDonald", src: "radio/Otis McDonald - Find Your Lane.mp3", duration: 159.2 },
-            { title: "CRAZY (Live)", artist: "Otis McDonald", src: "sounds/Otis McDonald - CRAZY - Live (SPOTISAVER).mp3", duration: 124.1 },
-            { title: "Tokyo Magic", artist: "Lawd Ito", src: "radio/ES_Tokyo Magic - Lawd Ito.mp3", duration: 179.2 },
-            { title: "Here If You're Going My Way", artist: "Otis McDonald", src: "radio/Here, If You're Going - Otis McDonald.mp3", duration: 108.8 },
-            { title: "Body, Mind & Soul", artist: "Otis McDonald", src: "radio/Otis McDonald - Body, Mind & Soul.mp3", duration: 250.3 },
+            { title: "MAS PERREO", artist: "Lawd Ito", src: "radio/stream in youtube/ES_MAS PERREO - Lawd Ito.mp3", duration: 173.3 },
+            { title: "Find Your Lane", artist: "Otis McDonald", src: "radio/stream in youtube/Otis McDonald - Find Your Lane.mp3", duration: 159.2 },
+            { title: "CRAZY (Live)", artist: "Otis McDonald", src: "radio/stream in youtube/Otis McDonald - CRAZY - Live (SPOTISAVER).mp3", duration: 124.1 },
+            { title: "Tokyo Magic", artist: "Lawd Ito", src: "radio/stream in youtube/ES_Tokyo Magic - Lawd Ito.mp3", duration: 179.2 },
+            { title: "Here If You're Going My Way", artist: "Otis McDonald", src: "radio/stream in youtube/Here, If You're Going - Otis McDonald.mp3", duration: 108.8 },
+            { title: "Body, Mind & Soul", artist: "Otis McDonald", src: "radio/stream in youtube/Otis McDonald - Body, Mind & Soul.mp3", duration: 250.3 },
             { title: "My Everything", artist: "Otis McDonald", src: "sounds/ost/Otis McDonald - My Everything.mp3", duration: 156.9 },
-            { title: "Atacha", artist: "Lawd Ito", src: "radio/ES_Atacha - Lawd Ito.mp3", duration: 195.0 },
-            { title: "Paulo Coelho", artist: "Otis McDonald, Mani Draper", src: "radio/Otis McDonald - Paulo Coelho.mp3", duration: 149.1 },
-            { title: "Menea", artist: "Master One, Lawd Ito", src: "radio/ES_Menea - Master One.mp3", duration: 198.8 },
-            { title: "Sin Pensar", artist: "Lawd Ito, Mercedes Gala", src: "radio/ES_Sin Pensar - Lawd Ito.mp3", duration: 184.6 },
-            { title: "Eres Mía", artist: "Lawd Ito", src: "radio/ES_Eres Mia - Lawd Ito.mp3", duration: 167.0 },
-            { title: "Cheers to Frank", artist: "Otis McDonald", src: "radio/Otis McDonald - Cheers to Frank.mp3", duration: 177.5 },
+            { title: "Atacha", artist: "Lawd Ito", src: "radio/stream in youtube/ES_Atacha - Lawd Ito.mp3", duration: 195.0 },
+            { title: "Paulo Coelho", artist: "Otis McDonald, Mani Draper", src: "radio/stream in youtube/Otis McDonald - Paulo Coelho.mp3", duration: 149.1 },
+            { title: "Menea", artist: "Master One, Lawd Ito", src: "radio/stream in youtube/ES_Menea - Master One.mp3", duration: 198.8 },
+            { title: "Sin Pensar", artist: "Lawd Ito, Mercedes Gala", src: "radio/stream in youtube/ES_Sin Pensar - Lawd Ito.mp3", duration: 184.6 },
+            { title: "Eres Mía", artist: "Lawd Ito", src: "radio/stream in youtube/ES_Eres Mia - Lawd Ito.mp3", duration: 167.0 },
+            { title: "Cheers to Frank", artist: "Otis McDonald", src: "radio/stream in youtube/Otis McDonald - Cheers to Frank.mp3", duration: 177.5 },
             { title: "Loko", artist: "Lawd Ito, Nicolas Rengifo", src: "radio/1792559637795_ES_Loko_-_Lawd_Ito.mp3", duration: 166.0 },
-            { title: "Tulipanes Pa' Yaire", artist: "Rodezel", src: "radio/Tulipanes Pa' Yaire - Rodezel.mp3", duration: 177.2 },
-            { title: "Entre Tú y Yo", artist: "Nico Rengifo", src: "radio/ES_Entre Tu y Yo - Nico Rengifo.mp3", duration: 177.7 },
-            { title: "Finally the Air Is Cool", artist: "Otis McDonald", src: "radio/Otis McDonald - Finally the Air Is Cool.mp3", duration: 166.2 },
-            { title: "As Long As You Love Me", artist: "Otis McDonald", src: "radio/As long as you love me - Otis McDonald.mp3", duration: 141.2 },
-            { title: "Ella", artist: "Lawd Ito, Bambi Haze, Frontera Bugalú", src: "radio/ES_Ella - Lawd Ito.mp3", duration: 181.3 },
-            { title: "Purple Flowers", artist: "Filthy The Kid, Lawd Ito", src: "radio/ES_Purple Flowers - Filthy The Kid.mp3", duration: 193.3 },
-            { title: "Quemao", artist: "Lawd Ito", src: "radio/ES_Quemao - Lawd Ito.mp3", duration: 173.0 },
-            { title: "The Lights", artist: "Lawd Ito", src: "radio/ES_The Lights - Lawd Ito.mp3", duration: 177.2 },
-            { title: "Suéltame", artist: "Lawd Ito", src: "radio/ES_Sueltame - Lawd Ito.mp3", duration: 179.5 },
-            { title: "Feel Right", artist: "Otis McDonald, The Kount, Sndtrak", src: "radio/Otis McDonald - Feel Right (feat. The Kount & Sndtrak).mp3", duration: 191.6 },
-            { title: "Introduction", artist: "Otis McDonald", src: "radio/Otis McDonald - Introduction.mp3", duration: 198.6 },
-            { title: "Caro", artist: "Lawd Ito", src: "radio/ES_Caro - Lawd Ito.mp3", duration: 168.0 },
-            { title: "Tikiti", artist: "Lawd Ito", src: "radio/ES_Tikiti - Lawd Ito.mp3", duration: 170.1 },
-            { title: "Peachy", artist: "half.cool", src: "radio/Peachy - half.cool.mp3", duration: 98.5 },
-            { title: "GWTF", artist: "Lawd Ito", src: "radio/ES_GWTF - Lawd Ito.mp3", duration: 190.8 },
-            { title: "Ever Felt, Pt. 1", artist: "Otis McDonald", src: "radio/Otis McDonald - Ever Felt, Pt. 1.mp3", duration: 143.9 },
-            { title: "Belén", artist: "Lawd Ito", src: "radio/ES_Belen - Lawd Ito.mp3", duration: 204.0 },
-            { title: "At the Top of the World", artist: "LaKesha Nugent", src: "radio/ES_At the Top of the World - LaKesha Nugent.mp3", duration: 187.2 },
-            { title: "Sacatela", artist: "Lawd Ito", src: "radio/ES_Sacatela - Lawd Ito.mp3", duration: 172.5 },
-            { title: "The H3 Theme", artist: "Otis McDonald", src: "radio/Otis McDonald - The H3 Theme.mp3", duration: 195.8 },
-            { title: "Pathways", artist: "Otis McDonald, Wil Blades", src: "radio/Otis McDonald - Pathways (feat. Wil Blades).mp3", duration: 214.9 },
-            { title: "Cafecito", artist: "Lawd Ito", src: "radio/ES_Cafecito - Lawd Ito.mp3", duration: 176.8 },
-            { title: "Pink Guava", artist: "Lawd Ito", src: "radio/ES_Pink Guava - Lawd Ito.mp3", duration: 175.1 },
-            { title: "Involved", artist: "Otis McDonald, Mani Draper", src: "radio/Otis McDonald - Involved.mp3", duration: 171.7 },
-            { title: "While Siena Sings", artist: "Otis McDonald", src: "radio/Otis McDonald - While Siena Sings.mp3", duration: 219.5 },
-            { title: "Sangria", artist: "Lawd Ito", src: "radio/ES_Sangria - Lawd Ito.mp3", duration: 210.6 },
-            { title: "Vela", artist: "Lawd Ito", src: "radio/ES_Vela - Lawd Ito.mp3", duration: 182.1 },
-            { title: "Bendiciones", artist: "Lawd Ito, Tilden Parc", src: "radio/ES_Bendiciones - Lawd Ito.mp3", duration: 220.6 },
-            { title: "SUNLIGHT", artist: "Otis McDonald", src: "radio/Otis McDonald - SUNLIGHT.mp3", duration: 194.7 },
-            { title: "No Hay Trabajo", artist: "Lawd Ito", src: "radio/ES_No Hay Trabajo - Lawd Ito.mp3", duration: 168.6 },
-            { title: "Goin Strait", artist: "Fasion", src: "radio/ES_Goin Strait - Fasion.mp3", duration: 156.9 },
-            { title: "Survive", artist: "Otis McDonald", src: "radio/Otis McDonald - Survive.mp3", duration: 158.3 },
+            { title: "Tulipanes Pa' Yaire", artist: "Rodezel", src: "radio/stream in youtube/Tulipanes Pa' Yaire - Rodezel.mp3", duration: 177.2 },
+            { title: "Entre Tú y Yo", artist: "Nico Rengifo", src: "radio/stream in youtube/ES_Entre Tu y Yo - Nico Rengifo.mp3", duration: 177.7 },
+            { title: "Finally the Air Is Cool", artist: "Otis McDonald", src: "radio/stream in youtube/Otis McDonald - Finally the Air Is Cool.mp3", duration: 166.2 },
+            { title: "As Long As You Love Me", artist: "Otis McDonald", src: "radio/stream in youtube/As long as you love me - Otis McDonald.mp3", duration: 141.2 },
+            { title: "Ella", artist: "Lawd Ito, Bambi Haze, Frontera Bugalú", src: "radio/stream in youtube/ES_Ella - Lawd Ito.mp3", duration: 181.3 },
+            { title: "Purple Flowers", artist: "Filthy The Kid, Lawd Ito", src: "radio/stream in youtube/ES_Purple Flowers - Filthy The Kid.mp3", duration: 193.3 },
+            { title: "Quemao", artist: "Lawd Ito", src: "radio/stream in youtube/ES_Quemao - Lawd Ito.mp3", duration: 173.0 },
+            { title: "The Lights", artist: "Lawd Ito", src: "radio/stream in youtube/ES_The Lights - Lawd Ito.mp3", duration: 177.2 },
+            { title: "Suéltame", artist: "Lawd Ito", src: "radio/stream in youtube/ES_Sueltame - Lawd Ito.mp3", duration: 179.5 },
+            { title: "Feel Right", artist: "Otis McDonald, The Kount, Sndtrak", src: "radio/stream in youtube/Otis McDonald - Feel Right (feat. The Kount & Sndtrak).mp3", duration: 191.6 },
+            { title: "Introduction", artist: "Otis McDonald", src: "radio/stream in youtube/Otis McDonald - Introduction.mp3", duration: 198.6 },
+            { title: "Caro", artist: "Lawd Ito", src: "radio/stream in youtube/ES_Caro - Lawd Ito.mp3", duration: 168.0 },
+            { title: "Tikiti", artist: "Lawd Ito", src: "radio/stream in youtube/ES_Tikiti - Lawd Ito.mp3", duration: 170.1 },
+            { title: "Bajo La Lluvia", artist: "Rodezel", src: "radio/Bajo La Lluvia - Rodezel.mp3", duration: 166.9 },
+            { title: "Peachy", artist: "half.cool", src: "radio/stream in youtube/Peachy - half.cool.mp3", duration: 98.5 },
+            { title: "GWTF", artist: "Lawd Ito", src: "radio/stream in youtube/ES_GWTF - Lawd Ito.mp3", duration: 190.8 },
+            { title: "Ever Felt, Pt. 1", artist: "Otis McDonald", src: "radio/stream in youtube/Otis McDonald - Ever Felt, Pt. 1.mp3", duration: 143.9 },
+            { title: "Belén", artist: "Lawd Ito", src: "radio/stream in youtube/ES_Belen - Lawd Ito.mp3", duration: 204.0 },
+            { title: "At the Top of the World", artist: "LaKesha Nugent", src: "radio/stream in youtube/ES_At the Top of the World - LaKesha Nugent.mp3", duration: 187.2 },
+            { title: "Sacatela", artist: "Lawd Ito", src: "radio/stream in youtube/ES_Sacatela - Lawd Ito.mp3", duration: 172.5 },
+            { title: "The H3 Theme", artist: "Otis McDonald", src: "radio/stream in youtube/Otis McDonald - The H3 Theme.mp3", duration: 195.8 },
+            { title: "Pathways", artist: "Otis McDonald, Wil Blades", src: "radio/stream in youtube/Otis McDonald - Pathways (feat. Wil Blades).mp3", duration: 214.9 },
+            { title: "Cafecito", artist: "Lawd Ito", src: "radio/stream in youtube/ES_Cafecito - Lawd Ito.mp3", duration: 176.8 },
+            { title: "Pink Guava", artist: "Lawd Ito", src: "radio/stream in youtube/ES_Pink Guava - Lawd Ito.mp3", duration: 175.1 },
+            { title: "Involved", artist: "Otis McDonald, Mani Draper", src: "radio/stream in youtube/Otis McDonald - Involved.mp3", duration: 171.7 },
+            { title: "While Siena Sings", artist: "Otis McDonald", src: "radio/stream in youtube/Otis McDonald - While Siena Sings.mp3", duration: 219.5 },
+            { title: "Sangria", artist: "Lawd Ito", src: "radio/stream in youtube/ES_Sangria - Lawd Ito.mp3", duration: 210.6 },
+            { title: "Vela", artist: "Lawd Ito", src: "radio/stream in youtube/ES_Vela - Lawd Ito.mp3", duration: 182.1 },
+            { title: "Bendiciones", artist: "Lawd Ito, Tilden Parc", src: "radio/stream in youtube/ES_Bendiciones - Lawd Ito.mp3", duration: 220.6 },
+            { title: "SUNLIGHT", artist: "Otis McDonald", src: "radio/stream in youtube/Otis McDonald - SUNLIGHT.mp3", duration: 194.7 },
+            { title: "No Hay Trabajo", artist: "Lawd Ito", src: "radio/stream in youtube/ES_No Hay Trabajo - Lawd Ito.mp3", duration: 168.6 },
+            { title: "Goin Strait", artist: "Fasion", src: "radio/stream in youtube/ES_Goin Strait - Fasion.mp3", duration: 156.9 },
+            { title: "Survive", artist: "Otis McDonald", src: "radio/stream in youtube/Otis McDonald - Survive.mp3", duration: 158.3 },
             { title: "Treat Me This Way (AI Rework)", artist: "Rodezel", src: "radio/1777594789237_f228324448.mp3", duration: 254.6 },
             { title: "Joe Louis", artist: "Otis McDonald", src: "sounds/ost/Otis McDonald - Joe Louis.mp3", duration: 182.7 },
-            { title: "Fireworks", artist: "Otis McDonald", src: "radio/Otis McDonald - Fireworks.mp3", duration: 173.8 },
+            { title: "Fireworks", artist: "Otis McDonald", src: "radio/stream in youtube/Otis McDonald - Fireworks.mp3", duration: 173.8 },
             { title: "But We're Family", artist: "Otis McDonald", src: "sounds/ost/Otis McDonald - But We're Family.mp3", duration: 219.3 },
             { title: "Magic, Pt. 2", artist: "Otis McDonald", src: "sounds/ost/Otis McDonald - I Got Your Back.mp3", duration: 225.7 },
-            { title: "I Wish I Knew", artist: "Otis McDonald, Joni Inez", src: "radio/I Wish I Knew - Otis McDonald.mp3", duration: 165.6 },
-            { title: "Hide from the Heavy", artist: "Otis McDonald", src: "radio/Otis McDonald - Hide from the Heavy.mp3", duration: 159.5 },
-            { title: "Forever Young", artist: "Otis McDonald", src: "radio/Forever Young - Otis McDonald.mp3", duration: 161.8 },
-            { title: "Pressure", artist: "Otis McDonald", src: "radio/Pressure - Otis McDonald.mp3", duration: 158.3 },
-            { title: "Winter Time is Near", artist: "TrackTribe, Otis McDonald", src: "radio/TrackTribe - Winter Time is Near (feat. Otis McDonald).mp3", duration: 198.7 },
-            { title: "Side Steppin'", artist: "Otis McDonald", src: "radio/Side Steppin' - Otis McDonald.mp3", duration: 165.5 },
-            { title: "Truckee, CA", artist: "Otis McDonald", src: "radio/Truckee - Otis McDonald.mp3", duration: 168.8 },
-            { title: "Complicate Ya", artist: "Otis McDonald", src: "radio/Complicate ya - Otis McDonald.mp3", duration: 166.5 },
-            { title: "RAGE", artist: "Otis McDonald", src: "radio/Otis McDonald - RAGE.mp3", duration: 183.4 },
-            { title: "Treat Me This Way", artist: "Otis McDonald", src: "radio/Treat me this way - Otis McDonald.mp3", duration: 125.3 },
-            { title: "Yesterday", artist: "Otis McDonald", src: "radio/Yesterday - Otis McDonald.mp3", duration: 169.7 },
-            { title: "Be There", artist: "Otis McDonald", src: "radio/Otis McDonald - Be There.mp3", duration: 206.5 },
-            { title: "BirdBrainz", artist: "Otis McDonald", src: "radio/BirdBrainz - Otis McDonald.mp3", duration: 134.0 },
-            { title: "BirdBrainz II", artist: "Otis McDonald", src: "radio/BirdBrainz II - Otis McDonald.mp3", duration: 169.9 },
-            { title: "ALTITUDE", artist: "BLUE STEEL", src: "radio/ES_ALTITUDE - BLUE STEEL.mp3", duration: 169.8 },
-            { title: "That Slapper", artist: "Otis McDonald", src: "radio/That Slapper - Otis McDonald.mp3", duration: 198.4 },
-            { title: "Holiday", artist: "Otis McDonald", src: "radio/Otis McDonald - Holiday.mp3", duration: 450.7 },
-            { title: "3rdeyeblimp", artist: "Otis McDonald", src: "radio/3rdEyeBlimp - Otis McDonald.mp3", duration: 157.8 },
-            { title: "Fly Away", artist: "Otis McDonald", src: "radio/Fly Away - Otis McDonald.mp3", duration: 165.1 },
-            { title: "Wait for You", artist: "Otis McDonald", src: "radio/Otis McDonald - Wait for You.mp3", duration: 192.5 },
-            { title: "Stay", artist: "Otis McDonald", src: "radio/Stay - Otis McDonald.mp3", duration: 118.6 },
-            { title: "Eres", artist: "Rodezel", src: "radio/Eres - Rodezel.mp3", duration: 200.0 },
-            { title: "Other Way", artist: "Otis McDonald", src: "radio/Other Way - Otis McDonald.mp3", duration: 114.7 },
-            { title: "Gold", artist: "Ooyy, Janset", src: "radio/ES_Gold - Ooyy.mp3", duration: 187.8 },
-            { title: "Ever Felt, Pt. 2", artist: "Otis McDonald", src: "radio/Otis McDonald - Ever Felt, Pt. 2.mp3", duration: 140.0 },
-            { title: "Behind These Closed Doors", artist: "Otis McDonald", src: "radio/Behind Closed Doors - Otis McDonald.mp3", duration: 128.5 },
+            { title: "I Wish I Knew", artist: "Otis McDonald, Joni Inez", src: "radio/stream in youtube/I Wish I Knew - Otis McDonald.mp3", duration: 165.6 },
+            { title: "Hide from the Heavy", artist: "Otis McDonald", src: "radio/stream in youtube/Otis McDonald - Hide from the Heavy.mp3", duration: 159.5 },
+            { title: "Forever Young", artist: "Otis McDonald", src: "radio/stream in youtube/Forever Young - Otis McDonald.mp3", duration: 161.8 },
+            { title: "Pressure", artist: "Otis McDonald", src: "radio/stream in youtube/Pressure - Otis McDonald.mp3", duration: 158.3 },
+            { title: "Winter Time is Near", artist: "TrackTribe, Otis McDonald", src: "radio/stream in youtube/TrackTribe - Winter Time is Near (feat. Otis McDonald).mp3", duration: 198.7 },
+            { title: "Side Steppin'", artist: "Otis McDonald", src: "radio/stream in youtube/Side Steppin' - Otis McDonald.mp3", duration: 165.5 },
+            { title: "Truckee, CA", artist: "Otis McDonald", src: "radio/stream in youtube/Truckee - Otis McDonald.mp3", duration: 168.8 },
+            { title: "Complicate Ya", artist: "Otis McDonald", src: "radio/stream in youtube/Complicate ya - Otis McDonald.mp3", duration: 166.5 },
+            { title: "RAGE", artist: "Otis McDonald", src: "radio/stream in youtube/Otis McDonald - RAGE.mp3", duration: 183.4 },
+            { title: "Treat Me This Way", artist: "Otis McDonald", src: "radio/stream in youtube/Treat me this way - Otis McDonald.mp3", duration: 125.3 },
+            { title: "Yesterday", artist: "Otis McDonald", src: "radio/stream in youtube/Yesterday - Otis McDonald.mp3", duration: 169.7 },
+            { title: "Be There", artist: "Otis McDonald", src: "radio/stream in youtube/Otis McDonald - Be There.mp3", duration: 206.5 },
+            { title: "BirdBrainz", artist: "Otis McDonald", src: "radio/stream in youtube/BirdBrainz - Otis McDonald.mp3", duration: 134.0 },
+            { title: "BirdBrainz II", artist: "Otis McDonald", src: "radio/stream in youtube/BirdBrainz II - Otis McDonald.mp3", duration: 169.9 },
+            { title: "ALTITUDE", artist: "BLUE STEEL", src: "radio/stream in youtube/ES_ALTITUDE - BLUE STEEL.mp3", duration: 169.8 },
+            { title: "That Slapper", artist: "Otis McDonald", src: "radio/stream in youtube/That Slapper - Otis McDonald.mp3", duration: 198.4 },
+            { title: "Holiday", artist: "Otis McDonald", src: "radio/stream in youtube/Otis McDonald - Holiday.mp3", duration: 450.7 },
+            { title: "3rdeyeblimp", artist: "Otis McDonald", src: "radio/stream in youtube/3rdEyeBlimp - Otis McDonald.mp3", duration: 157.8 },
+            { title: "Fly Away", artist: "Otis McDonald", src: "radio/stream in youtube/Fly Away - Otis McDonald.mp3", duration: 165.1 },
+            { title: "Wait for You", artist: "Otis McDonald", src: "radio/stream in youtube/Otis McDonald - Wait for You.mp3", duration: 192.5 },
+            { title: "Stay", artist: "Otis McDonald", src: "radio/stream in youtube/Stay - Otis McDonald.mp3", duration: 118.6 },
+            { title: "Eres", artist: "Rodezel", src: "radio/stream in youtube/Eres - Rodezel.mp3", duration: 200.0 },
+            { title: "Other Way", artist: "Otis McDonald", src: "radio/stream in youtube/Other Way - Otis McDonald.mp3", duration: 114.7 },
+            { title: "Gold", artist: "Ooyy, Janset", src: "radio/stream in youtube/ES_Gold - Ooyy.mp3", duration: 187.8 },
+            { title: "Ever Felt, Pt. 2", artist: "Otis McDonald", src: "radio/stream in youtube/Otis McDonald - Ever Felt, Pt. 2.mp3", duration: 140.0 },
+            { title: "Behind These Closed Doors", artist: "Otis McDonald", src: "radio/stream in youtube/Behind Closed Doors - Otis McDonald.mp3", duration: 128.5 },
             { title: "A Legacy Endures", artist: "Otis McDonald", src: "sounds/ost/Otis McDonald - A Legacy Endures.mp3", duration: 299.7 },
-            { title: "Good Time", artist: "Otis McDonald", src: "radio/Otis McDonald - Good Time.mp3", duration: 269.8 },
+            { title: "Good Time", artist: "Otis McDonald", src: "radio/stream in youtube/Otis McDonald - Good Time.mp3", duration: 269.8 },
             { title: "A Legacy Lived", artist: "Otis McDonald", src: "sounds/ost/Otis McDonald - A Legacy Lived.mp3", duration: 307.2 },
-            { title: "ELEVATION", artist: "BLUE STEEL", src: "radio/ES_ELEVATION - BLUE STEEL.mp3", duration: 192.4 },
+            { title: "ELEVATION", artist: "BLUE STEEL", src: "radio/stream in youtube/ES_ELEVATION - BLUE STEEL.mp3", duration: 192.4 },
             { title: "A Legacy Understood", artist: "Otis McDonald", src: "sounds/ost/Otis McDonald - A Legacy Understood.mp3", duration: 404.4 },
-            { title: "Don't Show Your Face", artist: "Otis McDonald", src: "radio/Otis McDonald - Don't Show Your Face.mp3", duration: 151.4 },
-            { title: "LUDICROUS", artist: "BLUE STEEL", src: "radio/ES_LUDICROUS - BLUE STEEL.mp3", duration: 149.6 },
+            { title: "Don't Show Your Face", artist: "Otis McDonald", src: "radio/stream in youtube/Otis McDonald - Don't Show Your Face.mp3", duration: 151.4 },
+            { title: "LUDICROUS", artist: "BLUE STEEL", src: "radio/stream in youtube/ES_LUDICROUS - BLUE STEEL.mp3", duration: 149.6 },
             { title: "It Slowly Started to Fade Away", artist: "Otis McDonald", src: "sounds/ost/Otis McDonald - It Slowly Started to Fade Away.mp3", duration: 506.4 },
-            { title: "Holiday (reprise)", artist: "Otis McDonald", src: "radio/Otis McDonald - Holiday (reprise).mp3", duration: 169.6 }
+            { title: "Holiday (reprise)", artist: "Otis McDonald", src: "radio/stream in youtube/Otis McDonald - Holiday (reprise).mp3", duration: 169.6 }
         ];
+
+        const radioIdents = [
+            { title: "Identify", artist: "28E Radio", src: "radio/28E_ID_01.mp3", duration: 10.0 },
+            { title: "Identify", artist: "28E Radio", src: "radio/28E_ID_02.mp3", duration: 10.0 },
+            { title: "Identify", artist: "28E Radio", src: "radio/28E_ID_03.mp3", duration: 15.0 },
+            { title: "Identify", artist: "28E Radio", src: "radio/28E_ID_04.mp3", duration: 6.0 },
+            { title: "Identify", artist: "28E Radio", src: "radio/28E_ID_05.mp3", duration: 3.7 }
+        ];
+        const identOrder = [3, 4, 2, 0, 1, 4, 2, 3, 1, 0, 2, 4, 1, 3, 0, 4, 3, 2, 0, 1, 3, 4];
+        const radioTracks = [];
+        for (let i = 0, identStep = 0; i < baseSongs.length; i++) {
+            radioTracks.push(baseSongs[i]);
+            if ((i + 1) % 4 === 0) {
+                radioTracks.push(radioIdents[identOrder[identStep % identOrder.length]]);
+                identStep++;
+            }
+        }
 
         const audio = document.getElementById('audio-elem');
         const info = document.getElementById('music-info');
@@ -804,14 +822,22 @@
             serverTimeOffset = snap.val() || 0;
         });
 
-        function findTrackIndex(src) {
+        function findTrackIndex(src, hintIdx) {
+            const baseOf = (u) => String(u || '').split('/').pop();
+            if (Number.isInteger(hintIdx) && hintIdx >= 0 && hintIdx < radioTracks.length) {
+                const cand = radioTracks[hintIdx];
+                if (!src || cand.src === src || baseOf(cand.src) === baseOf(src) || new URL(cand.src, document.baseURI).href === src) {
+                    return hintIdx;
+                }
+            }
             if (!src) return 0;
-            const idx = radioTracks.findIndex(t => t.src === src || new URL(t.src, document.baseURI).href === src);
+            const targetBase = baseOf(src);
+            const idx = radioTracks.findIndex(t => t.src === src || baseOf(t.src) === targetBase || new URL(t.src, document.baseURI).href === src);
             return idx !== -1 ? idx : 0;
         }
 
-        function resolveLiveTrack(startTrackSrc, startTimeMs, nowMs) {
-            let idx = findTrackIndex(startTrackSrc);
+        function resolveLiveTrack(startTrackSrc, startTimeMs, nowMs, hintIdx) {
+            let idx = findTrackIndex(startTrackSrc, hintIdx);
             let elapsed = Math.max(0, (nowMs - startTimeMs) / 1000);
 
             while (elapsed >= radioTracks[idx].duration) {
@@ -891,7 +917,7 @@
             if (hasInitialSynced && state.source === 'dj' && state.startTime && state.startTime !== lastDjStartTime) {
                 lastDjStartTime = state.startTime;
                 currentRadioState = state;
-                loadAndPlayTrack(findTrackIndex(state.src), 0, false);
+                loadAndPlayTrack(findTrackIndex(state.src, state.trackIdx), 0, false);
                 return;
             }
 
@@ -902,10 +928,10 @@
                 // Si el navegador tiene el audio en pausa (bloqueo de autoplay antes del primer clic),
                 // mantener el título y la pista actualizados en tiempo real con el stream
                 if (audio.paused) {
-                    const resolved = resolveLiveTrack(state.src, startTime, now);
+                    const resolved = resolveLiveTrack(state.src, startTime, now, state.trackIdx);
                     let liveIdx = resolved.idx;
                     let liveSeek = resolved.seekTime;
-                    if (liveSeek >= radioTracks[liveIdx].duration - 8) {
+                    if (radioTracks[liveIdx].duration > 10 && liveSeek >= radioTracks[liveIdx].duration - 8) {
                         liveIdx = (liveIdx + 1) % radioTracks.length;
                         liveSeek = 0;
                     }
@@ -925,10 +951,10 @@
             }
             currentRadioState = state;
 
-            const resolved = resolveLiveTrack(state.src, startTime, now);
+            const resolved = resolveLiveTrack(state.src, startTime, now, state.trackIdx);
             let bootIdx = resolved.idx;
             let bootSeek = resolved.seekTime;
-            if (bootSeek >= radioTracks[bootIdx].duration - 8) {
+            if (radioTracks[bootIdx].duration > 10 && bootSeek >= radioTracks[bootIdx].duration - 8) {
                 bootIdx = (bootIdx + 1) % radioTracks.length;
                 bootSeek = 0;
             }
@@ -1008,10 +1034,10 @@
                 if (currentRadioState && currentRadioState.src) {
                     const now = Date.now() + serverTimeOffset;
                     const startTime = currentRadioState.startTime || now;
-                    const resolved = resolveLiveTrack(currentRadioState.src, startTime, now);
+                    const resolved = resolveLiveTrack(currentRadioState.src, startTime, now, currentRadioState.trackIdx);
                     let liveIdx = resolved.idx;
                     let liveSeek = resolved.seekTime;
-                    if (liveSeek >= radioTracks[liveIdx].duration - 8) {
+                    if (radioTracks[liveIdx].duration > 10 && liveSeek >= radioTracks[liveIdx].duration - 8) {
                         liveIdx = (liveIdx + 1) % radioTracks.length;
                         liveSeek = 0;
                     }

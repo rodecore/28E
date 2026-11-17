@@ -29,7 +29,9 @@
                     return;
                 }
                 if (host === 'dclf.yaire.site') {
-                    window.location.replace('dclf.html' + window.location.search + window.location.hash);
+                    var dclfTarget = Date.parse('2027-01-28T00:00:00-04:00');
+                    var dclfEntry = Date.now() < dclfTarget ? 'dclf-lanzamiento.html' : 'dclf.html';
+                    window.location.replace(dclfEntry + window.location.search + window.location.hash);
                     return;
                 }
                 if (host === 'tv.yaire.site') {
@@ -60,7 +62,17 @@
 
             var dest = '';
             if (target === 'dclf') {
-                dest = isLocal ? 'dclf.html' : 'https://dclf.yaire.site/';
+                var dclfLaunchMs = Date.parse('2027-01-28T00:00:00-04:00');
+                var dclfUnlocked = false;
+                try {
+                    var qp = new URLSearchParams(window.location.search);
+                    dclfUnlocked = qp.get('dclf_dev') === '1' || sessionStorage.getItem('dclf_dev_unlock') === '1' || localStorage.getItem('dclf_dev_unlock') === '1';
+                } catch (e) {}
+                if (!dclfUnlocked && Date.now() < dclfLaunchMs) {
+                    dest = isLocal ? 'dclf-lanzamiento.html' : 'https://dclf.yaire.site/';
+                } else {
+                    dest = isLocal ? 'dclf.html' : 'https://dclf.yaire.site/';
+                }
             } else if (target === 'tv') {
                 dest = isLocal ? 'tv.html' : 'https://tv.yaire.site/';
             }
@@ -1672,7 +1684,7 @@
 
         content="Para Yaire 🌷 — Mi lugar favorito es contigo. Feliz 28E. Plataforma interactiva de canales de voz y minijuegos.">
 
-    <link rel="icon" type="image/x-icon" href="dclf_game.ico?v=1793311199028">
+    <link rel="icon" type="image/x-icon" href="icons/dclf_game.ico?v=1793311199028">
 
     <!-- Bloqueo temporal: Redirigir a mantenimiento antes del 28 de Abril -->
 
@@ -4316,7 +4328,6 @@
 
         <!-- Spotlight Music Engine -->
 
-        <script src="assets/js/hls.min.js"></script>
         <script src="assets/js/radio-tracks.js?v=1794103000000"></script>
 
     </aside>
@@ -4620,7 +4631,7 @@
 
     <div id="page-loader">
         <video id="loader-video" autoplay muted playsinline preload="auto">
-            <source src="liquid-glass-logo-16x9-2560x1440-60fps.mp4" type="video/mp4">
+            <source src="assets/video/liquid-glass-logo-16x9-2560x1440-60fps.mp4" type="video/mp4">
         </video>
     </div>
 
@@ -5347,7 +5358,7 @@
 
                     <img src="images/video_hola_28e.jpg" alt="Hola, 28E Entertainment."
 
-                        class="spotlight-img w-full h-full object-cover" onerror="this.src='icon.png'">
+                        class="spotlight-img w-full h-full object-cover" onerror="this.src='icons/icon.png'">
 
                     <div
 
@@ -5403,7 +5414,7 @@
 
                     <img src="images/itchio_cover.jpg" alt="Donde crecen las flores"
 
-                        class="spotlight-img w-full h-full object-cover" onerror="this.src='icon.png'">
+                        class="spotlight-img w-full h-full object-cover" onerror="this.src='icons/icon.png'">
 
                     <div
 
@@ -11491,7 +11502,7 @@
 
                         style="position: relative; aspect-ratio: 3/4; min-height: 380px; width: 100%; overflow: hidden; border-radius: 24px; background: #0f0f14; border: 1px solid rgba(255, 255, 255, 0.08);">
 
-                        <img loading="lazy" decoding="async" src="lasfotos/1779487399736_IMG-20260125-WA0097.jpg"
+                        <img loading="lazy" decoding="async" src="gallery/1779487399736_IMG-20260125-WA0097.jpg"
 
                             alt="Yaire - Obra I" onerror="this.onerror=null; this.src='https://i.ibb.co/yByRfq5y/IMG-20260125-WA0097.jpg'"
 
@@ -11527,7 +11538,7 @@
 
                         style="position: relative; aspect-ratio: 3/4; min-height: 380px; width: 100%; overflow: hidden; border-radius: 24px; background: #0f0f14; border: 1px solid rgba(255, 255, 255, 0.08);">
 
-                        <img loading="lazy" decoding="async" src="lasfotos/IMG-20260127-WA0067.jpg"
+                        <img loading="lazy" decoding="async" src="gallery/IMG-20260127-WA0067.jpg"
 
                             alt="Yaire - Obra II" onerror="this.onerror=null; this.src='https://i.ibb.co/DDHBsJy2/IMG-20260127-WA0067.jpg'"
 
@@ -11563,7 +11574,7 @@
 
                         style="position: relative; aspect-ratio: 3/4; min-height: 380px; width: 100%; overflow: hidden; border-radius: 24px; background: #0f0f14; border: 1px solid rgba(255, 255, 255, 0.08);">
 
-                        <img loading="lazy" decoding="async" src="lasfotos/IMG-20260720-WA0038.jpg"
+                        <img loading="lazy" decoding="async" src="gallery/IMG-20260720-WA0038.jpg"
 
                             alt="Yaire - Obra III"
 
@@ -11599,7 +11610,7 @@
 
                         style="position: relative; aspect-ratio: 3/4; min-height: 380px; width: 100%; overflow: hidden; border-radius: 24px; background: #0f0f14; border: 1px solid rgba(255, 255, 255, 0.08);">
 
-                        <img loading="lazy" decoding="async" src="lasfotos/IMG-20260718-WA0010.jpg"
+                        <img loading="lazy" decoding="async" src="gallery/IMG-20260718-WA0010.jpg"
 
                             alt="Yaire - Obra IV"
 
@@ -11635,7 +11646,7 @@
 
                         style="position: relative; aspect-ratio: 3/4; min-height: 380px; width: 100%; overflow: hidden; border-radius: 24px; background: #0f0f14; border: 1px solid rgba(255, 255, 255, 0.08);">
 
-                        <img loading="lazy" decoding="async" src="lasfotos/IMG-20260719-WA0021.jpg" alt="Yaire - Obra V"
+                        <img loading="lazy" decoding="async" src="gallery/IMG-20260719-WA0021.jpg" alt="Yaire - Obra V"
 
                             class="transition-transform duration-700 ease-out group-hover:scale-105"
 
@@ -11669,7 +11680,7 @@
 
                         style="position: relative; aspect-ratio: 3/4; min-height: 380px; width: 100%; overflow: hidden; border-radius: 24px; background: #0f0f14; border: 1px solid rgba(255, 255, 255, 0.08);">
 
-                        <img loading="lazy" decoding="async" src="lasfotos/AirBrush_20260327204142.jpg"
+                        <img loading="lazy" decoding="async" src="gallery/AirBrush_20260327204142.jpg"
 
                             alt="Yaire - Obra VI"
 
@@ -11831,7 +11842,7 @@
 
                         <div class="ghub-v3-icon">
 
-                            <img src="icon.png" alt="Donde Crecen las Flores"
+                            <img src="icons/icon.png" alt="Donde Crecen las Flores"
 
                                 class="w-28 h-28 md:w-32 md:h-32 object-contain select-none pointer-events-none drop-shadow-2xl"
 
@@ -19202,7 +19213,7 @@
 
                         <div class="relative p-1.5 rounded-2xl bg-white/[0.04] border border-white/10 shadow-2xl overflow-hidden max-w-sm">
 
-                            <img loading="lazy" src="lasfotos/AirBrush_20260327204142.jpg" alt="Nosotros" class="w-full h-auto rounded-xl object-cover shadow-lg" style="max-height: 220px; aspect-ratio: 4/3; object-position: center;">
+                            <img loading="lazy" src="gallery/AirBrush_20260327204142.jpg" alt="Nosotros" class="w-full h-auto rounded-xl object-cover shadow-lg" style="max-height: 220px; aspect-ratio: 4/3; object-position: center;">
 
                         </div>
 
@@ -19292,7 +19303,7 @@
                         <div class="relative w-14 h-14 rounded-full p-[2px] flex-shrink-0"
                             style="background: linear-gradient(135deg, rgba(255, 148, 194, 0.7), rgba(196, 55, 122, 0.8)); box-shadow: 0 0 16px rgba(231, 117, 166, 0.4);">
                             <div class="w-full h-full rounded-full overflow-hidden bg-zinc-900">
-                                <img loading="lazy" src="lasfotos/AirBrush_20260327204142.jpg" class="w-full h-full object-cover">
+                                <img loading="lazy" src="gallery/AirBrush_20260327204142.jpg" class="w-full h-full object-cover">
                             </div>
                         </div>
                         <div>
@@ -19585,7 +19596,7 @@
 
             <!-- Luxury Micro-Pills Navigation Links -->
             <div class="mt-4 flex flex-wrap items-center justify-center gap-2.5">
-                <a href="privacy"
+                <a href="privacy.html"
                     class="footer-nav-pill group"
                     aria-label="Ver Política de Privacidad">
                     <svg class="w-2.5 h-2.5 text-pink-300/70 group-hover:text-pink-200 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -19897,7 +19908,7 @@
 
                 if (window.__loadScriptOnce) {
 
-                    window.__loadScriptOnce('assets/js/firebase-voice-transport.js?v=20261117_music_session').then(function () { return window.__loadScriptOnce('assets/js/voice-channel-widget.js?v=20261117_pill'); }).catch(function () { });
+                    window.__loadScriptOnce('assets/js/firebase-voice-transport.js?v=20261117_music_session').then(function () { return window.__loadScriptOnce('assets/js/voice-channel-widget.js?v=20261117_sebenta'); }).catch(function () { });
 
                 }
 

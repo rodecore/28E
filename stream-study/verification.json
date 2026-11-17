@@ -1,0 +1,166 @@
+{
+  "errors": [],
+  "boundaryPixelDifferences": 0,
+  "states": [
+    {
+      "time": 0,
+      "paused": true,
+      "width": 1280,
+      "height": 720,
+      "glError": 0,
+      "pose": {
+        "phase": 0,
+        "breath": 0,
+        "turn": 0,
+        "page": 0,
+        "look": 0,
+        "reach": 0,
+        "sip": 0,
+        "blink": 0,
+        "writing": 1
+      },
+      "staticVertices": 14463,
+      "streamOverlayVisible": false
+    },
+    {
+      "time": 43,
+      "paused": true,
+      "width": 1280,
+      "height": 720,
+      "glError": 0,
+      "pose": {
+        "phase": 2.251474735072685,
+        "breath": -0.007053423027509589,
+        "turn": 0.7407407407407407,
+        "page": 0,
+        "look": 0,
+        "reach": 0,
+        "sip": 0,
+        "blink": 0,
+        "writing": 0.2592592592592593
+      },
+      "staticVertices": 14463,
+      "streamOverlayVisible": false
+    },
+    {
+      "time": 46,
+      "paused": true,
+      "width": 1280,
+      "height": 720,
+      "glError": 0,
+      "pose": {
+        "phase": 2.408554367752175,
+        "breath": 0.011412678195541861,
+        "turn": 1,
+        "page": 0.84375,
+        "look": 0,
+        "reach": 0,
+        "sip": 0,
+        "blink": 0,
+        "writing": 0
+      },
+      "staticVertices": 14463,
+      "streamOverlayVisible": false
+    },
+    {
+      "time": 82,
+      "paused": true,
+      "width": 1280,
+      "height": 720,
+      "glError": 0,
+      "pose": {
+        "phase": 4.293509959906051,
+        "breath": 0.007053423027509579,
+        "turn": 0,
+        "page": 1,
+        "look": 1,
+        "reach": 0,
+        "sip": 0,
+        "blink": 0,
+        "writing": 0
+      },
+      "staticVertices": 14463,
+      "streamOverlayVisible": false
+    },
+    {
+      "time": 96,
+      "paused": true,
+      "width": 1280,
+      "height": 720,
+      "glError": 0,
+      "pose": {
+        "phase": 5.026548245743669,
+        "breath": 0.011412678195541825,
+        "turn": 0,
+        "page": 1,
+        "look": 0,
+        "reach": 1,
+        "sip": 0.5,
+        "blink": 0,
+        "writing": 0
+      },
+      "staticVertices": 14463,
+      "streamOverlayVisible": false
+    },
+    {
+      "time": 100,
+      "paused": true,
+      "width": 1280,
+      "height": 720,
+      "glError": 0,
+      "pose": {
+        "phase": 5.235987755982989,
+        "breath": -5.878304635907296e-17,
+        "turn": 0,
+        "page": 1,
+        "look": 0,
+        "reach": 1,
+        "sip": 1,
+        "blink": 0,
+        "writing": 0
+      },
+      "staticVertices": 14463,
+      "streamOverlayVisible": false
+    },
+    {
+      "time": 119.96666670000002,
+      "paused": true,
+      "width": 1280,
+      "height": 720,
+      "glError": 0,
+      "pose": {
+        "phase": 6.281439979672922,
+        "breath": -0.0005025073425361935,
+        "turn": 0,
+        "page": 1,
+        "look": 0,
+        "reach": 0,
+        "sip": 0,
+        "blink": 0,
+        "writing": 1
+      },
+      "staticVertices": 14463,
+      "streamOverlayVisible": false
+    },
+    {
+      "time": 0,
+      "paused": true,
+      "width": 1280,
+      "height": 720,
+      "glError": 0,
+      "pose": {
+        "phase": 0,
+        "breath": 0,
+        "turn": 0,
+        "page": 0,
+        "look": 0,
+        "reach": 0,
+        "sip": 0,
+        "blink": 0,
+        "writing": 1
+      },
+      "staticVertices": 14463,
+      "streamOverlayVisible": false
+    }
+  ]
+}

@@ -412,6 +412,8 @@
      */
     function show28EPlayToast(options = {}) {
         const now = Date.now();
+        // Evitar duplicaciones o reinicios si ya está activo o se disparó recientemente
+        if (isToastActive || (now - lastToastTriggerTime < 3500)) return;
         // Evitar duplicaciones o reinicios si ya está activo o ya se disparó en esta página
         if (hasExperienceToastShown && !options.force) return;
         if (isToastActive || (now - lastToastTriggerTime < 5000)) return;
@@ -518,13 +520,18 @@
         const path = window.location.pathname.toLowerCase();
         const host = window.location.hostname.toLowerCase();
         const isTv = path.includes('tv') || host.indexOf('tv.') !== -1;
-        const isDclf = path.includes('dclf') || host.indexOf('dclf.') !== -1;
+        const isDclf = (path.includes('dclf') || host.indexOf('dclf.') !== -1) && !path.includes('lanzamiento');
 
-        if (isDclf || isTv) {
-            // Disparar en el loader inicial tanto en DCLF como en 28E TV
+        if (isDclf) {
+            // Disparar en el loader inicial en DCLF
             setTimeout(() => {
                 show28EPlayToast();
             }, 800);
+        } else if (isTv) {
+            // En TV damos margen para que termine el ident inicial (4 segundos) o initTV lo dispara
+            setTimeout(() => {
+                show28EPlayToast();
+            }, 4200);
         }
     }
 

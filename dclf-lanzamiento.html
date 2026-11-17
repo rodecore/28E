@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="es" class="notranslate">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="color-scheme" content="dark">
+    <meta name="theme-color" content="#060a08">
+    <meta name="darkreader-lock">
+    <meta name="google" content="notranslate">
+    <title>28E: Donde crecen las flores · Lanzamiento 28 de enero de 2027</title>
+    <script>
+        (function () {
+            try {
+                var ua = navigator.userAgent || '';
+                var isDesktopApp = window.location.protocol === 'file:' && (/Electron/i.test(ua) || (typeof process !== 'undefined' && process.versions && !!process.versions.electron));
+                var p = new URLSearchParams(window.location.search);
+                var unlocked = isDesktopApp || p.get('dclf_dev') === '1';
+                try {
+                    unlocked = unlocked || sessionStorage.getItem('dclf_dev_unlock') === '1' || localStorage.getItem('dclf_dev_unlock') === '1';
+                } catch (e) {}
+                var launchMs = Date.parse('2027-01-28T00:00:00-04:00');
+                if (unlocked || Date.now() >= launchMs) {
+                    window.location.replace('dclf.html' + window.location.search + window.location.hash);
+                    return;
+                }
+                if (window.location.hostname === 'dclf.yaire.site' && window.location.pathname !== '/') {
+                    window.history.replaceState(null, '', '/' + window.location.search + window.location.hash);
+                }
+            } catch (e) {}
+        })();
+    </script>
+    <link rel="icon" type="image/x-icon" href="./icons/dclf_game.ico">
+    <link rel="stylesheet" href="./fonts/fonts.css">
+    <style>
+        @font-face {
+            font-family: 'Sebenta';
+            font-style: normal;
+            font-weight: 400 700;
+            font-display: swap;
+            src: url('./fonts/Sebenta-Medium.woff2') format('woff2');
+        }
+
+        @font-face {
+            font-family: 'Sebenta';
+            font-style: italic;
+            font-weight: 400 700;
+            font-display: swap;
+            src: url('./fonts/Sebenta-MediumItalic.woff2') format('woff2');
+        }
+
+        :root {
+            --bg-night: #060a08;
+            --ink-primary: #faf7ef;
+            --ink-secondary: rgba(245, 240, 229, 0.80);
+            --ink-muted: rgba(230, 223, 209, 0.64);
+            --tulip-rose: #efa5c0;
+            --tulip-rose-soft: rgba(239, 165, 192, 0.24);
+            --hairline: rgba(250, 247, 239, 0.14);
+            --control-bg: rgba(10, 16, 13, 0.56);
+            --control-bg-hover: rgba(22, 33, 27, 0.78);
+            --control-border: rgba(250, 247, 239, 0.18);
+            --font-display: 'Sebenta', Georgia, serif;
+            --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        ::selection {
+            background: var(--tulip-rose-soft);
+            color: var(--ink-primary);
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: var(--bg-night);
+            color: var(--ink-primary);
+            font-family: var(--font-sans);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            overscroll-behavior: none;
+        }
+
+        /* Escena 3D viva del jardín en segundo plano */
+        .garden-bg {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            overflow: hidden;
+            background: var(--bg-night) url('./images/itchio_cover.jpg') center center / cover no-repeat;
+        }
+
+        .garden-bg iframe {
+            width: 100%;
+            height: 100%;
+            border: 0;
+            display: block;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 900ms cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .garden-bg iframe.is-ready {
+            opacity: 1;
+        }
+
+        /* Velo atmosférico botánico para legibilidad editorial en todo encuadre */
+        .garden-scrim {
+            position: fixed;
+            inset: 0;
+            z-index: 2;
+            pointer-events: none;
+            background:
+                radial-gradient(ellipse 68% 62% at 50% 48%, rgba(6, 10, 8, 0.58) 0%, rgba(6, 10, 8, 0.80) 68%, rgba(4, 7, 5, 0.92) 100%),
+                linear-gradient(180deg, rgba(4, 7, 5, 0.62) 0%, rgba(6, 10, 8, 0.32) 45%, rgba(4, 7, 5, 0.78) 100%);
+        }
+
+        /* Escenario principal */
+        .stage {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            height: 100dvh;
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            padding:
+                max(1.5rem, env(safe-area-inset-top))
+                max(2.4rem, env(safe-area-inset-right))
+                max(1.5rem, env(safe-area-inset-bottom))
+                max(2.4rem, env(safe-area-inset-left));
+            transition: opacity 900ms cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* Encabezado */
+        .top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .brand-mark {
+            display: inline-flex;
+            align-items: center;
+            height: 44px;
+            pointer-events: none;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .brand-mark img {
+            height: 36px;
+            width: auto;
+            display: block;
+            margin-left: -5px;
+            user-select: none;
+            -webkit-user-drag: none;
+        }
+
+        .top-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+        }
+
+        .icon-control,
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 44px;
+            border: 1px solid var(--control-border);
+            background: var(--control-bg);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            color: var(--ink-primary);
+            font-family: var(--font-sans);
+            text-decoration: none;
+            cursor: pointer;
+            touch-action: manipulation;
+            transition: background-color 160ms ease-out, border-color 160ms ease-out, transform 150ms ease-out;
+        }
+
+        .icon-control {
+            width: 44px;
+            padding: 0;
+            border-radius: 50%;
+        }
+
+        .icon-control[aria-pressed="true"] {
+            border-color: rgba(239, 165, 192, 0.52);
+            color: var(--tulip-rose);
+        }
+
+        .back-link {
+            gap: 0.5rem;
+            padding: 0 1.05rem;
+            border-radius: 999px;
+            font-size: 0.86rem;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            white-space: nowrap;
+        }
+
+        @media (hover: hover) {
+            .icon-control:hover,
+            .back-link:hover {
+                background: var(--control-bg-hover);
+                border-color: rgba(250, 247, 239, 0.32);
+            }
+        }
+
+        .icon-control:active,
+        .back-link:active {
+            transform: scale(0.97);
+        }
+
+        .icon-control:focus-visible,
+        .back-link:focus-visible {
+            outline: 2px solid var(--tulip-rose);
+            outline-offset: 3px;
+        }
+
+        .icon-control svg,
+        .back-link svg,
+        .meta-date svg {
+            width: 17px;
+            height: 17px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 1.75;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            flex-shrink: 0;
+        }
+
+        /* Bloque central de lanzamiento */
+        .hero-center {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            max-width: 720px;
+            width: 100%;
+            margin: 0 auto;
+            animation: heroReveal 720ms cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+
+        @keyframes heroReveal {
+            from {
+                opacity: 0;
+                transform: translateY(14px);
+                filter: blur(6px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+                filter: blur(0);
+            }
+        }
+
+        .emblem-wrap {
+            width: clamp(82px, 11vh, 114px);
+            height: clamp(82px, 11vh, 114px);
+            margin-bottom: 1.35rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .emblem-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+            user-select: none;
+            -webkit-user-drag: none;
+            filter: drop-shadow(0 16px 28px rgba(0, 0, 0, 0.56));
+        }
+
+        .hero-title {
+            font-family: var(--font-display);
+            font-weight: 500;
+            font-size: clamp(2.35rem, 5.4vw, 4.35rem);
+            line-height: 1.04;
+            letter-spacing: -0.028em;
+            color: var(--ink-primary);
+            text-wrap: balance;
+        }
+
+        .hero-title em {
+            font-style: italic;
+            font-weight: 500;
+            color: var(--tulip-rose);
+        }
+
+        .hero-lead {
+            margin-top: 0.95rem;
+            max-width: 46ch;
+            font-size: clamp(0.95rem, 1.35vw, 1.08rem);
+            font-weight: 500;
+            line-height: 1.55;
+            letter-spacing: -0.01em;
+            color: var(--ink-secondary);
+            text-wrap: balance;
+        }
+
+        .hero-lead strong {
+            font-weight: 700;
+            color: var(--ink-primary);
+        }
+
+        /* Contador arquitectónico en vivo */
+        .countdown-rail {
+            margin-top: 2.15rem;
+            width: 100%;
+            max-width: 560px;
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            border-top: 1px solid var(--hairline);
+            border-bottom: 1px solid var(--hairline);
+            padding: 1.25rem 0.25rem;
+            font-variant-numeric: tabular-nums lining-nums;
+            font-feature-settings: 'tnum' 1, 'lnum' 1;
+        }
+
+        .cd-unit {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            padding: 0 0.5rem;
+        }
+
+        .cd-unit + .cd-unit::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 16%;
+            bottom: 16%;
+            width: 1px;
+            background: var(--hairline);
+        }
+
+        .cd-value {
+            font-family: var(--font-sans);
+            font-size: clamp(2rem, 4.3vw, 3.35rem);
+            font-weight: 700;
+            line-height: 1;
+            letter-spacing: -0.035em;
+            color: var(--ink-primary);
+        }
+
+        .cd-label {
+            margin-top: 0.5rem;
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--ink-muted);
+        }
+
+        /* Pie de página */
+        .bottom-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            font-size: 0.82rem;
+            font-weight: 500;
+            color: var(--ink-muted);
+        }
+
+        .meta-date {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--ink-secondary);
+        }
+
+        .meta-date svg {
+            width: 15px;
+            height: 15px;
+            color: var(--tulip-rose);
+        }
+
+        .meta-copy {
+            letter-spacing: 0.01em;
+        }
+
+        /* Adaptación móvil y alturas compactas */
+        @media (max-width: 640px) {
+            .stage {
+                padding:
+                    max(1.1rem, env(safe-area-inset-top))
+                    max(1.2rem, env(safe-area-inset-right))
+                    max(1.1rem, env(safe-area-inset-bottom))
+                    max(1.2rem, env(safe-area-inset-left));
+            }
+
+            .brand-mark img {
+                height: 31px;
+                margin-left: -4px;
+            }
+
+            .back-link {
+                padding: 0 0.88rem;
+                font-size: 0.82rem;
+            }
+
+            .emblem-wrap {
+                margin-bottom: 1.05rem;
+            }
+
+            .countdown-rail {
+                margin-top: 1.65rem;
+                padding: 1rem 0;
+            }
+
+            .cd-unit {
+                padding: 0 0.25rem;
+            }
+
+            .cd-label {
+                font-size: 0.64rem;
+                letter-spacing: 0.1em;
+            }
+
+            .bottom-bar {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                gap: 0.35rem;
+                font-size: 0.76rem;
+            }
+        }
+
+        @media (max-height: 560px) {
+            .emblem-wrap {
+                width: 60px;
+                height: 60px;
+                margin-bottom: 0.65rem;
+            }
+
+            .hero-title {
+                font-size: clamp(1.85rem, 4.2vw, 2.6rem);
+            }
+
+            .hero-lead {
+                margin-top: 0.5rem;
+                font-size: 0.88rem;
+            }
+
+            .countdown-rail {
+                margin-top: 1rem;
+                padding: 0.75rem 0;
+            }
+
+            .cd-value {
+                font-size: 1.75rem;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .hero-center {
+                animation: none;
+            }
+
+            .garden-bg iframe,
+            .stage,
+            .icon-control,
+            .back-link {
+                transition: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="garden-bg" aria-hidden="true">
+        <iframe id="garden-frame" src="./cinematica_jardin.html?bg=1" title="" tabindex="-1" allow="autoplay"></iframe>
+    </div>
+    <div class="garden-scrim" aria-hidden="true"></div>
+
+    <div class="stage" id="stage-root">
+        <header class="top-bar">
+            <div class="brand-mark">
+                <img src="./assets/logos/logo_28e_oficial.png" alt="28E" draggable="false">
+            </div>
+
+            <div class="top-actions">
+                <button type="button" id="ambient-btn" class="icon-control" aria-pressed="false"
+                    aria-label="Activar música de fondo" title="Save Me (Instrumental) — Rodezel">
+                    <svg id="ambient-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M11 5 6 9H3v6h3l5 4V5Z" />
+                        <path d="m16 9 5 6" />
+                        <path d="m21 9-5 6" />
+                    </svg>
+                </button>
+                <a id="back-home" href="https://yaire.site/" class="back-link">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M19 12H5" />
+                        <path d="m12 19-7-7 7-7" />
+                    </svg>
+                    <span>Volver a 28E</span>
+                </a>
+            </div>
+        </header>
+
+        <main class="hero-center">
+            <div class="emblem-wrap">
+                <img src="./icons/icon.png" alt="Emblema de Donde crecen las flores" class="emblem-img">
+            </div>
+
+            <h1 class="hero-title">Donde crecen <em>las flores</em></h1>
+
+            <p id="launch-lead" class="hero-lead">
+                El videojuego estará disponible en la web el <strong>28 de enero de 2027</strong>.
+            </p>
+
+            <section class="countdown-rail" role="timer" aria-live="off"
+                aria-label="Cuenta regresiva al 28 de enero de 2027">
+                <div class="cd-unit">
+                    <span id="cd-days" class="cd-value">--</span>
+                    <span id="lbl-days" class="cd-label">Días</span>
+                </div>
+                <div class="cd-unit">
+                    <span id="cd-hours" class="cd-value">--</span>
+                    <span id="lbl-hours" class="cd-label">Horas</span>
+                </div>
+                <div class="cd-unit">
+                    <span id="cd-mins" class="cd-value">--</span>
+                    <span id="lbl-mins" class="cd-label">Minutos</span>
+                </div>
+                <div class="cd-unit">
+                    <span id="cd-secs" class="cd-value">--</span>
+                    <span id="lbl-secs" class="cd-label">Segundos</span>
+                </div>
+            </section>
+        </main>
+
+        <footer class="bottom-bar">
+            <div class="meta-date">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <rect x="3" y="4" width="18" height="18" rx="3" />
+                    <path d="M16 2v4M8 2v4M3 10h18" />
+                </svg>
+                <span>Lanzamiento web · 28 de enero de 2027</span>
+            </div>
+            <div class="meta-copy">© 2026 28E Entertainment</div>
+        </footer>
+    </div>
+
+    <audio id="bg-music" src="./sounds/ost/save-me-instrumental.mp3" loop preload="auto" playsinline></audio>
+
+    <script>
+        (function () {
+            var LAUNCH_MS = Date.parse('2027-01-28T00:00:00-04:00');
+            var host = window.location.hostname;
+            var isLocal = host === 'localhost' || host === '127.0.0.1';
+            var homeHref = host === 'dclf.yaire.site' ? 'https://yaire.site/' : (isLocal ? 'index.html' : '/');
+
+            var backLink = document.getElementById('back-home');
+            if (backLink) backLink.href = homeHref;
+
+            var gardenFrame = document.getElementById('garden-frame');
+            if (gardenFrame) {
+                gardenFrame.addEventListener('load', function () {
+                    gardenFrame.classList.add('is-ready');
+                });
+            }
+
+            var bgMusic = document.getElementById('bg-music');
+            var ambientBtn = document.getElementById('ambient-btn');
+            var ambientIcon = document.getElementById('ambient-icon');
+            var TARGET_VOL = 0.45;
+            var userMuted = false;
+            var fadeTimer = null;
+
+            function syncAudioButton(playing) {
+                if (!ambientBtn) return;
+                ambientBtn.setAttribute('aria-pressed', String(playing));
+                ambientBtn.setAttribute('aria-label', playing ? 'Silenciar música de fondo' : 'Activar música de fondo');
+                if (ambientIcon) {
+                    ambientIcon.innerHTML = playing
+                        ? '<path d="M11 5 6 9H3v6h3l5 4V5Z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.8 6a8.5 8.5 0 0 1 0 12"/>'
+                        : '<path d="M11 5 6 9H3v6h3l5 4V5Z"/><path d="m16 9 5 6"/><path d="m21 9-5 6"/>';
+                }
+            }
+
+            function fadeVolumeTo(target, durationMs, onDone) {
+                if (!bgMusic) return;
+                if (fadeTimer) clearInterval(fadeTimer);
+                var start = bgMusic.volume;
+                var delta = target - start;
+                var steps = Math.max(1, Math.round(durationMs / 40));
+                var step = 0;
+                fadeTimer = setInterval(function () {
+                    step++;
+                    var next = step >= steps ? target : start + delta * (step / steps);
+                    bgMusic.volume = Math.max(0, Math.min(1, next));
+                    if (step >= steps) {
+                        clearInterval(fadeTimer);
+                        fadeTimer = null;
+                        if (onDone) onDone();
+                    }
+                }, 40);
+            }
+
+            function tryStartMusic() {
+                if (!bgMusic || userMuted || !bgMusic.paused) return;
+                bgMusic.volume = 0;
+                var p = bgMusic.play();
+                if (p && typeof p.then === 'function') {
+                    p.then(function () {
+                        syncAudioButton(true);
+                        fadeVolumeTo(TARGET_VOL, 1100);
+                        detachUnlockListeners();
+                    }).catch(function () {
+                        syncAudioButton(false);
+                    });
+                }
+            }
+
+            function onFirstGesture(e) {
+                if (ambientBtn && ambientBtn.contains(e.target)) return;
+                tryStartMusic();
+            }
+
+            function detachUnlockListeners() {
+                window.removeEventListener('pointerdown', onFirstGesture, true);
+                window.removeEventListener('keydown', onFirstGesture, true);
+            }
+
+            window.addEventListener('pointerdown', onFirstGesture, true);
+            window.addEventListener('keydown', onFirstGesture, true);
+
+            if (bgMusic) {
+                bgMusic.addEventListener('play', function () { syncAudioButton(true); });
+                bgMusic.addEventListener('pause', function () { syncAudioButton(false); });
+                tryStartMusic();
+            }
+
+            if (ambientBtn && bgMusic) {
+                ambientBtn.addEventListener('click', function () {
+                    detachUnlockListeners();
+                    if (bgMusic.paused) {
+                        userMuted = false;
+                        bgMusic.volume = 0;
+                        bgMusic.play().then(function () {
+                            syncAudioButton(true);
+                            fadeVolumeTo(TARGET_VOL, 650);
+                        }).catch(function () {});
+                    } else {
+                        userMuted = true;
+                        fadeVolumeTo(0, 320, function () {
+                            bgMusic.pause();
+                            syncAudioButton(false);
+                        });
+                    }
+                });
+            }
+
+            var elDays = document.getElementById('cd-days');
+            var elHours = document.getElementById('cd-hours');
+            var elMins = document.getElementById('cd-mins');
+            var elSecs = document.getElementById('cd-secs');
+            var lblDays = document.getElementById('lbl-days');
+            var lblHours = document.getElementById('lbl-hours');
+            var lblMins = document.getElementById('lbl-mins');
+            var lblSecs = document.getElementById('lbl-secs');
+            var elLead = document.getElementById('launch-lead');
+            var stageRoot = document.getElementById('stage-root');
+            var unlocked = false;
+
+            function unlockNow() {
+                if (unlocked) return;
+                unlocked = true;
+                if (elDays) elDays.textContent = '00';
+                if (elHours) elHours.textContent = '00';
+                if (elMins) elMins.textContent = '00';
+                if (elSecs) elSecs.textContent = '00';
+                if (elLead) {
+                    elLead.innerHTML = '<strong>El jardín ya está disponible.</strong> Entrando a la experiencia…';
+                }
+                if (bgMusic && !bgMusic.paused) {
+                    fadeVolumeTo(0, 1400, function () { bgMusic.pause(); });
+                }
+                setTimeout(function () {
+                    if (stageRoot) stageRoot.style.opacity = '0';
+                    setTimeout(function () {
+                        window.location.replace('dclf.html' + window.location.search + window.location.hash);
+                    }, 900);
+                }, 1200);
+            }
+
+            function updateCountdown() {
+                var diff = LAUNCH_MS - Date.now();
+                if (diff <= 0) {
+                    unlockNow();
+                    return;
+                }
+
+                var totalSecs = Math.floor(diff / 1000);
+                var days = Math.floor(totalSecs / 86400);
+                var hours = Math.floor((totalSecs % 86400) / 3600);
+                var mins = Math.floor((totalSecs % 3600) / 60);
+                var secs = totalSecs % 60;
+
+                var dStr = String(days).padStart(2, '0');
+                var hStr = String(hours).padStart(2, '0');
+                var mStr = String(mins).padStart(2, '0');
+                var sStr = String(secs).padStart(2, '0');
+
+                if (elDays && elDays.textContent !== dStr) elDays.textContent = dStr;
+                if (elHours && elHours.textContent !== hStr) elHours.textContent = hStr;
+                if (elMins && elMins.textContent !== mStr) elMins.textContent = mStr;
+                if (elSecs && elSecs.textContent !== sStr) elSecs.textContent = sStr;
+
+                if (lblDays) lblDays.textContent = days === 1 ? 'Día' : 'Días';
+                if (lblHours) lblHours.textContent = hours === 1 ? 'Hora' : 'Horas';
+                if (lblMins) lblMins.textContent = mins === 1 ? 'Minuto' : 'Minutos';
+                if (lblSecs) lblSecs.textContent = secs === 1 ? 'Segundo' : 'Segundos';
+            }
+
+            updateCountdown();
+            setInterval(updateCountdown, 250);
+        })();
+    </script>
+</body>
+
+</html>
