@@ -541,7 +541,7 @@
   };
 
   // The visual layer is independent from Firebase and WebRTC.
-  const VOICE_STYLESHEET = new URL('../css/voice-channel.css?v=20261114_motion', document.currentScript?.src || new URL('assets/js/voice-channel-widget.js', document.baseURI)).href;
+  const VOICE_STYLESHEET = new URL('../css/voice-channel.css?v=20261117_room', document.currentScript?.src || new URL('assets/js/voice-channel-widget.js', document.baseURI)).href;
 
   const ICONS = {
     close: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="m6 6 12 12M18 6 6 18"/></svg>',
@@ -986,6 +986,18 @@
       this._updateBarLayout();
       window.addEventListener('resize', () => { this._updateBarLayout(); this._positionTabIndicator(); });
       window.addEventListener('orientationchange', () => this._updateBarLayout());
+      const viewport = window.visualViewport;
+      if (viewport) {
+        const fitMobilePanel = () => {
+          if (viewport.scale !== 1) return;
+          this.panel.style.setProperty('--vc-viewport-height', viewport.height + 'px');
+          this.panel.style.setProperty('--vc-viewport-top', viewport.offsetTop + 'px');
+        };
+        viewport.addEventListener('resize', fitMobilePanel);
+        viewport.addEventListener('scroll', fitMobilePanel);
+        fitMobilePanel();
+      }
+
 
       // Hide connected floating bar immediately when hamburger menu / drawer is opened
       const checkMenuState = () => {
@@ -1345,10 +1357,10 @@
       if (!indicator) { indicator = document.createElement('span'); indicator.className = 'vc-tab-indicator'; indicator.dataset.vcMotion = ''; indicator.setAttribute('aria-hidden', 'true'); tabs.appendChild(indicator); }
       tabs.classList.add('vc-motion-tabs');
       const rect = active.getBoundingClientRect(), parent = tabs.getBoundingClientRect();
-      const end = { x: rect.left - parent.left, scaleX: rect.width };
+      const end = { x: rect.left - parent.left, width: rect.width };
       window.gsap.killTweensOf(indicator);
       if (previous && !this._motionKeyboard && !this._reducedMotion.matches) {
-        window.gsap.fromTo(indicator, { x: previous.left - parent.left, scaleX: previous.width }, { ...end, duration: .2, ease: 'power3.out', overwrite: true });
+        window.gsap.fromTo(indicator, { x: previous.left - parent.left, width: previous.width }, { ...end, duration: .2, ease: 'power3.out', overwrite: true });
       } else window.gsap.set(indicator, end);
     }
 
