@@ -541,7 +541,7 @@
   };
 
   // The visual layer is independent from Firebase and WebRTC.
-  const VOICE_STYLESHEET = new URL('../css/voice-channel.css?v=20261117_visible_motion', document.currentScript?.src || new URL('assets/js/voice-channel-widget.js', document.baseURI)).href;
+  const VOICE_STYLESHEET = new URL('../css/voice-channel.css?v=20261117_pill', document.currentScript?.src || new URL('assets/js/voice-channel-widget.js', document.baseURI)).href;
 
   const ICONS = {
     close: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="m6 6 12 12M18 6 6 18"/></svg>',
@@ -976,8 +976,8 @@
       this._bar.setAttribute('aria-hidden', 'true');
       this._bar.innerHTML = `
         <button id="vc-bar-open" class="vc-dock-open" aria-label="${_t('dock_open')}">
-          <span class="vc-dock-symbol">${ICONS.sound}</span>
-          <span class="vc-dock-info"><strong>Afterglow <span id="vc-bar-count"></span></strong><span class="vc-dock-meta"><span id="vc-bar-title">${_t('dock_active')}</span><time id="vc-bar-timer">00:00</time></span></span>
+          <span class="vc-dock-symbol" aria-hidden="true"></span>
+          <time id="vc-bar-timer">00:00</time>
           <span class="vc-dock-notices"><span id="vc-bar-music-icon" class="hidden" title="${_t('vc_music')}">${ICONS.music}</span><span id="vc-bar-chat-icon" class="hidden" title="${_t('vc_chat')}">${ICONS.chat}</span></span>
         </button>
         <button id="vc-bar-mute" class="vc-dock-action" aria-label="${_t('room_mic_off')}" aria-pressed="false">${ICONS.mic}</button>
@@ -1585,8 +1585,10 @@
 
     _updateDockState() {
       if (!this._bar) return;
-      const count = this._bar.querySelector('#vc-bar-count');
-      if (count) count.textContent = `${Math.max(this.connected ? 1 : 0, this.users.length)}/4`;
+      const restore = this._bar.querySelector('#vc-bar-open');
+      const count = Math.max(this.connected ? 1 : 0, this.users.length);
+      restore.title = `Afterglow · ${_t('dock_active')} · ${count}/4`;
+      restore.setAttribute('aria-label', `${_t('dock_open')} · ${count}/4`);
       for (const [id, pressed, icon, label] of [
         ['vc-bar-mute', this.muted, this.muted ? ICONS.micOff : ICONS.mic, _t(this.muted ? 'room_mic_on' : 'room_mic_off')],
         ['vc-bar-dnd', this.dnd, this.dnd ? ICONS.dnd : ICONS.bell, _t(this.dnd ? 'room_undeafen' : 'room_deafen')]
@@ -1601,8 +1603,6 @@
           }
         }
       }
-      const title = this._bar.querySelector('#vc-bar-title');
-      if (title) title.textContent = _t(this.muted ? 'room_mic_off' : this.dnd ? 'room_deafened' : 'dock_active');
       this._bar.classList.toggle('is-speaking', this._speakers.size > 0);
       this._updateBarMusicState();
       this._updateBarChatState();
