@@ -61,12 +61,13 @@
             --ink-primary: #f7f4ee;
             --ink-italic: #f2dac6;
             --ink-secondary: rgba(244, 239, 231, 0.74);
-            --ink-muted: rgba(236, 229, 218, 0.50);
+            --ink-muted: rgba(236, 229, 218, 0.52);
             --ink-faint: rgba(236, 229, 218, 0.28);
             --accent-amber: #e8bd83;
             --accent-amber-ink: #1d160d;
             --accent-tulip: #e69ab8;
             --hairline: rgba(247, 244, 238, 0.11);
+            --hairline-soft: rgba(247, 244, 238, 0.08);
             --hairline-strong: rgba(247, 244, 238, 0.18);
             --hairline-lit: rgba(232, 189, 131, 0.38);
             --font-display: 'Sebenta', Georgia, serif;
@@ -138,6 +139,7 @@
             z-index: 25;
         }
 
+        /* ─── Base Mobile-First Shell (320px -> 767px) ─── */
         .monolith-shell {
             position: relative;
             z-index: 10;
@@ -147,10 +149,10 @@
             display: grid;
             grid-template-rows: auto 1fr auto;
             padding:
-                max(1.15rem, env(safe-area-inset-top, 0px) + 0.8rem)
-                max(1.35rem, env(safe-area-inset-right, 0px) + 1rem)
-                max(1.1rem, env(safe-area-inset-bottom, 0px) + 0.75rem)
-                max(1.35rem, env(safe-area-inset-left, 0px) + 1rem);
+                max(0.95rem, env(safe-area-inset-top, 0px) + 0.65rem)
+                max(1.1rem, env(safe-area-inset-right, 0px) + 0.9rem)
+                max(0.9rem, env(safe-area-inset-bottom, 0px) + 0.6rem)
+                max(1.1rem, env(safe-area-inset-left, 0px) + 0.9rem);
             transition:
                 opacity 720ms var(--ease-apple),
                 transform 720ms var(--ease-apple),
@@ -163,13 +165,13 @@
             filter: blur(8px);
         }
 
-        /* ─── Cabecera superior minimalista (sin controles de música) ─── */
+        /* ─── Cabecera superior ─── */
         .chrome-top {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 1rem;
-            max-width: 68rem;
+            gap: 0.75rem;
+            max-width: 76rem;
             width: 100%;
             margin: 0 auto;
             min-height: 44px;
@@ -185,7 +187,7 @@
         }
 
         .brand-mark img {
-            height: 28px;
+            height: 26px;
             width: auto;
             display: block;
             object-fit: contain;
@@ -195,7 +197,7 @@
         .top-nav {
             display: inline-flex;
             align-items: center;
-            gap: 0.55rem;
+            gap: 0.5rem;
         }
 
         .back-pill {
@@ -204,7 +206,7 @@
             background: transparent;
             color: var(--ink-secondary);
             min-height: 44px;
-            padding: 0 0.9rem 0 0.72rem;
+            padding: 0 0.88rem 0 0.7rem;
             border-radius: 999px;
             display: inline-flex;
             align-items: center;
@@ -263,18 +265,17 @@
             -webkit-user-select: none;
         }
 
-        /* ─── Focus accesible global ─── */
         button:focus-visible,
         [tabindex]:focus-visible {
             outline: 2px solid var(--accent-amber);
             outline-offset: 3px;
         }
 
-        /* ─── Contenedor central por actos ─── */
+        /* ─── Contenedor de escenario adaptable (Móvil 1 columna / PC 2 columnas) ─── */
         .stage-viewport {
             position: relative;
             width: 100%;
-            max-width: 44rem;
+            max-width: 38rem;
             margin: 0 auto;
             display: flex;
             align-items: center;
@@ -282,7 +283,7 @@
             overflow-y: auto;
             overflow-x: hidden;
             overscroll-behavior: contain;
-            padding: 0.4rem 0;
+            padding: 0.35rem 0;
         }
 
         .act-panel {
@@ -291,13 +292,14 @@
             flex-direction: column;
             align-items: center;
             text-align: center;
+            gap: 1.45rem;
             opacity: 0;
             transform: translateY(10px);
             filter: blur(5px);
             transition:
-                opacity 460ms var(--ease-out-expo),
-                transform 460ms var(--ease-out-expo),
-                filter 460ms var(--ease-out-expo);
+                opacity 440ms var(--ease-out-expo),
+                transform 440ms var(--ease-out-expo),
+                filter 440ms var(--ease-out-expo);
         }
 
         .act-panel.is-mounted {
@@ -317,10 +319,24 @@
             pointer-events: none;
         }
 
+        .act-narrative {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .act-interactive {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
         .headline {
             font-family: var(--font-display);
             font-weight: 500;
-            font-size: clamp(2.05rem, 5.1vw, 3.65rem);
+            font-size: clamp(1.88rem, 7.6vw, 2.75rem);
             line-height: 1.07;
             letter-spacing: -0.025em;
             color: var(--ink-primary);
@@ -334,34 +350,34 @@
         }
 
         .prose-lead {
-            margin-top: 0.9rem;
-            font-size: clamp(0.93rem, 1.35vw, 1.05rem);
-            line-height: 1.6;
+            margin-top: 0.78rem;
+            font-size: clamp(0.92rem, 3.6vw, 1.04rem);
+            line-height: 1.58;
             letter-spacing: -0.005em;
             color: var(--ink-secondary);
-            max-width: 47ch;
+            max-width: 44ch;
             text-wrap: pretty;
         }
 
         .micro-status {
-            margin-top: 0.95rem;
+            margin-top: 0.85rem;
             font-size: 0.8125rem;
             color: var(--ink-muted);
             font-variant-numeric: tabular-nums;
             transition: color 260ms var(--ease-apple);
+            text-align: center;
         }
 
         .micro-status.is-lit {
             color: var(--accent-amber);
         }
 
-        /* ─── ACTO 1: Riel táctil de umbral con resorte 1:1 ─── */
+        /* ─── ACTO 1: Riel táctil / cursor de umbral ─── */
         .slide-rail {
             position: relative;
             width: 100%;
-            max-width: 22rem;
+            max-width: 23rem;
             height: 58px;
-            margin-top: 2.2rem;
             border-radius: 999px;
             border: 1px solid var(--hairline-strong);
             background: rgba(255, 255, 255, 0.035);
@@ -372,6 +388,14 @@
             user-select: none;
             -webkit-user-select: none;
             touch-action: none;
+            cursor: pointer;
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+            .slide-rail:hover {
+                border-color: rgba(232, 189, 131, 0.36);
+                background: rgba(255, 255, 255, 0.05);
+            }
         }
 
         .slide-rail-fill {
@@ -389,8 +413,9 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding-left: 2.2rem;
-            font-size: 0.85rem;
+            padding-left: 2.35rem;
+            padding-right: 0.75rem;
+            font-size: 0.84rem;
             font-weight: 500;
             color: var(--ink-secondary);
             pointer-events: none;
@@ -426,13 +451,12 @@
             height: 18px;
         }
 
-        /* ─── ACTO 2: Cristal empañado para limpiar con el dedo ─── */
+        /* ─── ACTO 2: Cristal empañado ─── */
         .frost-frame {
             position: relative;
             width: 100%;
             max-width: 34rem;
-            min-height: 11.5rem;
-            margin-top: 1.75rem;
+            min-height: 10.6rem;
             border-radius: 16px;
             border: 1px solid var(--hairline);
             background: #090908;
@@ -440,7 +464,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 1.65rem 1.4rem;
+            padding: 1.45rem 1.2rem;
             touch-action: none;
             user-select: none;
             -webkit-user-select: none;
@@ -448,11 +472,12 @@
 
         .frost-hidden-truth {
             font-family: var(--font-display);
-            font-size: clamp(1.3rem, 2.7vw, 1.75rem);
+            font-size: clamp(1.25rem, 2.5vw, 1.65rem);
             line-height: 1.32;
             letter-spacing: -0.015em;
             color: var(--ink-primary);
             max-width: 28ch;
+            text-align: center;
             text-wrap: balance;
             pointer-events: none;
         }
@@ -478,20 +503,19 @@
             pointer-events: none;
         }
 
-        /* ─── ACTO 3: Seis roces reales que se disuelven al tocar o barrer ─── */
+        /* ─── ACTO 3: Seis roces reales ─── */
         .noise-arena {
             position: relative;
             width: 100%;
-            max-width: 36rem;
-            min-height: 11rem;
-            margin-top: 1.6rem;
-            padding: 0.4rem 0.15rem;
+            max-width: 34rem;
+            min-height: 10.5rem;
+            padding: 0.35rem 0.1rem;
             display: flex;
             flex-wrap: wrap;
             align-items: center;
             justify-content: center;
             align-content: center;
-            gap: 0.7rem 0.75rem;
+            gap: 0.62rem 0.68rem;
             touch-action: none;
             user-select: none;
             -webkit-user-select: none;
@@ -501,12 +525,12 @@
             appearance: none;
             border: 1px solid rgba(244, 239, 231, 0.14);
             background: rgba(255, 255, 255, 0.035);
-            color: rgba(244, 239, 231, 0.84);
+            color: rgba(244, 239, 231, 0.85);
             min-height: 44px;
-            padding: 0.62rem 1.1rem;
+            padding: 0.58rem 1rem;
             border-radius: 999px;
             font-family: var(--font-sans);
-            font-size: 0.88rem;
+            font-size: 0.86rem;
             font-weight: 500;
             letter-spacing: -0.01em;
             cursor: pointer;
@@ -542,8 +566,8 @@
 
         @media (hover: hover) and (pointer: fine) {
             .noise-chip:hover {
-                border-color: rgba(232, 189, 131, 0.42);
-                background: rgba(232, 189, 131, 0.07);
+                border-color: rgba(232, 189, 131, 0.48);
+                background: rgba(232, 189, 131, 0.09);
                 color: var(--ink-primary);
             }
         }
@@ -556,19 +580,19 @@
             animation: none;
         }
 
-        /* ─── ACTO 4: Pausa respirada (enfriar el impulso) ─── */
+        /* ─── ACTO 4: Pausa respirada ─── */
         .breath-stage {
-            margin-top: 1.9rem;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 1rem;
+            gap: 0.95rem;
+            padding: 0.5rem 0;
         }
 
         .breath-orb-btn {
             position: relative;
-            width: 118px;
-            height: 118px;
+            width: 122px;
+            height: 122px;
             border-radius: 50%;
             border: 1px solid rgba(247, 244, 238, 0.16);
             background: rgba(255, 255, 255, 0.03);
@@ -582,6 +606,13 @@
             -webkit-touch-callout: none;
             touch-action: none;
             transition: border-color 240ms var(--ease-apple), background-color 240ms var(--ease-apple);
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+            .breath-orb-btn:hover {
+                border-color: rgba(232, 189, 131, 0.42);
+                background: rgba(232, 189, 131, 0.05);
+            }
         }
 
         .breath-halo {
@@ -616,12 +647,11 @@
             transform: scale(1.35);
         }
 
-        /* ─── ACTO 5: Balanza directa Mi Orgullo -> Nosotros Dos ─── */
+        /* ─── ACTO 5: Balanza Mi Orgullo -> Nosotros Dos ─── */
         .balance-box {
             width: 100%;
             max-width: 32rem;
-            margin-top: 1.85rem;
-            padding: 1.4rem 0;
+            padding: 1.3rem 0;
             border-top: 1px solid var(--hairline);
             border-bottom: 1px solid var(--hairline);
             user-select: none;
@@ -669,7 +699,7 @@
             position: relative;
             width: calc(100% - 36px);
             height: 48px;
-            margin: 1rem auto 0;
+            margin: 0.9rem auto 0;
             display: flex;
             align-items: center;
             cursor: pointer;
@@ -706,7 +736,14 @@
             background: #14120f;
             cursor: grab;
             touch-action: none;
-            transition: transform 120ms var(--ease-apple);
+            transition: transform 120ms var(--ease-apple), background-color 160ms var(--ease-apple);
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+            .scrubber-track:hover .scrubber-knob {
+                background: #221d15;
+                transform: scale(1.08);
+            }
         }
 
         .scrubber-knob:active {
@@ -715,23 +752,23 @@
         }
 
         .balance-quote {
-            margin-top: 1rem;
-            font-size: 0.9rem;
-            line-height: 1.55;
+            margin-top: 0.9rem;
+            font-size: 0.89rem;
+            line-height: 1.52;
             color: var(--ink-secondary);
-            min-height: 2.8em;
+            min-height: 2.75em;
             display: flex;
             align-items: center;
             justify-content: center;
+            text-align: center;
         }
 
-        /* ─── ACTO 6: Unir dos puntos a través de la distancia ─── */
+        /* ─── ACTO 6: Unir Yai + Yo ─── */
         .bridge-arena {
             position: relative;
             width: 100%;
             max-width: 33rem;
             height: 132px;
-            margin-top: 1.85rem;
             border-top: 1px solid var(--hairline);
             border-bottom: 1px solid var(--hairline);
             touch-action: none;
@@ -769,11 +806,18 @@
             user-select: none;
             -webkit-user-select: none;
             -webkit-touch-callout: none;
-            transition: border-color 220ms var(--ease-apple), background-color 220ms var(--ease-apple);
+            transition: border-color 220ms var(--ease-apple), background-color 220ms var(--ease-apple), transform 140ms var(--ease-apple);
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+            .bridge-node:hover {
+                transform: scale(1.07);
+            }
         }
 
         .bridge-node:active {
             cursor: grabbing;
+            transform: scale(1.05);
         }
 
         .bridge-node.node-yai {
@@ -792,14 +836,68 @@
             color: var(--ink-primary);
         }
 
-        /* ─── ACTO 7: Tres certezas deslizables (Snap Track) ─── */
+        /* ─── ACTO 7: Tres certezas (Swipe en celular + Flechas/Arrastre en PC) ─── */
         .truths-carousel-wrap {
             width: 100%;
             max-width: 34rem;
-            margin-top: 1.65rem;
+        }
+
+        .truths-stage-row {
+            position: relative;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .carousel-arrow {
+            display: none;
+            appearance: none;
+            width: 40px;
+            height: 40px;
+            flex-shrink: 0;
+            border-radius: 50%;
+            border: 1px solid var(--hairline);
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--ink-secondary);
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition:
+                background-color 180ms var(--ease-apple),
+                border-color 180ms var(--ease-apple),
+                color 180ms var(--ease-apple),
+                opacity 180ms var(--ease-apple),
+                transform 120ms var(--ease-apple);
+        }
+
+        .carousel-arrow svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .carousel-arrow:disabled {
+            opacity: 0.25;
+            cursor: default;
+        }
+
+        @media (pointer: fine) and (min-width: 640px) {
+            .carousel-arrow {
+                display: inline-flex;
+            }
+            .carousel-arrow:hover:not(:disabled) {
+                border-color: var(--hairline-strong);
+                background: var(--surface-control-hover);
+                color: var(--ink-primary);
+            }
+            .carousel-arrow:active:not(:disabled) {
+                transform: scale(0.95);
+            }
         }
 
         .truths-track {
+            flex: 1 1 auto;
+            min-width: 0;
             display: flex;
             overflow-x: auto;
             scroll-snap-type: x mandatory;
@@ -817,18 +915,17 @@
         .truth-slide {
             flex: 0 0 100%;
             scroll-snap-align: center;
-            padding: 1.6rem 0.75rem;
+            padding: 1.5rem 0.65rem;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 0.75rem;
             text-align: center;
         }
 
         .truth-quote {
             font-family: var(--font-display);
-            font-size: clamp(1.28rem, 2.6vw, 1.68rem);
+            font-size: clamp(1.25rem, 2.3vw, 1.62rem);
             line-height: 1.34;
             letter-spacing: -0.015em;
             color: var(--ink-primary);
@@ -842,9 +939,10 @@
         }
 
         .truth-nav {
-            margin-top: 0.95rem;
-            display: inline-flex;
+            margin-top: 0.9rem;
+            display: flex;
             align-items: center;
+            justify-content: center;
             gap: 0.5rem;
         }
 
@@ -853,9 +951,9 @@
             border: 1px solid var(--hairline);
             background: transparent;
             color: var(--ink-muted);
-            min-width: 44px;
-            min-height: 36px;
-            padding: 0 0.75rem;
+            min-width: 48px;
+            min-height: 40px;
+            padding: 0 0.8rem;
             border-radius: 999px;
             font-family: var(--font-sans);
             font-size: 0.78rem;
@@ -869,17 +967,23 @@
                 color 180ms var(--ease-apple);
         }
 
+        @media (hover: hover) and (pointer: fine) {
+            .truth-pill-btn:hover {
+                border-color: var(--hairline-strong);
+                color: var(--ink-primary);
+            }
+        }
+
         .truth-pill-btn.is-current {
             border-color: var(--accent-amber);
             background: rgba(232, 189, 131, 0.12);
             color: var(--ink-primary);
         }
 
-        /* ─── ACTO 8: Cuatro acuerdos sobre líneas editoriales ─── */
+        /* ─── ACTO 8: Cuatro acuerdos reales ─── */
         .promises-list {
             width: 100%;
-            max-width: 38rem;
-            margin-top: 1.35rem;
+            max-width: 36rem;
             border-top: 1px solid var(--hairline);
             text-align: left;
         }
@@ -890,10 +994,10 @@
             background: transparent;
             border: 0;
             border-bottom: 1px solid var(--hairline);
-            padding: 0.85rem 0.2rem;
+            padding: 0.82rem 0.25rem;
             display: grid;
             grid-template-columns: 22px 1fr;
-            gap: 0.85rem;
+            gap: 0.82rem;
             align-items: start;
             text-align: left;
             color: var(--ink-primary);
@@ -903,10 +1007,16 @@
             -webkit-user-select: none;
             -webkit-touch-callout: none;
             touch-action: manipulation;
-            transition: border-color 280ms var(--ease-apple), opacity 200ms var(--ease-apple);
+            transition:
+                border-color 280ms var(--ease-apple),
+                background-color 180ms var(--ease-apple),
+                opacity 200ms var(--ease-apple);
         }
 
         @media (hover: hover) and (pointer: fine) {
+            .promise-row:hover {
+                background: rgba(255, 255, 255, 0.02);
+            }
             .promise-row:hover .promise-title {
                 color: var(--ink-primary);
             }
@@ -942,10 +1052,10 @@
         }
 
         .promise-title {
-            font-size: 0.95rem;
+            font-size: 0.94rem;
             font-weight: 600;
             letter-spacing: -0.012em;
-            color: rgba(247, 244, 238, 0.68);
+            color: rgba(247, 244, 238, 0.70);
             transition: color 240ms var(--ease-apple);
         }
 
@@ -964,7 +1074,7 @@
         }
 
         .promise-detail {
-            font-size: 0.86rem;
+            font-size: 0.85rem;
             line-height: 1.52;
             color: var(--ink-secondary);
             text-wrap: pretty;
@@ -988,23 +1098,23 @@
         .promise-row.is-lit .promise-detail-wrap {
             grid-template-rows: 1fr;
             opacity: 1;
-            margin-top: 0.34rem;
+            margin-top: 0.32rem;
         }
 
-        /* ─── ACTO 9: Rebobinar el marcador a 00:00:00 ─── */
+        /* ─── ACTO 9: Rebobinar a 00:00:00 ─── */
         .rewind-box {
             width: 100%;
             max-width: 30rem;
-            margin-top: 1.75rem;
-            padding: 1.35rem 0;
+            padding: 1.3rem 0;
             border-top: 1px solid var(--hairline);
             border-bottom: 1px solid var(--hairline);
+            text-align: center;
             user-select: none;
             -webkit-user-select: none;
         }
 
         .rewind-digits {
-            font-size: clamp(2.35rem, 6.2vw, 3.6rem);
+            font-size: clamp(2.3rem, 6vw, 3.5rem);
             font-weight: 600;
             letter-spacing: -0.035em;
             line-height: 1;
@@ -1024,19 +1134,19 @@
             color: var(--ink-muted);
         }
 
-        /* ─── ACTO 10: Sello mantenido de propuesta ─── */
+        /* ─── ACTO 10: Sello mantenido ─── */
         .seal-stage {
-            margin-top: 1.85rem;
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 0.85rem;
+            padding: 0.35rem 0;
         }
 
         .seal-button {
             position: relative;
-            width: 102px;
-            height: 102px;
+            width: 106px;
+            height: 106px;
             border-radius: 50%;
             border: 0;
             background: rgba(232, 189, 131, 0.06);
@@ -1054,13 +1164,14 @@
 
         @media (hover: hover) and (pointer: fine) {
             .seal-button:hover {
-                background: rgba(232, 189, 131, 0.11);
+                background: rgba(232, 189, 131, 0.12);
+                transform: scale(1.03);
             }
         }
 
         .seal-button.is-holding {
-            transform: scale(1.06);
-            background: rgba(232, 189, 131, 0.14);
+            transform: scale(1.07);
+            background: rgba(232, 189, 131, 0.15);
         }
 
         .seal-ring-svg {
@@ -1095,6 +1206,8 @@
             font-size: 0.84rem;
             font-weight: 500;
             color: var(--ink-secondary);
+            text-align: center;
+            max-width: 28ch;
             user-select: none;
             -webkit-user-select: none;
         }
@@ -1102,7 +1215,7 @@
         .first-note-drawer {
             width: 100%;
             max-width: 30rem;
-            margin-top: 0.85rem;
+            margin-top: 0.75rem;
             display: none;
             flex-direction: column;
             gap: 0.7rem;
@@ -1113,9 +1226,8 @@
             display: flex;
         }
 
-        /* ─── EPÍLOGO (ACTO 11): Reloj ascendente + Mensaje para ti ─── */
+        /* ─── EPÍLOGO: Reloj ascendente + Mensaje ─── */
         .fresh-clock {
-            margin-top: 1.4rem;
             padding: 0.85rem 0;
             border-top: 1px solid var(--hairline);
             border-bottom: 1px solid var(--hairline);
@@ -1136,7 +1248,7 @@
         }
 
         .fresh-num {
-            font-size: clamp(1.5rem, 3.6vw, 2.15rem);
+            font-size: clamp(1.5rem, 3.4vw, 2.15rem);
             font-weight: 600;
             letter-spacing: -0.03em;
             color: var(--accent-amber);
@@ -1155,10 +1267,10 @@
         .reply-composer {
             width: 100%;
             max-width: 31rem;
-            margin-top: 1.25rem;
+            margin-top: 1.15rem;
             display: flex;
             flex-direction: column;
-            gap: 0.75rem;
+            gap: 0.7rem;
             text-align: left;
         }
 
@@ -1170,7 +1282,7 @@
         .reply-textarea {
             width: 100%;
             min-height: 88px;
-            max-height: 160px;
+            max-height: 155px;
             resize: vertical;
             padding: 0.8rem 0.95rem;
             border-radius: 14px;
@@ -1195,12 +1307,13 @@
 
         /* ─── Botones compartidos ─── */
         .act-actions {
-            margin-top: 1.45rem;
+            margin-top: 1.25rem;
+            width: 100%;
             display: flex;
             flex-wrap: wrap;
             align-items: center;
             justify-content: center;
-            gap: 0.75rem;
+            gap: 0.7rem;
         }
 
         .btn-primary {
@@ -1280,39 +1393,64 @@
             transform: scale(0.97);
         }
 
-        /* ─── Barra inferior de 10 segmentos ─── */
+        /* ─── Barra inferior navegable de 10 segmentos ─── */
         .chrome-bottom {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 0.5rem;
-            min-height: 28px;
+            gap: 0.35rem;
+            min-height: 30px;
+            max-width: 76rem;
+            width: 100%;
+            margin: 0 auto;
         }
 
         .step-rail {
             display: inline-flex;
             align-items: center;
-            gap: 5px;
+            gap: 4px;
         }
 
         .step-seg {
-            width: 14px;
+            position: relative;
+            appearance: none;
+            border: 0;
+            padding: 8px 2px;
+            background: transparent;
+            cursor: default;
+            display: inline-flex;
+            align-items: center;
+            touch-action: manipulation;
+        }
+
+        .step-seg.is-unlocked {
+            cursor: pointer;
+        }
+
+        .step-seg-bar {
+            width: 11px;
             height: 3px;
             border-radius: 999px;
             background: rgba(247, 244, 238, 0.14);
             transition:
                 width 260ms var(--ease-out-expo),
-                background-color 260ms var(--ease-apple);
+                background-color 220ms var(--ease-apple);
         }
 
-        .step-seg.is-active {
-            width: 26px;
+        .step-seg.is-active .step-seg-bar {
+            width: 22px;
             background: var(--accent-amber);
         }
 
-        .step-seg.is-done {
-            background: rgba(232, 189, 131, 0.46);
+        .step-seg.is-done .step-seg-bar {
+            background: rgba(232, 189, 131, 0.48);
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+            .step-seg.is-unlocked:hover .step-seg-bar {
+                background: var(--accent-amber);
+            }
         }
 
         .footer-note {
@@ -1322,56 +1460,196 @@
             font-variant-numeric: tabular-nums;
         }
 
-        @media (max-width: 560px) {
-            .monolith-shell {
-                padding:
-                    max(0.95rem, env(safe-area-inset-top, 0px) + 0.6rem)
-                    max(1.05rem, env(safe-area-inset-right, 0px) + 0.85rem)
-                    max(0.95rem, env(safe-area-inset-bottom, 0px) + 0.6rem)
-                    max(1.05rem, env(safe-area-inset-left, 0px) + 0.85rem);
-            }
-
-            .headline {
-                font-size: clamp(1.82rem, 7.9vw, 2.45rem);
-            }
-
-            .frost-frame {
-                min-height: 10.2rem;
-                padding: 1.35rem 1.1rem;
-                margin-top: 1.35rem;
-            }
-
-            .noise-arena {
-                margin-top: 1.25rem;
-                gap: 0.55rem;
-            }
-
-            .noise-chip {
-                padding: 0.56rem 0.95rem;
-                font-size: 0.84rem;
-            }
-
-            .step-seg {
-                width: 11px;
-            }
-
-            .step-seg.is-active {
-                width: 22px;
+        /* ─── Móviles pequeños (<= 390px): botones ergonómicos al pulgar ─── */
+        @media (max-width: 420px) {
+            .act-actions .btn-primary {
+                width: 100%;
+                max-width: 20rem;
             }
         }
 
-        @media (max-height: 760px) {
+        /* ─── Móviles en horizontal (Landscape corto): vista dividida compacta ─── */
+        @media (max-height: 540px) and (min-width: 560px) {
+            .monolith-shell {
+                padding-top: max(0.55rem, env(safe-area-inset-top, 0px) + 0.4rem);
+                padding-bottom: max(0.5rem, env(safe-area-inset-bottom, 0px) + 0.35rem);
+            }
+
+            .stage-viewport {
+                max-width: 56rem;
+            }
+
+            .act-panel.is-mounted {
+                display: grid;
+                grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+                column-gap: 2rem;
+                align-items: center;
+                text-align: left;
+            }
+
+            .act-narrative {
+                align-items: flex-start;
+            }
+
             .headline {
-                font-size: clamp(1.7rem, 6.5vw, 2.3rem);
+                font-size: clamp(1.55rem, 3.6vw, 2.05rem);
             }
 
             .prose-lead {
-                margin-top: 0.6rem;
-                font-size: 0.9rem;
+                margin-top: 0.5rem;
+                font-size: 0.86rem;
+            }
+
+            .frost-frame {
+                min-height: 8.4rem;
+                padding: 1rem;
+            }
+
+            .noise-arena {
+                min-height: 8rem;
+            }
+
+            .breath-orb-btn {
+                width: 96px;
+                height: 96px;
+            }
+
+            .seal-button {
+                width: 88px;
+                height: 88px;
+            }
+        }
+
+        /* ─── Tablet (>= 768px) ─── */
+        @media (min-width: 768px) {
+            .monolith-shell {
+                padding:
+                    max(1.5rem, env(safe-area-inset-top, 0px) + 1rem)
+                    max(2rem, env(safe-area-inset-right, 0px) + 1.5rem)
+                    max(1.35rem, env(safe-area-inset-bottom, 0px) + 0.9rem)
+                    max(2rem, env(safe-area-inset-left, 0px) + 1.5rem);
+            }
+
+            .brand-mark img {
+                height: 29px;
+            }
+
+            .stage-viewport {
+                max-width: 42rem;
+            }
+
+            .step-seg-bar {
+                width: 16px;
+            }
+
+            .step-seg.is-active .step-seg-bar {
+                width: 30px;
+            }
+        }
+
+        /* ─── ESCRITORIO / PC (>= 1024px): Arquitectura Editorial de Dos Columnas ─── */
+        @media (min-width: 1024px) and (min-height: 580px) {
+            .monolith-shell {
+                padding: 1.85rem 3.25rem 1.55rem;
+            }
+
+            .stage-viewport {
+                max-width: 74rem;
+                padding: 1rem 0;
+            }
+
+            .act-panel.is-mounted {
+                display: grid;
+                grid-template-columns: minmax(0, 1fr) minmax(0, 1.06fr);
+                column-gap: clamp(3.25rem, 5.5vw, 6.25rem);
+                align-items: center;
+                text-align: left;
+            }
+
+            .act-narrative {
+                align-items: flex-start;
+                justify-self: start;
+                max-width: 32rem;
+            }
+
+            .headline {
+                font-size: clamp(2.65rem, 3.85vw, 4.05rem);
+                line-height: 1.05;
+                max-width: 14.5ch;
+            }
+
+            .prose-lead {
+                margin-top: 1.15rem;
+                font-size: clamp(1rem, 1.12vw, 1.12rem);
+                line-height: 1.66;
+                max-width: 40ch;
+            }
+
+            .act-interactive {
+                align-items: center;
+                justify-content: center;
+                padding-left: clamp(2.25rem, 4.2vw, 4.25rem);
+                border-left: 1px solid var(--hairline-soft);
+                min-height: 21rem;
+            }
+
+            .slide-rail {
+                max-width: 25rem;
+                height: 62px;
+            }
+
+            .slide-thumb {
+                width: 50px;
+                height: 50px;
+            }
+
+            .frost-frame {
+                min-height: 13.5rem;
+                padding: 2rem 1.85rem;
+            }
+
+            .noise-arena {
+                min-height: 13rem;
+                gap: 0.8rem 0.85rem;
+            }
+
+            .noise-chip {
+                padding: 0.68rem 1.2rem;
+                font-size: 0.92rem;
+            }
+
+            .breath-orb-btn {
+                width: 138px;
+                height: 138px;
+            }
+
+            .bridge-arena {
+                height: 152px;
             }
 
             .promises-list {
-                margin-top: 0.9rem;
+                max-width: 100%;
+            }
+
+            .chrome-bottom {
+                flex-direction: row;
+                justify-content: space-between;
+            }
+        }
+
+        /* ─── Pantallas verticales compactas en móvil (<= 750px alto, < 1024px ancho) ─── */
+        @media (max-width: 1023px) and (max-height: 750px) and (orientation: portrait) {
+            .act-panel {
+                gap: 1.05rem;
+            }
+
+            .headline {
+                font-size: clamp(1.68rem, 6.6vw, 2.25rem);
+            }
+
+            .prose-lead {
+                margin-top: 0.55rem;
+                font-size: 0.89rem;
             }
 
             .promise-row {
@@ -1383,13 +1661,7 @@
             }
 
             .act-actions {
-                margin-top: 1.05rem;
-            }
-        }
-
-        @media (max-height: 640px) {
-            .stage-viewport {
-                align-items: flex-start;
+                margin-top: 0.95rem;
             }
         }
 
@@ -1445,395 +1717,475 @@
         <main id="stage-viewport" class="stage-viewport">
             <!-- ACTO 1: EL UMBRAL EN SILENCIO -->
             <section id="act-1" class="act-panel is-mounted is-visible" aria-labelledby="act1-title">
-                <h1 id="act1-title" class="headline">Hola, <em>Yai.</em></h1>
-                <p class="prose-lead">
-                    Dejé esta página en completo silencio a propósito. No quiero distraerte ni convencerte con adornos: solo quiero hablarte sin escudos y desde la calma.
-                </p>
+                <div class="act-narrative">
+                    <h1 id="act1-title" class="headline">Hola, <em>Yai.</em></h1>
+                    <p class="prose-lead">
+                        Dejé esta página en completo silencio a propósito. No quiero distraerte ni convencerte con adornos: solo quiero hablarte sin escudos y desde la calma.
+                    </p>
+                </div>
 
-                <div id="threshold-rail" class="slide-rail" role="slider" tabindex="0" aria-label="Desliza hacia la derecha para entrar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
-                    <div id="threshold-fill" class="slide-rail-fill" aria-hidden="true"></div>
-                    <span id="threshold-label" class="slide-rail-label">Desliza con calma para entrar</span>
-                    <div id="threshold-thumb" class="slide-thumb" aria-hidden="true">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M5 12h14"></path>
-                            <path d="M13 6l6 6-6 6"></path>
-                        </svg>
+                <div class="act-interactive">
+                    <div id="threshold-rail" class="slide-rail" role="slider" tabindex="0" aria-label="Desliza hacia la derecha para entrar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                        <div id="threshold-fill" class="slide-rail-fill" aria-hidden="true"></div>
+                        <span id="threshold-label" class="slide-rail-label"
+                            data-touch="Desliza con calma para entrar"
+                            data-fine="Arrastra hacia la derecha para entrar">Desliza con calma para entrar</span>
+                        <div id="threshold-thumb" class="slide-thumb" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M5 12h14"></path>
+                                <path d="M13 6l6 6-6 6"></path>
+                            </svg>
+                        </div>
                     </div>
                 </div>
             </section>
 
             <!-- ACTO 2: DESEMPAÑAR LA VERDAD -->
             <section id="act-2" class="act-panel" aria-labelledby="act2-title" hidden>
-                <h2 id="act2-title" class="headline">Últimamente nos tapó <em>demasiado el ruido.</em></h2>
-                <p class="prose-lead">
-                    Pasa tu dedo por el cristal empañado para ver lo que siempre se quedó intacto debajo de tantas subidas y bajadas.
-                </p>
-
-                <div id="frost-frame" class="frost-frame">
-                    <p class="frost-hidden-truth">
-                        Debajo del cansancio y de cada discusión sin sentido, <em>nunca dejé de sentir que eres tú</em> la persona con la que quiero estar en paz.
+                <div class="act-narrative">
+                    <h2 id="act2-title" class="headline">Últimamente nos tapó <em>demasiado el ruido.</em></h2>
+                    <p class="prose-lead"
+                        data-touch="Pasa tu dedo por el cristal empañado para ver lo que siempre se quedó intacto debajo de tantas subidas y bajadas."
+                        data-fine="Pasa el cursor por el cristal empañado para ver lo que siempre se quedó intacto debajo de tantas subidas y bajadas.">
+                        Pasa tu dedo por el cristal empañado para ver lo que siempre se quedó intacto debajo de tantas subidas y bajadas.
                     </p>
-                    <canvas id="frost-canvas" tabindex="0" role="button" aria-label="Pasa tu dedo o presiona Enter para limpiar el cristal"></canvas>
                 </div>
 
-                <p id="frost-status" class="micro-status">Desliza tu dedo sobre el cristal para despejarlo</p>
+                <div class="act-interactive">
+                    <div id="frost-frame" class="frost-frame">
+                        <p class="frost-hidden-truth">
+                            Debajo del cansancio y de cada discusión sin sentido, <em>nunca dejé de sentir que eres tú</em> la persona con la que quiero estar en paz.
+                        </p>
+                        <canvas id="frost-canvas" tabindex="0" role="button" aria-label="Despejar el cristal empañado"></canvas>
+                    </div>
 
-                <div class="act-actions">
-                    <button id="act2-next-btn" type="button" class="btn-primary" data-goto="3" disabled>
-                        <span>Continuar</span>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <path d="M5 12h14"></path>
-                            <path d="M13 6l6 6-6 6"></path>
-                        </svg>
-                    </button>
+                    <p id="frost-status" class="micro-status"
+                        data-touch="Frota el cristal con tu dedo para despejarlo"
+                        data-fine="Mueve el cursor sobre el cristal para despejarlo">Frota el cristal con tu dedo para despejarlo</p>
+
+                    <div class="act-actions">
+                        <button id="act2-next-btn" type="button" class="btn-primary" data-goto="3" disabled>
+                            <span>Continuar</span>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M5 12h14"></path>
+                                <path d="M13 6l6 6-6 6"></path>
+                            </svg>
+                        </button>
+                    </div>
                 </div>
             </section>
 
             <!-- ACTO 3: SOLTAR LOS SEIS ROCES REALES -->
             <section id="act-3" class="act-panel" aria-labelledby="act3-title" hidden>
-                <h2 id="act3-title" class="headline">No quiero fingir que <em>aquí no pasó nada.</em></h2>
-                <p class="prose-lead">
-                    Toca o barre con tu dedo cada una de las cosas que nos desgastaron para soltarlas antes de seguir.
-                </p>
-
-                <div id="noise-arena" class="noise-arena" aria-label="Toca o desliza sobre cada frase para soltarla">
-                    <button type="button" class="noise-chip" data-noise="0">El orgullo</button>
-                    <button type="button" class="noise-chip" data-noise="1">Contestar en caliente</button>
-                    <button type="button" class="noise-chip" data-noise="2">Callar lo que sentimos</button>
-                    <button type="button" class="noise-chip" data-noise="3">Querer tener la razón</button>
-                    <button type="button" class="noise-chip" data-noise="4">Enfriarnos en silencio</button>
-                    <button type="button" class="noise-chip" data-noise="5">Dejar que la distancia gane</button>
+                <div class="act-narrative">
+                    <h2 id="act3-title" class="headline">No quiero fingir que <em>aquí no pasó nada.</em></h2>
+                    <p class="prose-lead"
+                        data-touch="Toca o barre con tu dedo cada una de las cosas que nos desgastaron para soltarlas antes de seguir."
+                        data-fine="Haz clic o pasa el cursor sobre cada una de las cosas que nos desgastaron para soltarlas antes de seguir.">
+                        Toca o barre con tu dedo cada una de las cosas que nos desgastaron para soltarlas antes de seguir.
+                    </p>
                 </div>
 
-                <p id="noise-caption" class="micro-status">Toca o pasa tu dedo por las 6 para dejarlas atrás</p>
+                <div class="act-interactive">
+                    <div id="noise-arena" class="noise-arena" aria-label="Soltar cada frase que nos hizo daño">
+                        <button type="button" class="noise-chip" data-noise="0">El orgullo</button>
+                        <button type="button" class="noise-chip" data-noise="1">Contestar en caliente</button>
+                        <button type="button" class="noise-chip" data-noise="2">Callar lo que sentimos</button>
+                        <button type="button" class="noise-chip" data-noise="3">Querer tener la razón</button>
+                        <button type="button" class="noise-chip" data-noise="4">Enfriarnos en silencio</button>
+                        <button type="button" class="noise-chip" data-noise="5">Dejar que la distancia gane</button>
+                    </div>
+
+                    <p id="noise-caption" class="micro-status"
+                        data-touch="Toca o desliza sobre las 6 para dejarlas atrás"
+                        data-fine="Haz clic en las 6 (o arrastra sobre ellas) para dejarlas atrás">Toca o desliza sobre las 6 para dejarlas atrás</p>
+                </div>
             </section>
 
             <!-- ACTO 4: LA PAUSA ANTES DEL IMPULSO -->
             <section id="act-4" class="act-panel" aria-labelledby="act4-title" hidden>
-                <h2 id="act4-title" class="headline">Aprendí cuánto lastima <em>hablar en caliente.</em></h2>
-                <p class="prose-lead">
-                    Muchas discusiones crecieron porque respondí desde el impulso cuando tocaba respirar primero. Haz esta pausa de tres segundos conmigo.
-                </p>
+                <div class="act-narrative">
+                    <h2 id="act4-title" class="headline">Aprendí cuánto lastima <em>hablar en caliente.</em></h2>
+                    <p class="prose-lead">
+                        Muchas discusiones crecieron porque respondí desde el impulso cuando tocaba respirar primero. Haz esta pausa de tres segundos conmigo.
+                    </p>
+                </div>
 
-                <div class="breath-stage">
-                    <button id="breath-btn" type="button" class="breath-orb-btn" aria-label="Mantén presionado tres segundos para hacer una pausa en calma">
-                        <span id="breath-halo" class="breath-halo" aria-hidden="true"></span>
-                        <svg class="breath-ring-svg" viewBox="0 0 118 118" fill="none" aria-hidden="true">
-                            <circle cx="59" cy="59" r="54" stroke="rgba(247,244,238,0.12)" stroke-width="1.5"></circle>
-                            <circle id="breath-progress-circle" cx="59" cy="59" r="54" stroke="#e8bd83" stroke-width="2" stroke-linecap="round" stroke-dasharray="339.29" stroke-dashoffset="339.29"></circle>
-                        </svg>
-                        <span class="breath-core-dot" aria-hidden="true"></span>
-                    </button>
-                    <p id="breath-status" class="micro-status">Mantén tu dedo en el centro para enfriar el impulso</p>
+                <div class="act-interactive">
+                    <div class="breath-stage">
+                        <button id="breath-btn" type="button" class="breath-orb-btn" aria-label="Mantén presionado tres segundos para hacer una pausa en calma">
+                            <span id="breath-halo" class="breath-halo" aria-hidden="true"></span>
+                            <svg class="breath-ring-svg" viewBox="0 0 122 122" fill="none" aria-hidden="true">
+                                <circle cx="61" cy="61" r="56" stroke="rgba(247,244,238,0.12)" stroke-width="1.5"></circle>
+                                <circle id="breath-progress-circle" cx="61" cy="61" r="56" stroke="#e8bd83" stroke-width="2" stroke-linecap="round" stroke-dasharray="351.86" stroke-dashoffset="351.86"></circle>
+                            </svg>
+                            <span class="breath-core-dot" aria-hidden="true"></span>
+                        </button>
+                        <p id="breath-status" class="micro-status"
+                            data-touch="Mantén tu dedo en el centro para enfriar el impulso"
+                            data-fine="Mantén clic en el centro (o barra espaciadora) durante 3 s">Mantén tu dedo en el centro para enfriar el impulso</p>
+                    </div>
                 </div>
             </section>
 
             <!-- ACTO 5: BAJAR EL ORGULLO A CERO -->
             <section id="act-5" class="act-panel" aria-labelledby="act5-title" hidden>
-                <h2 id="act5-title" class="headline">Tener la razón no sirve de nada <em>si te pierdo a ti.</em></h2>
-                <p class="prose-lead">
-                    A veces cuidé más mi orgullo que nuestra tranquilidad. Lleva esta barra hasta el final para poner las cosas en su lugar.
-                </p>
-
-                <div class="balance-box">
-                    <div class="balance-meters">
-                        <div class="balance-side">
-                            <span class="balance-name">Mi orgullo</span>
-                            <span id="pride-pct" class="balance-pct">100%</span>
-                        </div>
-                        <div class="balance-side is-right">
-                            <span class="balance-name">Nosotros dos</span>
-                            <span id="us-pct" class="balance-pct">0%</span>
-                        </div>
-                    </div>
-
-                    <div id="balance-track" class="scrubber-track" role="slider" tabindex="0" aria-label="Bajar el orgullo a cero y subir nosotros dos al cien por ciento" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
-                        <div class="scrubber-line">
-                            <div id="balance-fill" class="scrubber-fill"></div>
-                        </div>
-                        <div id="balance-knob" class="scrubber-knob" aria-hidden="true"></div>
-                    </div>
-
-                    <p id="balance-quote" class="balance-quote">Defender mi orgullo solo nos ponía en bandos opuestos.</p>
+                <div class="act-narrative">
+                    <h2 id="act5-title" class="headline">Tener la razón no sirve de nada <em>si te pierdo a ti.</em></h2>
+                    <p class="prose-lead">
+                        A veces cuidé más mi orgullo que nuestra tranquilidad. Lleva esta barra hasta el final para poner las cosas en su lugar.
+                    </p>
                 </div>
 
-                <div class="act-actions">
-                    <button id="act5-next-btn" type="button" class="btn-primary" data-goto="6" disabled>
-                        <span>Continuar</span>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <path d="M5 12h14"></path>
-                            <path d="M13 6l6 6-6 6"></path>
-                        </svg>
-                    </button>
+                <div class="act-interactive">
+                    <div class="balance-box">
+                        <div class="balance-meters">
+                            <div class="balance-side">
+                                <span class="balance-name">Mi orgullo</span>
+                                <span id="pride-pct" class="balance-pct">100%</span>
+                            </div>
+                            <div class="balance-side is-right">
+                                <span class="balance-name">Nosotros dos</span>
+                                <span id="us-pct" class="balance-pct">0%</span>
+                            </div>
+                        </div>
+
+                        <div id="balance-track" class="scrubber-track" role="slider" tabindex="0" aria-label="Bajar el orgullo a cero y subir nosotros dos al cien por ciento" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                            <div class="scrubber-line">
+                                <div id="balance-fill" class="scrubber-fill"></div>
+                            </div>
+                            <div id="balance-knob" class="scrubber-knob" aria-hidden="true"></div>
+                        </div>
+
+                        <p id="balance-quote" class="balance-quote">Defender mi orgullo solo nos ponía en bandos opuestos.</p>
+                    </div>
+
+                    <div class="act-actions">
+                        <button id="act5-next-btn" type="button" class="btn-primary" data-goto="6" disabled>
+                            <span>Continuar</span>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M5 12h14"></path>
+                                <path d="M13 6l6 6-6 6"></path>
+                            </svg>
+                        </button>
+                    </div>
                 </div>
             </section>
 
             <!-- ACTO 6: ACORTAR LA DISTANCIA -->
             <section id="act-6" class="act-panel" aria-labelledby="act6-title" hidden>
-                <h2 id="act6-title" class="headline">La distancia solo gana cuando <em>nos soltamos por dentro.</em></h2>
-                <p class="prose-lead">
-                    Arrastra cualquiera de los dos círculos con tu dedo hasta volver a juntarnos en el centro.
-                </p>
-
-                <div id="bridge-arena" class="bridge-arena">
-                    <svg class="bridge-svg" id="bridge-svg" preserveAspectRatio="none" aria-hidden="true">
-                        <path id="bridge-path" fill="none" stroke="rgba(232,189,131,0.45)" stroke-width="1.6" stroke-dasharray="4 5"></path>
-                    </svg>
-                    <button id="node-yai" type="button" class="bridge-node node-yai" aria-label="Arrastra a Yai hacia el centro">Yai</button>
-                    <button id="node-yo" type="button" class="bridge-node node-yo" aria-label="Arrastra a Yo hacia el centro">Yo</button>
+                <div class="act-narrative">
+                    <h2 id="act6-title" class="headline">La distancia solo gana cuando <em>nos soltamos por dentro.</em></h2>
+                    <p class="prose-lead"
+                        data-touch="Arrastra cualquiera de los dos círculos con tu dedo hasta volver a juntarnos en el centro."
+                        data-fine="Arrastra cualquiera de los dos círculos con el cursor hasta volver a juntarnos en el centro.">
+                        Arrastra cualquiera de los dos círculos con tu dedo hasta volver a juntarnos en el centro.
+                    </p>
                 </div>
 
-                <p id="bridge-status" class="micro-status">Acércalos para cortar la distancia</p>
-
-                <div class="act-actions">
-                    <button id="act6-next-btn" type="button" class="btn-primary" data-goto="7" disabled>
-                        <span>Continuar</span>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <path d="M5 12h14"></path>
-                            <path d="M13 6l6 6-6 6"></path>
+                <div class="act-interactive">
+                    <div id="bridge-arena" class="bridge-arena">
+                        <svg class="bridge-svg" id="bridge-svg" preserveAspectRatio="none" aria-hidden="true">
+                            <path id="bridge-path" fill="none" stroke="rgba(232,189,131,0.45)" stroke-width="1.6" stroke-dasharray="4 5"></path>
                         </svg>
-                    </button>
+                        <button id="node-yai" type="button" class="bridge-node node-yai" aria-label="Acercar a Yai hacia el centro">Yai</button>
+                        <button id="node-yo" type="button" class="bridge-node node-yo" aria-label="Acercar a Yo hacia el centro">Yo</button>
+                    </div>
+
+                    <p id="bridge-status" class="micro-status">Acércalos para cortar la distancia</p>
+
+                    <div class="act-actions">
+                        <button id="act6-next-btn" type="button" class="btn-primary" data-goto="7" disabled>
+                            <span>Continuar</span>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M5 12h14"></path>
+                                <path d="M13 6l6 6-6 6"></path>
+                            </svg>
+                        </button>
+                    </div>
                 </div>
             </section>
 
             <!-- ACTO 7: TRES VERDADES QUE SOBREVIVIERON A TODO -->
             <section id="act-7" class="act-panel" aria-labelledby="act7-title" hidden>
-                <h2 id="act7-title" class="headline">Ni en nuestras peores rachas <em>dudé de esto.</em></h2>
-                <p class="prose-lead">
-                    Desliza hacia los lados o toca cada parte para leer las tres certezas que ninguna pelea pudo borrar.
-                </p>
-
-                <div class="truths-carousel-wrap">
-                    <div id="truths-track" class="truths-track" aria-label="Tres certezas sobre nosotros">
-                        <article class="truth-slide">
-                            <p class="truth-quote">
-                                Cómo me cambia el día entero cuando estamos bien, nos reímos sin tensión y <em>te siento tranquila conmigo.</em>
-                            </p>
-                        </article>
-                        <article class="truth-slide">
-                            <p class="truth-quote">
-                                Que incluso cuando discutíamos fuerte, mi mente jamás buscó otro lugar: <em>siempre buscó cómo arreglarlo contigo.</em>
-                            </p>
-                        </article>
-                        <article class="truth-slide">
-                            <p class="truth-quote">
-                                Que prefiero aprender a cuidarte mejor mil veces antes que <em>acostumbrarme a una vida sin ti.</em>
-                            </p>
-                        </article>
-                    </div>
-
-                    <div class="truth-nav" role="tablist" aria-label="Seleccionar certeza">
-                        <button type="button" class="truth-pill-btn is-current" data-truth-idx="0">1 / 3</button>
-                        <button type="button" class="truth-pill-btn" data-truth-idx="1">2 / 3</button>
-                        <button type="button" class="truth-pill-btn" data-truth-idx="2">3 / 3</button>
-                    </div>
+                <div class="act-narrative">
+                    <h2 id="act7-title" class="headline">Ni en nuestras peores rachas <em>dudé de esto.</em></h2>
+                    <p class="prose-lead"
+                        data-touch="Desliza hacia los lados o toca cada parte para leer las tres certezas que ninguna pelea pudo borrar."
+                        data-fine="Usa las flechas o selecciona cada parte para leer las tres certezas que ninguna pelea pudo borrar.">
+                        Desliza hacia los lados o toca cada parte para leer las tres certezas que ninguna pelea pudo borrar.
+                    </p>
                 </div>
 
-                <div class="act-actions">
-                    <button id="act7-next-btn" type="button" class="btn-primary" data-goto="8" disabled>
-                        <span id="act7-next-label">Lee las 3 partes para seguir</span>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <path d="M5 12h14"></path>
-                            <path d="M13 6l6 6-6 6"></path>
-                        </svg>
-                    </button>
+                <div class="act-interactive">
+                    <div class="truths-carousel-wrap">
+                        <div class="truths-stage-row">
+                            <button id="truth-prev-arrow" type="button" class="carousel-arrow" aria-label="Certeza anterior" disabled>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <path d="M15 18l-6-6 6-6"></path>
+                                </svg>
+                            </button>
+
+                            <div id="truths-track" class="truths-track" aria-label="Tres certezas sobre nosotros">
+                                <article class="truth-slide">
+                                    <p class="truth-quote">
+                                        Cómo me cambia el día entero cuando estamos bien, nos reímos sin tensión y <em>te siento tranquila conmigo.</em>
+                                    </p>
+                                </article>
+                                <article class="truth-slide">
+                                    <p class="truth-quote">
+                                        Que incluso cuando discutíamos fuerte, mi mente jamás buscó otro lugar: <em>siempre buscó cómo arreglarlo contigo.</em>
+                                    </p>
+                                </article>
+                                <article class="truth-slide">
+                                    <p class="truth-quote">
+                                        Que prefiero aprender a cuidarte mejor mil veces antes que <em>acostumbrarme a una vida sin ti.</em>
+                                    </p>
+                                </article>
+                            </div>
+
+                            <button id="truth-next-arrow" type="button" class="carousel-arrow" aria-label="Siguiente certeza">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <path d="M9 18l6-6-6-6"></path>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <div class="truth-nav" role="tablist" aria-label="Seleccionar certeza">
+                            <button type="button" class="truth-pill-btn is-current" data-truth-idx="0">1 / 3</button>
+                            <button type="button" class="truth-pill-btn" data-truth-idx="1">2 / 3</button>
+                            <button type="button" class="truth-pill-btn" data-truth-idx="2">3 / 3</button>
+                        </div>
+                    </div>
+
+                    <div class="act-actions">
+                        <button id="act7-next-btn" type="button" class="btn-primary" data-goto="8" disabled>
+                            <span id="act7-next-label">Lee las 3 partes para seguir</span>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M5 12h14"></path>
+                                <path d="M13 6l6 6-6 6"></path>
+                            </svg>
+                        </button>
+                    </div>
                 </div>
             </section>
 
             <!-- ACTO 8: CUATRO ACUERDOS REALES -->
             <section id="act-8" class="act-panel" aria-labelledby="act8-title" hidden>
-                <h2 id="act8-title" class="headline">Si empezamos de cero, <em>no va a ser igual.</em></h2>
-                <p class="prose-lead">Toca cada línea para encender los cuatro compromisos que asumo contigo desde hoy.</p>
-
-                <div class="promises-list" role="group" aria-label="Mis cuatro compromisos contigo">
-                    <button type="button" class="promise-row" data-promise="0" aria-expanded="false">
-                        <span class="promise-beacon" aria-hidden="true">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M20 6L9 17l-5-5"></path>
-                            </svg>
-                        </span>
-                        <span>
-                            <span class="promise-title">Respirar antes de contestar en caliente</span>
-                            <span class="promise-detail-wrap">
-                                <span class="promise-detail-inner">
-                                    <span class="promise-detail">Cuando algo duela o incomode, bajar la guardia primero. Nunca volver a hablarte desde el impulso ni usar palabras para herirnos.</span>
-                                </span>
-                            </span>
-                        </span>
-                    </button>
-
-                    <button type="button" class="promise-row" data-promise="1" aria-expanded="false">
-                        <span class="promise-beacon" aria-hidden="true">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M20 6L9 17l-5-5"></path>
-                            </svg>
-                        </span>
-                        <span>
-                            <span class="promise-title">Poner nuestra paz por encima del orgullo</span>
-                            <span class="promise-detail-wrap">
-                                <span class="promise-detail-inner">
-                                    <span class="promise-detail">Dejar de competir por quién tiene la razón. En cualquier desacuerdo no eres mi rival, Yai: somos tú y yo del mismo lado.</span>
-                                </span>
-                            </span>
-                        </span>
-                    </button>
-
-                    <button type="button" class="promise-row" data-promise="2" aria-expanded="false">
-                        <span class="promise-beacon" aria-hidden="true">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M20 6L9 17l-5-5"></path>
-                            </svg>
-                        </span>
-                        <span>
-                            <span class="promise-title">Hablar claro sin castigarnos con silencios</span>
-                            <span class="promise-detail-wrap">
-                                <span class="promise-detail-inner">
-                                    <span class="promise-detail">Decir lo que sentimos a tiempo y con honestidad tranquila, sin guardarnos cosas ni enfriarnos durante días.</span>
-                                </span>
-                            </span>
-                        </span>
-                    </button>
-
-                    <button type="button" class="promise-row" data-promise="3" aria-expanded="false">
-                        <span class="promise-beacon" aria-hidden="true">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M20 6L9 17l-5-5"></path>
-                            </svg>
-                        </span>
-                        <span>
-                            <span class="promise-title">Hacerme presente a pesar de la distancia</span>
-                            <span class="promise-detail-wrap">
-                                <span class="promise-detail-inner">
-                                    <span class="promise-detail">Cuidar los detalles cotidianos para que te sientas acompañada, escuchada y cerca de mí todos los días, estemos donde estemos.</span>
-                                </span>
-                            </span>
-                        </span>
-                    </button>
+                <div class="act-narrative">
+                    <h2 id="act8-title" class="headline">Si empezamos de cero, <em>no va a ser igual.</em></h2>
+                    <p class="prose-lead"
+                        data-touch="Toca cada línea para encender los cuatro compromisos que asumo contigo desde hoy."
+                        data-fine="Haz clic en cada línea para encender los cuatro compromisos que asumo contigo desde hoy.">
+                        Toca cada línea para encender los cuatro compromisos que asumo contigo desde hoy.
+                    </p>
                 </div>
 
-                <div class="act-actions">
-                    <button id="act8-next-btn" type="button" class="btn-primary" data-goto="9" disabled>
-                        <span id="act8-next-label">Enciende los 4 acuerdos para seguir</span>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <path d="M5 12h14"></path>
-                            <path d="M13 6l6 6-6 6"></path>
-                        </svg>
-                    </button>
+                <div class="act-interactive">
+                    <div class="promises-list" role="group" aria-label="Mis cuatro compromisos contigo">
+                        <button type="button" class="promise-row" data-promise="0" aria-expanded="false">
+                            <span class="promise-beacon" aria-hidden="true">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M20 6L9 17l-5-5"></path>
+                                </svg>
+                            </span>
+                            <span>
+                                <span class="promise-title">Respirar antes de contestar en caliente</span>
+                                <span class="promise-detail-wrap">
+                                    <span class="promise-detail-inner">
+                                        <span class="promise-detail">Cuando algo duela o incomode, bajar la guardia primero. Nunca volver a hablarte desde el impulso ni usar palabras para herirnos.</span>
+                                    </span>
+                                </span>
+                            </span>
+                        </button>
+
+                        <button type="button" class="promise-row" data-promise="1" aria-expanded="false">
+                            <span class="promise-beacon" aria-hidden="true">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M20 6L9 17l-5-5"></path>
+                                </svg>
+                            </span>
+                            <span>
+                                <span class="promise-title">Poner nuestra paz por encima del orgullo</span>
+                                <span class="promise-detail-wrap">
+                                    <span class="promise-detail-inner">
+                                        <span class="promise-detail">Dejar de competir por quién tiene la razón. En cualquier desacuerdo no eres mi rival, Yai: somos tú y yo del mismo lado.</span>
+                                    </span>
+                                </span>
+                            </span>
+                        </button>
+
+                        <button type="button" class="promise-row" data-promise="2" aria-expanded="false">
+                            <span class="promise-beacon" aria-hidden="true">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M20 6L9 17l-5-5"></path>
+                                </svg>
+                            </span>
+                            <span>
+                                <span class="promise-title">Hablar claro sin castigarnos con silencios</span>
+                                <span class="promise-detail-wrap">
+                                    <span class="promise-detail-inner">
+                                        <span class="promise-detail">Decir lo que sentimos a tiempo y con honestidad tranquila, sin guardarnos cosas ni enfriarnos durante días.</span>
+                                    </span>
+                                </span>
+                            </span>
+                        </button>
+
+                        <button type="button" class="promise-row" data-promise="3" aria-expanded="false">
+                            <span class="promise-beacon" aria-hidden="true">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M20 6L9 17l-5-5"></path>
+                                </svg>
+                            </span>
+                            <span>
+                                <span class="promise-title">Hacerme presente a pesar de la distancia</span>
+                                <span class="promise-detail-wrap">
+                                    <span class="promise-detail-inner">
+                                        <span class="promise-detail">Cuidar los detalles cotidianos para que te sientas acompañada, escuchada y cerca de mí todos los días, estemos donde estemos.</span>
+                                    </span>
+                                </span>
+                            </span>
+                        </button>
+                    </div>
+
+                    <div class="act-actions">
+                        <button id="act8-next-btn" type="button" class="btn-primary" data-goto="9" disabled>
+                            <span id="act8-next-label">Enciende los 4 acuerdos para seguir</span>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M5 12h14"></path>
+                                <path d="M13 6l6 6-6 6"></path>
+                            </svg>
+                        </button>
+                    </div>
                 </div>
             </section>
 
             <!-- ACTO 9: PONER EL RELOJ EN CERO -->
             <section id="act-9" class="act-panel" aria-labelledby="act9-title" hidden>
-                <h2 id="act9-title" class="headline">Borremos la cuenta <em>de todo lo malo.</em></h2>
-                <p class="prose-lead">
-                    Arrastra el control hacia la izquierda hasta llevar todo el historial de discusiones a cero absoluto.
-                </p>
-
-                <div class="rewind-box">
-                    <div id="rewind-digits" class="rewind-digits">28 : 14 : 59</div>
-                    <p id="rewind-caption" class="rewind-caption">Altas y bajas acumuladas · Desliza hacia atrás</p>
-
-                    <div id="rewind-track" class="scrubber-track" role="slider" tabindex="0" aria-label="Rebobinar el contador hasta cero" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100">
-                        <div class="scrubber-line">
-                            <div id="rewind-fill" class="scrubber-fill" style="width: 100%;"></div>
-                        </div>
-                        <div id="rewind-knob" class="scrubber-knob" style="left: 100%;" aria-hidden="true"></div>
-                    </div>
+                <div class="act-narrative">
+                    <h2 id="act9-title" class="headline">Borremos la cuenta <em>de todo lo malo.</em></h2>
+                    <p class="prose-lead">
+                        Lleva el control hacia la izquierda hasta dejar todo el historial de discusiones en cero absoluto.
+                    </p>
                 </div>
 
-                <div class="act-actions">
-                    <button id="act9-next-btn" type="button" class="btn-primary" data-goto="10" disabled>
-                        <span>Ir a mi pregunta</span>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <path d="M5 12h14"></path>
-                            <path d="M13 6l6 6-6 6"></path>
-                        </svg>
-                    </button>
+                <div class="act-interactive">
+                    <div class="rewind-box">
+                        <div id="rewind-digits" class="rewind-digits">28 : 14 : 59</div>
+                        <p id="rewind-caption" class="rewind-caption">Altas y bajas acumuladas · Lleva la barra a cero</p>
+
+                        <div id="rewind-track" class="scrubber-track" role="slider" tabindex="0" aria-label="Rebobinar el contador hasta cero" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100">
+                            <div class="scrubber-line">
+                                <div id="rewind-fill" class="scrubber-fill" style="width: 100%;"></div>
+                            </div>
+                            <div id="rewind-knob" class="scrubber-knob" style="left: 100%;" aria-hidden="true"></div>
+                        </div>
+                    </div>
+
+                    <div class="act-actions">
+                        <button id="act9-next-btn" type="button" class="btn-primary" data-goto="10" disabled>
+                            <span>Ir a mi pregunta</span>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M5 12h14"></path>
+                                <path d="M13 6l6 6-6 6"></path>
+                            </svg>
+                        </button>
+                    </div>
                 </div>
             </section>
 
             <!-- ACTO 10: LA PREGUNTA + SELLO DE LUZ -->
             <section id="act-10" class="act-panel" aria-labelledby="act10-title" hidden>
-                <h2 id="act10-title" class="headline">Yai, ¿empezamos desde cero? <em>¿Quieres ser mi novia?</em></h2>
-                <p class="prose-lead">
-                    Sin arrastrar las peleas de ayer. Con todo lo que aprendimos y con el corazón en calma para hacerlo bien contigo.
-                </p>
-
-                <div class="seal-stage">
-                    <button id="seal-btn" type="button" class="seal-button" aria-label="Mantén presionado dos segundos para decir que sí">
-                        <svg class="seal-ring-svg" viewBox="0 0 102 102" fill="none" aria-hidden="true">
-                            <circle class="seal-ring-track" cx="51" cy="51" r="47" stroke-width="1.6"></circle>
-                            <circle id="seal-progress-circle" class="seal-ring-progress" cx="51" cy="51" r="47" stroke-width="2.3" stroke-linecap="round" stroke-dasharray="295.31" stroke-dashoffset="295.31"></circle>
-                        </svg>
-                        <svg class="seal-emblem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <path d="M12 20.5s-7-4.35-7-10.1A4.15 4.15 0 0 1 9.15 6.2c1.32 0 2.28.62 2.85 1.45.57-.83 1.53-1.45 2.85-1.45A4.15 4.15 0 0 1 19 10.4c0 5.75-7 10.1-7 10.1z"></path>
-                        </svg>
-                    </button>
-                    <p id="seal-hint" class="seal-hint">Mantén presionado el sello dos segundos para decir que sí</p>
+                <div class="act-narrative">
+                    <h2 id="act10-title" class="headline">Yai, ¿empezamos desde cero? <em>¿Quieres ser mi novia?</em></h2>
+                    <p class="prose-lead">
+                        Sin arrastrar las peleas de ayer. Con todo lo que aprendimos y con el corazón en calma para hacerlo bien contigo.
+                    </p>
                 </div>
 
-                <div class="act-actions" style="margin-top: 1rem;">
-                    <button id="open-talk-first-btn" type="button" class="btn-quiet">Quiero escribirte algo antes</button>
-                </div>
-
-                <div id="talk-first-drawer" class="first-note-drawer">
-                    <textarea id="talk-first-input" class="reply-textarea" maxlength="600" enterkeyhint="send" placeholder="Escríbeme con calma lo que sientes, Yai…"></textarea>
-                    <div class="act-actions" style="margin-top: 0.2rem; justify-content: flex-end;">
-                        <button id="send-talk-first-btn" type="button" class="btn-primary">
-                            <span id="send-talk-first-label">Enviarle mi mensaje</span>
+                <div class="act-interactive">
+                    <div class="seal-stage">
+                        <button id="seal-btn" type="button" class="seal-button" aria-label="Mantén presionado dos segundos para decir que sí">
+                            <svg class="seal-ring-svg" viewBox="0 0 106 106" fill="none" aria-hidden="true">
+                                <circle class="seal-ring-track" cx="53" cy="53" r="49" stroke-width="1.6"></circle>
+                                <circle id="seal-progress-circle" class="seal-ring-progress" cx="53" cy="53" r="49" stroke-width="2.3" stroke-linecap="round" stroke-dasharray="307.88" stroke-dashoffset="307.88"></circle>
+                            </svg>
+                            <svg class="seal-emblem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M12 20.5s-7-4.35-7-10.1A4.15 4.15 0 0 1 9.15 6.2c1.32 0 2.28.62 2.85 1.45.57-.83 1.53-1.45 2.85-1.45A4.15 4.15 0 0 1 19 10.4c0 5.75-7 10.1-7 10.1z"></path>
+                            </svg>
                         </button>
+                        <p id="seal-hint" class="seal-hint"
+                            data-touch="Mantén presionado el sello dos segundos para decir que sí"
+                            data-fine="Mantén clic sobre el sello dos segundos (o Espacio) para decir que sí">Mantén presionado el sello dos segundos para decir que sí</p>
+                    </div>
+
+                    <div class="act-actions" style="margin-top: 0.9rem;">
+                        <button id="open-talk-first-btn" type="button" class="btn-quiet">Quiero escribirte algo antes</button>
+                    </div>
+
+                    <div id="talk-first-drawer" class="first-note-drawer">
+                        <textarea id="talk-first-input" class="reply-textarea" maxlength="600" enterkeyhint="send" placeholder="Escríbeme con calma lo que sientes, Yai…"></textarea>
+                        <div class="act-actions" style="margin-top: 0.2rem; justify-content: flex-end;">
+                            <button id="send-talk-first-btn" type="button" class="btn-primary">
+                                <span id="send-talk-first-label">Enviarle mi mensaje</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </section>
 
             <!-- EPÍLOGO (ACTO 11): SELLADO · NUESTRO DÍA CERO -->
             <section id="act-11" class="act-panel" aria-labelledby="act11-title" hidden>
-                <h2 id="act11-title" class="headline">Gracias por darme <em>este nuevo comienzo, Yai.</em></h2>
-                <p class="prose-lead">
-                    Desde este segundo nuestra cuenta empieza limpia. Prometo cuidar tu tranquilidad y lo nuestro todos los días.
-                </p>
-
-                <div class="fresh-clock" role="timer" aria-label="Tiempo desde nuestro nuevo comienzo">
-                    <span class="fresh-unit"><span id="fc-days" class="fresh-num">00</span><span class="fresh-lbl">d</span></span>
-                    <span class="fresh-sep" aria-hidden="true">:</span>
-                    <span class="fresh-unit"><span id="fc-hours" class="fresh-num">00</span><span class="fresh-lbl">h</span></span>
-                    <span class="fresh-sep" aria-hidden="true">:</span>
-                    <span class="fresh-unit"><span id="fc-mins" class="fresh-num">00</span><span class="fresh-lbl">m</span></span>
-                    <span class="fresh-sep" aria-hidden="true">:</span>
-                    <span class="fresh-unit"><span id="fc-secs" class="fresh-num">00</span><span class="fresh-lbl">s</span></span>
+                <div class="act-narrative">
+                    <h2 id="act11-title" class="headline">Gracias por darme <em>este nuevo comienzo, Yai.</em></h2>
+                    <p class="prose-lead">
+                        Desde este segundo nuestra cuenta empieza limpia. Prometo cuidar tu tranquilidad y lo nuestro todos los días.
+                    </p>
                 </div>
 
-                <div class="reply-composer">
-                    <label for="accepted-note-input" class="reply-label">Si quieres dejarme unas palabras para guardar este momento, te leo ahora mismo:</label>
-                    <textarea id="accepted-note-input" class="reply-textarea" maxlength="600" enterkeyhint="send" placeholder="Escribe lo que quieras decirme, Yai…"></textarea>
-                </div>
+                <div class="act-interactive">
+                    <div class="fresh-clock" role="timer" aria-label="Tiempo desde nuestro nuevo comienzo">
+                        <span class="fresh-unit"><span id="fc-days" class="fresh-num">00</span><span class="fresh-lbl">d</span></span>
+                        <span class="fresh-sep" aria-hidden="true">:</span>
+                        <span class="fresh-unit"><span id="fc-hours" class="fresh-num">00</span><span class="fresh-lbl">h</span></span>
+                        <span class="fresh-sep" aria-hidden="true">:</span>
+                        <span class="fresh-unit"><span id="fc-mins" class="fresh-num">00</span><span class="fresh-lbl">m</span></span>
+                        <span class="fresh-sep" aria-hidden="true">:</span>
+                        <span class="fresh-unit"><span id="fc-secs" class="fresh-num">00</span><span class="fresh-lbl">s</span></span>
+                    </div>
 
-                <div class="act-actions">
-                    <button id="finish-enter-btn" type="button" class="btn-primary">
-                        <span id="finish-enter-label">Guardar y entrar a 28E</span>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <path d="M5 12h14"></path>
-                            <path d="M13 6l6 6-6 6"></path>
-                        </svg>
-                    </button>
-                    <button id="skip-note-enter-btn" type="button" class="btn-quiet">Entrar a 28E sin escribir</button>
+                    <div class="reply-composer">
+                        <label for="accepted-note-input" class="reply-label">Si quieres dejarme unas palabras para guardar este momento, te leo ahora mismo:</label>
+                        <textarea id="accepted-note-input" class="reply-textarea" maxlength="600" enterkeyhint="send" placeholder="Escribe lo que quieras decirme, Yai…"></textarea>
+                    </div>
+
+                    <div class="act-actions">
+                        <button id="finish-enter-btn" type="button" class="btn-primary">
+                            <span id="finish-enter-label">Guardar y entrar a 28E</span>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M5 12h14"></path>
+                                <path d="M13 6l6 6-6 6"></path>
+                            </svg>
+                        </button>
+                        <button id="skip-note-enter-btn" type="button" class="btn-quiet">Entrar a 28E sin escribir</button>
+                    </div>
                 </div>
             </section>
         </main>
 
         <footer class="chrome-bottom">
-            <div id="step-rail" class="step-rail" aria-hidden="true">
-                <span class="step-seg is-active" data-seg="1"></span>
-                <span class="step-seg" data-seg="2"></span>
-                <span class="step-seg" data-seg="3"></span>
-                <span class="step-seg" data-seg="4"></span>
-                <span class="step-seg" data-seg="5"></span>
-                <span class="step-seg" data-seg="6"></span>
-                <span class="step-seg" data-seg="7"></span>
-                <span class="step-seg" data-seg="8"></span>
-                <span class="step-seg" data-seg="9"></span>
-                <span class="step-seg" data-seg="10"></span>
-            </div>
+            <nav id="step-rail" class="step-rail" aria-label="Progreso de actos">
+                <button type="button" class="step-seg is-active is-unlocked" data-seg="1" aria-label="Acto 1"><span class="step-seg-bar"></span></button>
+                <button type="button" class="step-seg" data-seg="2" aria-label="Acto 2" disabled><span class="step-seg-bar"></span></button>
+                <button type="button" class="step-seg" data-seg="3" aria-label="Acto 3" disabled><span class="step-seg-bar"></span></button>
+                <button type="button" class="step-seg" data-seg="4" aria-label="Acto 4" disabled><span class="step-seg-bar"></span></button>
+                <button type="button" class="step-seg" data-seg="5" aria-label="Acto 5" disabled><span class="step-seg-bar"></span></button>
+                <button type="button" class="step-seg" data-seg="6" aria-label="Acto 6" disabled><span class="step-seg-bar"></span></button>
+                <button type="button" class="step-seg" data-seg="7" aria-label="Acto 7" disabled><span class="step-seg-bar"></span></button>
+                <button type="button" class="step-seg" data-seg="8" aria-label="Acto 8" disabled><span class="step-seg-bar"></span></button>
+                <button type="button" class="step-seg" data-seg="9" aria-label="Acto 9" disabled><span class="step-seg-bar"></span></button>
+                <button type="button" class="step-seg" data-seg="10" aria-label="Acto 10" disabled><span class="step-seg-bar"></span></button>
+            </nav>
             <p id="footer-note" class="footer-note">Día Cero · En silencio</p>
         </footer>
     </div>
@@ -1848,6 +2200,9 @@
             const urlParams = new URLSearchParams(window.location.search);
             const isPreview = urlParams.get('preview') === '1' || urlParams.get('preview') === 'true';
             const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            const finePointerMql = window.matchMedia('(pointer: fine)');
+
+            let isFinePointer = finePointerMql.matches;
 
             const shellEl = document.getElementById('monolith-shell');
             const stageViewport = document.getElementById('stage-viewport');
@@ -1855,9 +2210,35 @@
             const actCounterEl = document.getElementById('act-counter');
             const footerNoteEl = document.getElementById('footer-note');
 
-            if (isPreview && footerNoteEl) {
-                footerNoteEl.textContent = 'Vista previa segura · No sobrescribe la respuesta real';
+            function updateFooterNote() {
+                if (!footerNoteEl) return;
+                if (isPreview) {
+                    footerNoteEl.textContent = 'Vista previa segura · No sobrescribe la respuesta real';
+                    return;
+                }
+                footerNoteEl.textContent = isFinePointer
+                    ? 'Día Cero · En silencio · Teclas ← → disponibles'
+                    : 'Día Cero · En silencio';
             }
+
+            /* ─── Adaptación automática de textos según método de entrada (PC vs Celular) ─── */
+            function applyInputMethodCopy(fine) {
+                isFinePointer = !!fine;
+                document.querySelectorAll('[data-touch][data-fine]').forEach((el) => {
+                    if (el.dataset.lockedCopy === '1') return;
+                    el.textContent = isFinePointer ? el.getAttribute('data-fine') : el.getAttribute('data-touch');
+                });
+                updateFooterNote();
+            }
+
+            applyInputMethodCopy(finePointerMql.matches);
+            if (typeof finePointerMql.addEventListener === 'function') {
+                finePointerMql.addEventListener('change', (e) => applyInputMethodCopy(e.matches));
+            }
+            window.addEventListener('pointerdown', (e) => {
+                const nowFine = e.pointerType === 'mouse';
+                if (nowFine !== isFinePointer) applyInputMethodCopy(nowFine);
+            }, { passive: true });
 
             if (urlParams.get('auto') === '1' && !isPreview) {
                 fetch('https://yaire-591ca-default-rtdb.firebaseio.com/config/diaCeroEnabled.json', { cache: 'no-store' })
@@ -1898,7 +2279,7 @@
                     sessionId: sessionReplyId,
                     updatedAt: nowIso,
                     timestamp: Date.now(),
-                    userAgent: /Mobile|Android|iPhone|iPad/i.test(navigator.userAgent) ? 'Móvil' : 'Escritorio'
+                    userAgent: /Mobile|Android|iPhone|iPad/i.test(navigator.userAgent) ? 'Móvil' : 'PC / Escritorio'
                 }, fields);
 
                 try {
@@ -1962,7 +2343,7 @@
                     'float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123); }',
                     'void main(){',
                     '  vec2 uv = gl_FragCoord.xy / u_res;',
-                    '  vec2 center = vec2(0.5 + (u_ptr.x - 0.5) * 0.08, 0.46 + (u_ptr.y - 0.5) * 0.06);',
+                    '  vec2 center = vec2(0.5 + (u_ptr.x - 0.5) * 0.10, 0.48 + (u_ptr.y - 0.5) * 0.08);',
                     '  vec2 d = (uv - center) * vec2(u_res.x / max(1.0, u_res.y), 1.0);',
                     '  float dist = length(d);',
                     '  float breathe = sin(u_time * 0.5) * 0.02;',
@@ -2033,7 +2414,7 @@
                 requestAnimationFrame(renderAura);
             })();
 
-            /* ─── 3. Partículas sutiles 2D a 60 FPS ─── */
+            /* ─── 3. Partículas 2D a 60 FPS ─── */
             const moteCanvas = document.getElementById('mote-canvas');
             const moteCtx = moteCanvas ? moteCanvas.getContext('2d') : null;
             const motes = [];
@@ -2090,7 +2471,7 @@
                 requestAnimationFrame(renderMotes);
             })();
 
-            /* ─── 4. Orquestador de los 10 Actos + Epílogo ─── */
+            /* ─── 4. Orquestador de los 10 Actos + Navegación PC/Teclado/Barra ─── */
             let currentAct = 1;
             let transitioningAct = false;
             const actMountHooks = {};
@@ -2105,8 +2486,11 @@
                 }
                 document.querySelectorAll('.step-seg').forEach((seg) => {
                     const n = Number(seg.getAttribute('data-seg'));
+                    const unlocked = n <= highestReachedAct && actNum <= TOTAL_ACTS;
                     seg.classList.toggle('is-active', n === displayAct && actNum <= TOTAL_ACTS);
                     seg.classList.toggle('is-done', n < displayAct || actNum === 11);
+                    seg.classList.toggle('is-unlocked', unlocked);
+                    seg.disabled = !unlocked;
                 });
             }
 
@@ -2118,21 +2502,22 @@
 
                 transitioningAct = true;
                 currentAct = nextAct;
+
+                if (nextAct <= TOTAL_ACTS && nextAct > highestReachedAct) {
+                    highestReachedAct = nextAct;
+                    if (!sealCompleted) {
+                        sendDiaCeroPayload({
+                            status: 'reading',
+                            accepted: false,
+                            currentAct: nextAct,
+                            totalActs: TOTAL_ACTS
+                        });
+                    }
+                }
                 syncChrome(nextAct);
 
                 auraTargetWarmth = Math.min(1.0, (nextAct - 1) / 9.0);
-                if (nextAct === 11) auraTargetBoost = 0.34;
-                else auraTargetBoost = 0.0;
-
-                if (nextAct <= TOTAL_ACTS && nextAct > highestReachedAct && !sealCompleted) {
-                    highestReachedAct = nextAct;
-                    sendDiaCeroPayload({
-                        status: 'reading',
-                        accepted: false,
-                        currentAct: nextAct,
-                        totalActs: TOTAL_ACTS
-                    });
-                }
+                auraTargetBoost = nextAct === 11 ? 0.34 : 0.0;
 
                 fromEl.classList.remove('is-visible');
                 fromEl.classList.add('is-leaving');
@@ -2155,7 +2540,7 @@
                             transitioningAct = false;
                         });
                     });
-                }, prefersReducedMotion ? 110 : 300);
+                }, prefersReducedMotion ? 110 : 280);
             }
 
             if (prevActBtn) {
@@ -2166,12 +2551,43 @@
                 });
             }
 
+            document.querySelectorAll('.step-seg').forEach((seg) => {
+                seg.addEventListener('click', () => {
+                    const target = Number(seg.getAttribute('data-seg'));
+                    if (!seg.disabled && target <= highestReachedAct && currentAct <= TOTAL_ACTS) {
+                        goToAct(target);
+                    }
+                });
+            });
+
             document.querySelectorAll('[data-goto]').forEach((btn) => {
                 btn.addEventListener('click', () => {
                     if (btn.disabled) return;
                     pulseHaptic(8);
                     goToAct(Number(btn.getAttribute('data-goto')));
                 });
+            });
+
+            /* Atajos globales de teclado para PC (sin interferir con campos de texto ni controles propios) */
+            window.addEventListener('keydown', (e) => {
+                const tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
+                if (tag === 'textarea' || tag === 'input') return;
+                if (e.target && e.target.getAttribute && e.target.getAttribute('role') === 'slider') return;
+
+                if (e.key === 'ArrowLeft' && currentAct > 1 && currentAct <= TOTAL_ACTS && currentAct !== 7) {
+                    e.preventDefault();
+                    goToAct(currentAct - 1);
+                } else if (e.key === 'ArrowRight' && currentAct < TOTAL_ACTS && currentAct !== 7) {
+                    const activeSection = document.getElementById('act-' + currentAct);
+                    const nextBtn = activeSection ? activeSection.querySelector('[data-goto]') : null;
+                    if (nextBtn && !nextBtn.disabled) {
+                        e.preventDefault();
+                        goToAct(Number(nextBtn.getAttribute('data-goto')));
+                    } else if (currentAct < highestReachedAct) {
+                        e.preventDefault();
+                        goToAct(currentAct + 1);
+                    }
+                }
             });
 
             /* ─── ACTO 1: Deslizador de umbral con resorte crítico ─── */
@@ -2248,6 +2664,10 @@
                     applyPos(0);
                 };
 
+                window.addEventListener('resize', () => {
+                    if (currentAct === 1) applyPos(unlocked ? getMaxX() : pos);
+                }, { passive: true });
+
                 rail.addEventListener('pointerdown', (e) => {
                     if (unlocked) return;
                     dragging = true;
@@ -2302,7 +2722,7 @@
                 });
             })();
 
-            /* ─── ACTO 2: Cristal empañado con borrado por trazo ─── */
+            /* ─── ACTO 2: Cristal empañado (tacto con dedo en celular + barrido fluido de cursor en PC) ─── */
             (function setupAct2Frost() {
                 const frame = document.getElementById('frost-frame');
                 const canvas = document.getElementById('frost-canvas');
@@ -2341,17 +2761,20 @@
                     ctx.fillRect(0, 0, cssW, cssH);
 
                     ctx.fillStyle = 'rgba(247, 244, 238, 0.045)';
-                    for (let i = 0; i < 220; i++) {
+                    for (let i = 0; i < 240; i++) {
                         const gx = (Math.sin(i * 91.7) * 0.5 + 0.5) * cssW;
                         const gy = (Math.cos(i * 47.3) * 0.5 + 0.5) * cssH;
                         ctx.fillRect(gx, gy, 1.5, 1.5);
                     }
 
-                    ctx.fillStyle = 'rgba(244, 239, 231, 0.56)';
+                    ctx.fillStyle = 'rgba(244, 239, 231, 0.58)';
                     ctx.font = '500 13px "Plus Jakarta Sans", sans-serif';
                     ctx.textAlign = 'center';
                     ctx.textBaseline = 'middle';
-                    ctx.fillText('Pasa tu dedo aquí para desempañar', cssW / 2, cssH / 2);
+                    const promptTxt = isFinePointer
+                        ? 'Pasa el cursor aquí para desempañar'
+                        : 'Pasa tu dedo aquí para desempañar';
+                    ctx.fillText(promptTxt, cssW / 2, cssH / 2);
 
                     cells = new Uint8Array(COLS * ROWS);
                     clearedCount = 0;
@@ -2371,6 +2794,7 @@
                     frostCleared = true;
                     canvas.classList.add('is-cleared');
                     if (statusEl) {
+                        statusEl.dataset.lockedCopy = '1';
                         statusEl.textContent = 'Cristal despejado';
                         statusEl.classList.add('is-lit');
                     }
@@ -2380,7 +2804,7 @@
                     spawnMotes(r.left + r.width / 2, r.top + r.height / 2, 28, true);
                 }
 
-                function eraseAt(localX, localY) {
+                function eraseAt(localX, localY, radius) {
                     if (!ctx || frostCleared || cssW <= 0 || cssH <= 0) return;
                     ctx.globalCompositeOperation = 'destination-out';
 
@@ -2398,21 +2822,22 @@
                     }
                     prevPt = { x: localX, y: localY };
 
-                    const radius = 34;
+                    const rad = radius || 34;
+                    const hitPad = rad * 0.65;
                     for (let i = 0; i < pts.length; i++) {
                         const p = pts[i];
-                        const g = ctx.createRadialGradient(p.x, p.y, 6, p.x, p.y, radius);
+                        const g = ctx.createRadialGradient(p.x, p.y, 6, p.x, p.y, rad);
                         g.addColorStop(0, 'rgba(0,0,0,1)');
                         g.addColorStop(1, 'rgba(0,0,0,0)');
                         ctx.fillStyle = g;
                         ctx.beginPath();
-                        ctx.arc(p.x, p.y, radius, 0, Math.PI * 2);
+                        ctx.arc(p.x, p.y, rad, 0, Math.PI * 2);
                         ctx.fill();
 
-                        const cMin = Math.max(0, Math.floor(((p.x - 22) / cssW) * COLS));
-                        const cMax = Math.min(COLS - 1, Math.floor(((p.x + 22) / cssW) * COLS));
-                        const rMin = Math.max(0, Math.floor(((p.y - 22) / cssH) * ROWS));
-                        const rMax = Math.min(ROWS - 1, Math.floor(((p.y + 22) / cssH) * ROWS));
+                        const cMin = Math.max(0, Math.floor(((p.x - hitPad) / cssW) * COLS));
+                        const cMax = Math.min(COLS - 1, Math.floor(((p.x + hitPad) / cssW) * COLS));
+                        const rMin = Math.max(0, Math.floor(((p.y - hitPad) / cssH) * ROWS));
+                        const rMax = Math.min(ROWS - 1, Math.floor(((p.y + hitPad) / cssH) * ROWS));
                         for (let r = rMin; r <= rMax; r++) {
                             for (let c = cMin; c <= cMax; c++) {
                                 const idx = r * COLS + c;
@@ -2428,6 +2853,7 @@
                     if (pct >= 46) {
                         finishFrost();
                     } else if (statusEl) {
+                        statusEl.dataset.lockedCopy = '1';
                         statusEl.textContent = 'Despejando… ' + Math.min(99, Math.round((pct / 46) * 100)) + '%';
                     }
                 }
@@ -2438,13 +2864,18 @@
                     prevPt = null;
                     canvas.setPointerCapture(e.pointerId);
                     const r = canvas.getBoundingClientRect();
-                    eraseAt(e.clientX - r.left, e.clientY - r.top);
+                    eraseAt(e.clientX - r.left, e.clientY - r.top, e.pointerType === 'mouse' ? 40 : 34);
                 });
 
                 canvas.addEventListener('pointermove', (e) => {
-                    if (!wiping || frostCleared) return;
+                    if (frostCleared) return;
+                    if (!wiping && e.pointerType !== 'mouse') return;
                     const r = canvas.getBoundingClientRect();
-                    eraseAt(e.clientX - r.left, e.clientY - r.top);
+                    eraseAt(e.clientX - r.left, e.clientY - r.top, wiping ? 40 : 28);
+                });
+
+                canvas.addEventListener('pointerleave', () => {
+                    if (!wiping) prevPt = null;
                 });
 
                 function stopWipe() {
@@ -2483,6 +2914,7 @@
 
                     const left = totalChips - dissolvedSet.size;
                     if (noiseCaption) {
+                        noiseCaption.dataset.lockedCopy = '1';
                         if (left > 0) {
                             noiseCaption.textContent = left === 1 ? 'Queda 1 por soltar' : 'Quedan ' + left + ' por soltar';
                         } else {
@@ -2492,7 +2924,7 @@
                     }
 
                     if (left === 0) {
-                        setTimeout(() => goToAct(4), 720);
+                        setTimeout(() => goToAct(4), 700);
                     }
                 }
 
@@ -2518,7 +2950,7 @@
                 }
             })();
 
-            /* ─── ACTO 4: Pausa respirada de 3 segundos ─── */
+            /* ─── ACTO 4: Pausa respirada de 3 segundos (dedo, clic o barra espaciadora) ─── */
             (function setupAct4Breath() {
                 const btn = document.getElementById('breath-btn');
                 const halo = document.getElementById('breath-halo');
@@ -2526,7 +2958,7 @@
                 const statusEl = document.getElementById('breath-status');
                 if (!btn || !circle) return;
 
-                const CIRC = 339.29;
+                const CIRC = 351.86;
                 const DURATION = 3000;
                 let holding = false;
                 let progress = 0;
@@ -2552,12 +2984,13 @@
                     renderBreath(1);
                     pulseHaptic([14, 30, 18]);
                     if (statusEl) {
+                        statusEl.dataset.lockedCopy = '1';
                         statusEl.textContent = 'Así quiero escucharte siempre: en calma.';
                         statusEl.classList.add('is-lit');
                     }
                     const r = btn.getBoundingClientRect();
                     spawnMotes(r.left + r.width / 2, r.top + r.height / 2, 28, true);
-                    setTimeout(() => goToAct(5), 760);
+                    setTimeout(() => goToAct(5), 740);
                 }
 
                 (function loopBreath(now) {
@@ -2592,7 +3025,9 @@
                     holding = false;
                     btn.classList.remove('is-holding');
                     if (statusEl && progress < 1) {
-                        statusEl.textContent = 'Mantén tu dedo en el centro para enfriar el impulso';
+                        statusEl.textContent = isFinePointer
+                            ? 'Mantén clic en el centro (o barra espaciadora) durante 3 s'
+                            : 'Mantén tu dedo en el centro para enfriar el impulso';
                     }
                 }
 
@@ -2600,11 +3035,14 @@
                 window.addEventListener('pointerup', stopHold);
                 window.addEventListener('pointercancel', stopHold);
                 btn.addEventListener('contextmenu', (e) => e.preventDefault());
-                btn.addEventListener('keydown', (e) => {
-                    if ((e.key === 'Enter' || e.key === ' ') && !holding) startHold(e);
+
+                window.addEventListener('keydown', (e) => {
+                    if (currentAct !== 4 || done) return;
+                    if ((e.key === ' ' || e.key === 'Enter') && !holding) startHold(e);
                 });
-                btn.addEventListener('keyup', (e) => {
-                    if (e.key === 'Enter' || e.key === ' ') stopHold();
+                window.addEventListener('keyup', (e) => {
+                    if (currentAct !== 4) return;
+                    if (e.key === ' ' || e.key === 'Enter') stopHold();
                 });
             })();
 
@@ -2672,7 +3110,10 @@
                     const cur = Number(track.getAttribute('aria-valuenow')) || 0;
                     if (e.key === 'ArrowRight' || e.key === 'ArrowUp') {
                         e.preventDefault();
-                        setRatio((cur + 20) / 100);
+                        setRatio((cur + 25) / 100);
+                    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') {
+                        e.preventDefault();
+                        setRatio((cur - 25) / 100);
                     } else if (e.key === 'Enter' || e.key === ' ') {
                         e.preventDefault();
                         setRatio(1);
@@ -2786,19 +3227,26 @@
                 });
             })();
 
-            /* ─── ACTO 7: Tres certezas deslizables ─── */
+            /* ─── ACTO 7: Tres certezas (Swipe en móvil + Flechas / Teclado en PC) ─── */
             (function setupAct7Truths() {
                 const track = document.getElementById('truths-track');
+                const prevArrow = document.getElementById('truth-prev-arrow');
+                const nextArrow = document.getElementById('truth-next-arrow');
                 const btns = Array.from(document.querySelectorAll('.truth-pill-btn'));
                 const nextBtn = document.getElementById('act7-next-btn');
                 const nextLabel = document.getElementById('act7-next-label');
                 if (!track) return;
 
+                let activeIdx = 0;
                 const seen = new Set([0]);
 
-                function markSeen(idx) {
-                    seen.add(idx);
-                    btns.forEach((b, i) => b.classList.toggle('is-current', i === idx));
+                function syncTruthControls(idx) {
+                    activeIdx = Math.max(0, Math.min(2, idx));
+                    seen.add(activeIdx);
+                    btns.forEach((b, i) => b.classList.toggle('is-current', i === activeIdx));
+                    if (prevArrow) prevArrow.disabled = activeIdx <= 0;
+                    if (nextArrow) nextArrow.disabled = activeIdx >= 2;
+
                     if (seen.size >= 3 && nextBtn) {
                         nextBtn.disabled = false;
                         if (nextLabel) nextLabel.textContent = 'Ver mis acuerdos contigo';
@@ -2808,21 +3256,51 @@
                     }
                 }
 
+                function scrollToTruth(idx) {
+                    const clamped = Math.max(0, Math.min(2, idx));
+                    const w = track.clientWidth || 1;
+                    track.scrollTo({ left: clamped * w, behavior: prefersReducedMotion ? 'auto' : 'smooth' });
+                    syncTruthControls(clamped);
+                    pulseHaptic(8);
+                }
+
                 btns.forEach((btn) => {
                     btn.addEventListener('click', () => {
-                        const idx = Number(btn.getAttribute('data-truth-idx'));
-                        const w = track.clientWidth || 1;
-                        track.scrollTo({ left: idx * w, behavior: prefersReducedMotion ? 'auto' : 'smooth' });
-                        markSeen(idx);
-                        pulseHaptic(8);
+                        scrollToTruth(Number(btn.getAttribute('data-truth-idx')));
                     });
                 });
+
+                prevArrow?.addEventListener('click', () => scrollToTruth(activeIdx - 1));
+                nextArrow?.addEventListener('click', () => scrollToTruth(activeIdx + 1));
 
                 track.addEventListener('scroll', () => {
                     const w = Math.max(1, track.clientWidth);
                     const idx = Math.max(0, Math.min(2, Math.round(track.scrollLeft / w)));
-                    markSeen(idx);
+                    syncTruthControls(idx);
                 }, { passive: true });
+
+                window.addEventListener('keydown', (e) => {
+                    if (currentAct !== 7) return;
+                    const tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
+                    if (tag === 'textarea' || tag === 'input') return;
+                    if (e.key === 'ArrowRight') {
+                        if (activeIdx < 2) {
+                            e.preventDefault();
+                            scrollToTruth(activeIdx + 1);
+                        } else if (nextBtn && !nextBtn.disabled) {
+                            e.preventDefault();
+                            goToAct(8);
+                        }
+                    } else if (e.key === 'ArrowLeft') {
+                        if (activeIdx > 0) {
+                            e.preventDefault();
+                            scrollToTruth(activeIdx - 1);
+                        } else {
+                            e.preventDefault();
+                            goToAct(6);
+                        }
+                    }
+                });
             })();
 
             /* ─── ACTO 8: Encender los 4 acuerdos reales ─── */
@@ -2925,11 +3403,11 @@
                 });
             })();
 
-            /* ─── ACTO 10 + EPÍLOGO: Sello mantenido 2s + Reloj de nuevo comienzo ─── */
+            /* ─── ACTO 10 + EPÍLOGO: Sello mantenido 2s (dedo, clic o Espacio) ─── */
             const sealBtn = document.getElementById('seal-btn');
             const sealCircle = document.getElementById('seal-progress-circle');
             const sealHint = document.getElementById('seal-hint');
-            const SEAL_CIRC = 295.31;
+            const SEAL_CIRC = 307.88;
             const HOLD_DURATION_MS = 1900;
 
             let holdingSeal = false;
@@ -3012,7 +3490,9 @@
                 holdingSeal = false;
                 sealBtn?.classList.remove('is-holding');
                 if (sealHint && holdProgress < 1) {
-                    sealHint.textContent = 'Mantén presionado el sello dos segundos para decir que sí';
+                    sealHint.textContent = isFinePointer
+                        ? 'Mantén clic sobre el sello dos segundos (o Espacio) para decir que sí'
+                        : 'Mantén presionado el sello dos segundos para decir que sí';
                 }
             }
 
@@ -3021,13 +3501,18 @@
                 window.addEventListener('pointerup', endHold);
                 window.addEventListener('pointercancel', endHold);
                 sealBtn.addEventListener('contextmenu', (e) => e.preventDefault());
-                sealBtn.addEventListener('keydown', (e) => {
-                    if ((e.key === ' ' || e.key === 'Enter') && !holdingSeal) beginHold(e);
-                });
-                sealBtn.addEventListener('keyup', (e) => {
-                    if (e.key === ' ' || e.key === 'Enter') endHold();
-                });
             }
+
+            window.addEventListener('keydown', (e) => {
+                if (currentAct !== 10 || sealCompleted) return;
+                const tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
+                if (tag === 'textarea' || tag === 'input') return;
+                if (e.key === ' ' && !holdingSeal) beginHold(e);
+            });
+            window.addEventListener('keyup', (e) => {
+                if (currentAct !== 10) return;
+                if (e.key === ' ') endHold();
+            });
 
             /* Cajón opcional "Quiero escribirte algo antes" */
             const openTalkFirstBtn = document.getElementById('open-talk-first-btn');
