@@ -28,7 +28,7 @@
       ]
     },
     {
-      "source": "/(tv|dclf|dclf-lanzamiento|mantenimiento|wrapped|empezar)",
+      "source": "/(tv|dclf|dclf-lanzamiento|mantenimiento|wrapped|empezar|privacy)",
       "headers": [
         {
           "key": "Cache-Control",
@@ -213,16 +213,6 @@
         }
       ],
       "destination": "https://tv.yaire.site/",
-      "permanent": false
-    },
-    {
-      "source": "/privacy",
-      "destination": "/pages/privacy",
-      "permanent": false
-    },
-    {
-      "source": "/privacy.html",
-      "destination": "/pages/privacy.html",
       "permanent": false
     },
     {
