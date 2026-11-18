@@ -3,12 +3,13 @@
 // Version: 1.0.0
 // ══════════════════════════════════════════════════════════════════════════════
 
-const CACHE_NAME = '28e-pwa-v141';
+const CACHE_NAME = '28e-pwa-v142';
 
 // Recursos esenciales pre-cacheados para arranque instantáneo y offline básico
 const PRECACHE_ASSETS = [
   './',
   './index.html',
+  './empezar.html',
   './manifest.json',
   './styles.css',
   './icons/tulip.ico',

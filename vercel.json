@@ -28,7 +28,7 @@
       ]
     },
     {
-      "source": "/(tv|dclf|dclf-lanzamiento|mantenimiento|wrapped)",
+      "source": "/(tv|dclf|dclf-lanzamiento|mantenimiento|wrapped|empezar)",
       "headers": [
         {
           "key": "Cache-Control",

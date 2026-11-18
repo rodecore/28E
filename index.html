@@ -58,6 +58,14 @@
                         }
                     }
                 }
+                if (localStorage.getItem('yaire_dia_cero_done') !== '1') {
+                    var dcCfgRaw = localStorage.getItem('yaire_config');
+                    var dcCfg = dcCfgRaw ? JSON.parse(dcCfgRaw) : null;
+                    if (!dcCfg || dcCfg.diaCeroEnabled !== false) {
+                        window.location.replace('empezar.html?auto=1');
+                        return;
+                    }
+                }
             } catch (e) {}
         })();
 

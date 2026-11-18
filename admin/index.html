@@ -951,6 +951,69 @@
                             </div>
                         </div>
 
+                        <!-- DÍA CERO · PROPUESTA EN VIVO PARA YAI -->
+                        <div id="diacero-card" class="yaire-card p-8 bg-zinc-950 border border-white/5 transition-all duration-500">
+                            <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-5">
+                                <div class="flex items-start gap-4">
+                                    <div id="diacero-icon-wrap"
+                                        class="w-12 h-12 rounded-2xl bg-amber-500/15 text-amber-400 flex items-center justify-center flex-shrink-0">
+                                        <i class="ph-fill ph-heart text-2xl"></i>
+                                    </div>
+                                    <div>
+                                        <div class="flex flex-wrap items-center gap-2.5">
+                                            <h3 class="font-black text-xl text-white tracking-tight">Día Cero · Empezar con Yai</h3>
+                                            <span id="diacero-status-badge"
+                                                class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/25">
+                                                Esperando respuesta
+                                            </span>
+                                        </div>
+                                        <p class="text-xs text-zinc-400 mt-1">
+                                            Experiencia interactiva para soltar las peleas, encender 3 compromisos y pedirle volver a empezar de cero.
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center gap-3 self-end sm:self-start">
+                                    <span class="text-xs font-semibold text-zinc-400">Abrir al entrar</span>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" id="diacero-toggle" class="sr-only peer" checked
+                                            onchange="toggleDiaCeroGate(this.checked)">
+                                        <div
+                                            class="w-12 h-6 bg-zinc-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500">
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Respuesta y mensaje en tiempo real -->
+                            <div class="mt-6 p-5 rounded-2xl bg-black/50 border border-white/5 space-y-3">
+                                <div class="flex flex-wrap items-center justify-between gap-2 text-xs text-zinc-500">
+                                    <span id="diacero-meta-text">Sin actividad registrada todavía.</span>
+                                    <span id="diacero-device-text" class="font-mono text-[11px] text-zinc-600"></span>
+                                </div>
+                                <div id="diacero-message-box" class="hidden pt-3 border-t border-white/5">
+                                    <div class="text-[11px] font-bold text-amber-400/90 mb-1.5">Mensaje de Yai:</div>
+                                    <p id="diacero-message-text" class="text-sm text-zinc-100 leading-relaxed whitespace-pre-wrap"></p>
+                                </div>
+                            </div>
+
+                            <!-- Acciones rápidas -->
+                            <div class="mt-5 flex flex-wrap items-center gap-2.5">
+                                <button type="button" onclick="openDiaCeroPreview()"
+                                    class="flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold bg-amber-500 text-black hover:bg-amber-400 transition-all">
+                                    <i class="ph-bold ph-eye text-sm"></i>Probar Vista Previa
+                                </button>
+                                <button type="button" onclick="copyDiaCeroLink()"
+                                    class="flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-xs font-bold bg-white/5 text-zinc-300 hover:bg-white/10 hover:text-white border border-white/10 transition-all">
+                                    <i class="ph-bold ph-link text-sm"></i><span id="diacero-copy-label">Copiar link /empezar</span>
+                                </button>
+                                <button type="button" onclick="resetDiaCeroResponse()"
+                                    class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold text-zinc-500 hover:text-rose-400 hover:bg-rose-500/10 transition-all ml-auto">
+                                    <i class="ph-bold ph-arrow-counter-clockwise text-sm"></i>Reiniciar estado
+                                </button>
+                            </div>
+                        </div>
+
                         <!-- System Performance REAL (Node Cards Redesign) -->
                         <div class="yaire-card p-8 bg-zinc-950">
                             <div class="flex items-center justify-between mb-8">
@@ -3374,9 +3437,12 @@
 
             document.getElementById('maint-toggle').checked = cfg.mantenimiento || false;
             document.getElementById('maint-date').value = cfg.maintDate || (Date.now() < OFFICIAL_OPENING_MS ? OFFICIAL_OPENING_LOCAL : '');
+            const dcToggle = document.getElementById('diacero-toggle');
+            if (dcToggle) dcToggle.checked = cfg.diaCeroEnabled !== false;
             setMaintScreen('cinematic');
             setMaintDuration(cfg.maintType || (Date.now() < OFFICIAL_OPENING_MS ? 'scheduled' : 'indefinite'));
             toggleMaintOptions(false);
+            initDiaCeroMonitor();
 
             // Actualizar la insignia de estado según el estado de mantenimiento real en el servidor
             updateSystemStatusBadge(cfg.mantenimiento || false);
@@ -4262,6 +4328,8 @@
             cfg.maintType = document.getElementById('maint-type').value;
             cfg.maintScreen = document.getElementById('maint-screen').value;
             cfg.maintDate = document.getElementById('maint-date').value;
+            const dcEl = document.getElementById('diacero-toggle');
+            if (dcEl) cfg.diaCeroEnabled = dcEl.checked;
             cfg.ghRepo = document.getElementById('gh-repo').value || 'charlygustav/28E';
             // Solo actualizar el token si el usuario escribió uno nuevo en el campo
             const inputToken = document.getElementById('gh-token').value.trim();
@@ -4480,6 +4548,146 @@
             const base = isLocal ? '../mantenimiento.html' : 'https://yaire.site/mantenimiento.html';
             const url = `${base}?preview=true&type=${encodeURIComponent(type)}&date=${encodeURIComponent(date)}`;
             window.open(url, '_blank');
+        }
+
+        // ── DÍA CERO · MONITOR Y CONTROLES EN VIVO ────────────────────────────────────
+        let _diaCeroMonitorStarted = false;
+        let _lastDiaCeroSig = '';
+
+        function openDiaCeroPreview() {
+            const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+            const url = isLocal ? '../empezar.html?preview=1' : 'https://www.yaire.site/empezar?preview=1';
+            window.open(url, '_blank');
+        }
+
+        async function copyDiaCeroLink() {
+            const url = 'https://www.yaire.site/empezar';
+            const lbl = document.getElementById('diacero-copy-label');
+            try {
+                await navigator.clipboard.writeText(url);
+                if (lbl) {
+                    lbl.textContent = '¡Link copiado!';
+                    setTimeout(() => { lbl.textContent = 'Copiar link /empezar'; }, 2200);
+                }
+            } catch (_) {
+                window.prompt('Copia el enlace directo:', url);
+            }
+        }
+
+        async function toggleDiaCeroGate(enabled) {
+            try {
+                const cfg = JSON.parse(localStorage.getItem('yaire_config') || '{}');
+                cfg.diaCeroEnabled = !!enabled;
+                localStorage.setItem('yaire_config', JSON.stringify(cfg));
+                await firebaseFetch('https://yaire-591ca-default-rtdb.firebaseio.com/config.json', {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ diaCeroEnabled: !!enabled })
+                });
+                if (typeof showToast === 'function') {
+                    showToast(enabled ? 'Día Cero se abrirá al entrar a la web' : 'Entrada automática de Día Cero desactivada', 'amber');
+                }
+            } catch (e) {
+                console.error('Error guardando diaCeroEnabled:', e);
+            }
+        }
+
+        function renderDiaCeroStatus(data, notifyOnChange) {
+            const badge = document.getElementById('diacero-status-badge');
+            const meta = document.getElementById('diacero-meta-text');
+            const dev = document.getElementById('diacero-device-text');
+            const msgBox = document.getElementById('diacero-message-box');
+            const msgText = document.getElementById('diacero-message-text');
+            const card = document.getElementById('diacero-card');
+            if (!badge || !meta) return;
+
+            if (!data || (!data.status && !data.message)) {
+                badge.textContent = 'Esperando respuesta';
+                badge.className = 'text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/25';
+                meta.textContent = 'Sin actividad registrada todavía.';
+                if (dev) dev.textContent = '';
+                if (msgBox) msgBox.classList.add('hidden');
+                if (card) card.className = 'yaire-card p-8 bg-zinc-950 border border-white/5 transition-all duration-500';
+                _lastDiaCeroSig = 'empty';
+                return;
+            }
+
+            const sig = JSON.stringify([data.status || '', data.acceptedAt || '', data.message || '', data.updatedAt || '']);
+            const changed = _lastDiaCeroSig && _lastDiaCeroSig !== 'empty' && _lastDiaCeroSig !== sig;
+            const firstArrival = _lastDiaCeroSig === 'empty' && sig !== 'empty';
+            _lastDiaCeroSig = sig;
+
+            const whenRaw = data.acceptedAt || data.updatedAt;
+            let whenStr = '';
+            if (whenRaw) {
+                const d = new Date(whenRaw);
+                if (!Number.isNaN(d.getTime())) {
+                    whenStr = d.toLocaleString('es-VE', { dateStyle: 'medium', timeStyle: 'short' });
+                }
+            }
+
+            if (data.status === 'accepted' || data.accepted === true) {
+                badge.textContent = '¡Yai dijo que sí!';
+                badge.className = 'text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/35';
+                meta.textContent = whenStr ? `Aceptó empezar de cero el ${whenStr}` : 'Aceptó empezar de cero.';
+                if (card) card.className = 'yaire-card p-8 bg-zinc-950 border border-emerald-500/30 transition-all duration-500';
+            } else {
+                badge.textContent = 'Te dejó un mensaje';
+                badge.className = 'text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-pink-500/20 text-pink-300 border border-pink-500/35';
+                meta.textContent = whenStr ? `Escribió antes de responder el ${whenStr}` : 'Escribió un mensaje.';
+                if (card) card.className = 'yaire-card p-8 bg-zinc-950 border border-pink-500/30 transition-all duration-500';
+            }
+
+            if (dev) dev.textContent = data.userAgent ? `Dispositivo: ${data.userAgent}` : '';
+
+            if (data.message && String(data.message).trim()) {
+                if (msgText) msgText.textContent = String(data.message).trim();
+                if (msgBox) msgBox.classList.remove('hidden');
+            } else if (msgBox) {
+                msgBox.classList.add('hidden');
+            }
+
+            if (notifyOnChange && (changed || firstArrival)) {
+                if (typeof addLog === 'function') {
+                    addLog('Día Cero', data.accepted ? '¡Yai aceptó empezar desde cero!' : 'Yai envió un mensaje en Día Cero.', 'emerald-500');
+                }
+                if (typeof showToast === 'function') {
+                    showToast(data.accepted ? '¡Yai dijo que sí en Día Cero!' : 'Nuevo mensaje de Yai en Día Cero', 'emerald');
+                }
+            }
+        }
+
+        async function fetchDiaCeroStatus(notify) {
+            try {
+                const res = await firebaseFetch('https://yaire-591ca-default-rtdb.firebaseio.com/dia_cero.json');
+                if (res.ok) {
+                    const data = await res.json();
+                    renderDiaCeroStatus(data, notify);
+                }
+            } catch (_) {}
+        }
+
+        function initDiaCeroMonitor() {
+            if (_diaCeroMonitorStarted) return;
+            _diaCeroMonitorStarted = true;
+            fetchDiaCeroStatus(false);
+            setInterval(() => {
+                if (!document.hidden) fetchDiaCeroStatus(true);
+            }, 6000);
+            document.addEventListener('visibilitychange', () => {
+                if (!document.hidden) fetchDiaCeroStatus(true);
+            });
+        }
+
+        async function resetDiaCeroResponse() {
+            if (!window.confirm('¿Seguro que quieres borrar el estado/respuesta actual de Día Cero y dejarlo limpio para Yai?')) return;
+            try {
+                await firebaseFetch('https://yaire-591ca-default-rtdb.firebaseio.com/dia_cero.json', { method: 'DELETE' });
+                renderDiaCeroStatus(null, false);
+                if (typeof showToast === 'function') showToast('Estado de Día Cero reiniciado', 'amber');
+            } catch (e) {
+                console.error('Error reiniciando Día Cero:', e);
+            }
         }
 
         function toggleMaintDate() {
