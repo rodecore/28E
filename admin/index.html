@@ -985,15 +985,19 @@
                                 </div>
                             </div>
 
-                            <!-- Respuesta y mensaje en tiempo real -->
+                            <!-- Respuesta y mensajes en tiempo real -->
                             <div class="mt-5 sm:mt-6 p-4 sm:p-5 rounded-2xl bg-black/50 border border-white/5 space-y-3">
-                                <div class="flex flex-wrap items-center justify-between gap-2 text-xs text-zinc-500">
-                                    <span id="diacero-meta-text">Sin actividad registrada todavía.</span>
-                                    <span id="diacero-device-text" class="font-mono text-[11px] text-zinc-600"></span>
+                                <div class="flex flex-wrap items-center justify-between gap-2 text-xs text-zinc-400">
+                                    <span id="diacero-meta-text">Sin actividad registrada todavía · Aquí verás en vivo su avance y lo que te escriba.</span>
+                                    <span id="diacero-device-text" class="font-mono text-[11px] text-zinc-500"></span>
                                 </div>
-                                <div id="diacero-message-box" class="hidden pt-3 border-t border-white/5">
-                                    <div class="text-[11px] font-bold text-amber-400/90 mb-1.5">Mensaje de Yaire:</div>
-                                    <p id="diacero-message-text" class="text-sm text-zinc-100 leading-relaxed whitespace-pre-wrap"></p>
+                                <div id="diacero-message-box" class="hidden pt-3 border-t border-white/5 space-y-2.5">
+                                    <div class="flex items-center justify-between gap-2">
+                                        <span class="text-[11px] font-bold text-amber-400/95 uppercase tracking-wider">Bandeja de mensajes de Yaire</span>
+                                        <span id="diacero-msg-count" class="text-[11px] font-mono text-zinc-500"></span>
+                                    </div>
+                                    <div id="diacero-messages-list" class="space-y-2"></div>
+                                    <p id="diacero-message-text" class="hidden text-sm text-zinc-100 leading-relaxed whitespace-pre-wrap"></p>
                                 </div>
                             </div>
 
@@ -1006,6 +1010,10 @@
                                 <button type="button" onclick="copyDiaCeroLink()"
                                     class="flex items-center justify-center gap-2 min-h-[44px] px-3.5 py-2.5 rounded-xl text-xs font-bold bg-white/5 text-zinc-300 hover:bg-white/10 hover:text-white border border-white/10 transition-all">
                                     <i class="ph-bold ph-link text-sm"></i><span id="diacero-copy-label">Copiar link /empezar</span>
+                                </button>
+                                <button type="button" id="diacero-alert-btn" onclick="enableDiaCeroBrowserAlert()"
+                                    class="flex items-center justify-center gap-2 min-h-[44px] px-3.5 py-2.5 rounded-xl text-xs font-bold bg-white/5 text-zinc-300 hover:bg-white/10 hover:text-white border border-white/10 transition-all">
+                                    <i class="ph-bold ph-bell-ringing text-sm"></i><span id="diacero-alert-label">Activar alerta en vivo</span>
                                 </button>
                                 <button type="button" onclick="resetDiaCeroResponse()"
                                     class="flex items-center justify-center gap-1.5 min-h-[44px] px-3 py-2.5 rounded-xl text-xs font-bold text-zinc-500 hover:text-rose-400 hover:bg-rose-500/10 transition-all sm:ml-auto">
@@ -4592,27 +4600,79 @@
             }
         }
 
+        function syncDiaCeroAlertBtnUI() {
+            const alertLabel = document.getElementById('diacero-alert-label');
+            const alertBtn = document.getElementById('diacero-alert-btn');
+            if (!alertLabel || !alertBtn || !('Notification' in window)) return;
+            if (Notification.permission === 'granted') {
+                alertLabel.textContent = 'Alerta activa ✓';
+                alertBtn.className = 'flex items-center justify-center gap-2 min-h-[44px] px-3.5 py-2.5 rounded-xl text-xs font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 transition-all';
+            }
+        }
+
+        async function enableDiaCeroBrowserAlert() {
+            if (!('Notification' in window)) {
+                if (typeof showToast === 'function') showToast('Tu navegador no soporta notificaciones nativas', 'amber');
+                return;
+            }
+            const perm = await Notification.requestPermission();
+            syncDiaCeroAlertBtnUI();
+            if (perm === 'granted') {
+                if (typeof showToast === 'function') showToast('Te avisaré al instante cuando Yaire escriba o responda', 'emerald');
+            } else if (typeof showToast === 'function') {
+                showToast('Permiso de notificaciones denegado en el navegador', 'amber');
+            }
+        }
+
         function renderDiaCeroStatus(data, notifyOnChange) {
             const badge = document.getElementById('diacero-status-badge');
             const meta = document.getElementById('diacero-meta-text');
             const dev = document.getElementById('diacero-device-text');
             const msgBox = document.getElementById('diacero-message-box');
+            const msgList = document.getElementById('diacero-messages-list');
+            const msgCount = document.getElementById('diacero-msg-count');
             const msgText = document.getElementById('diacero-message-text');
             const card = document.getElementById('diacero-card');
             if (!badge || !meta) return;
 
-            if (!data || (!data.status && !data.message)) {
+            if (!data || (!data.status && !data.message && !data.messages)) {
                 badge.textContent = 'Esperando respuesta';
                 badge.className = 'text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/25';
-                meta.textContent = 'Sin actividad registrada todavía.';
+                meta.textContent = 'Sin actividad registrada todavía · Aquí verás en vivo su avance y lo que te escriba.';
                 if (dev) dev.textContent = '';
+                if (msgList) msgList.innerHTML = '';
+                if (msgCount) msgCount.textContent = '';
                 if (msgBox) msgBox.classList.add('hidden');
                 if (card) card.className = 'yaire-card p-5 sm:p-8 bg-zinc-950 border border-white/5 transition-all duration-500';
                 _lastDiaCeroSig = 'empty';
                 return;
             }
 
-            const sig = JSON.stringify([data.status || '', data.currentAct || '', data.acceptedAt || '', data.message || '', data.updatedAt || '']);
+            /* Construir lista cronológica de mensajes (soporta historial múltiple + mensaje único) */
+            const entries = [];
+            if (data.messages && typeof data.messages === 'object') {
+                Object.values(data.messages).forEach((m) => {
+                    if (m && m.text && String(m.text).trim()) {
+                        entries.push({
+                            text: String(m.text).trim(),
+                            stage: m.stage || 'Mensaje',
+                            sentAt: m.sentAt || data.updatedAt || '',
+                            timestamp: Number(m.timestamp) || 0
+                        });
+                    }
+                });
+                entries.sort((a, b) => a.timestamp - b.timestamp);
+            }
+            if (entries.length === 0 && data.message && String(data.message).trim()) {
+                entries.push({
+                    text: String(data.message).trim(),
+                    stage: data.lastMessageStage || (data.accepted ? 'En Día Cero' : 'Antes de responder'),
+                    sentAt: data.lastMessageAt || data.updatedAt || '',
+                    timestamp: Number(data.timestamp) || 0
+                });
+            }
+
+            const sig = JSON.stringify([data.status || '', data.currentAct || '', data.acceptedAt || '', data.message || '', entries.length, data.updatedAt || '']);
             const changed = _lastDiaCeroSig && _lastDiaCeroSig !== 'empty' && _lastDiaCeroSig !== sig;
             const firstArrival = _lastDiaCeroSig === 'empty' && sig !== 'empty';
             _lastDiaCeroSig = sig;
@@ -4647,19 +4707,63 @@
 
             if (dev) dev.textContent = data.userAgent ? `Dispositivo: ${data.userAgent}` : '';
 
-            if (data.message && String(data.message).trim()) {
-                if (msgText) msgText.textContent = String(data.message).trim();
+            if (entries.length > 0) {
                 if (msgBox) msgBox.classList.remove('hidden');
+                if (msgCount) msgCount.textContent = entries.length === 1 ? '1 mensaje' : `${entries.length} mensajes`;
+                if (msgList) {
+                    msgList.innerHTML = '';
+                    entries.forEach((entry) => {
+                        const item = document.createElement('div');
+                        item.className = 'p-3.5 rounded-xl bg-zinc-900/90 border border-white/10 space-y-1.5';
+
+                        const head = document.createElement('div');
+                        head.className = 'flex flex-wrap items-center justify-between gap-2 text-[11px]';
+
+                        const stageBadge = document.createElement('span');
+                        stageBadge.className = 'font-semibold text-amber-300';
+                        stageBadge.textContent = entry.stage;
+
+                        const timeSpan = document.createElement('span');
+                        timeSpan.className = 'font-mono text-zinc-500';
+                        if (entry.sentAt) {
+                            const td = new Date(entry.sentAt);
+                            timeSpan.textContent = !Number.isNaN(td.getTime())
+                                ? td.toLocaleString('es-VE', { dateStyle: 'short', timeStyle: 'short' })
+                                : '';
+                        }
+
+                        const body = document.createElement('p');
+                        body.className = 'text-sm text-zinc-100 leading-relaxed whitespace-pre-wrap';
+                        body.textContent = entry.text;
+
+                        head.appendChild(stageBadge);
+                        head.appendChild(timeSpan);
+                        item.appendChild(head);
+                        item.appendChild(body);
+                        msgList.appendChild(item);
+                    });
+                }
+                if (msgText) msgText.classList.add('hidden');
             } else if (msgBox) {
                 msgBox.classList.add('hidden');
             }
 
             if (notifyOnChange && (changed || firstArrival) && data.status !== 'reading') {
+                const latestMsg = entries.length > 0 ? entries[entries.length - 1].text : '';
+                const alertTitle = data.accepted ? '¡Yaire dijo que sí en Día Cero!' : 'Nuevo mensaje de Yaire en Día Cero';
                 if (typeof addLog === 'function') {
-                    addLog('Día Cero', data.accepted ? '¡Yaire aceptó empezar desde cero!' : 'Yaire envió un mensaje en Día Cero.', 'emerald-500');
+                    addLog('Día Cero', alertTitle, 'emerald-500');
                 }
                 if (typeof showToast === 'function') {
-                    showToast(data.accepted ? '¡Yaire dijo que sí en Día Cero!' : 'Nuevo mensaje de Yaire en Día Cero', 'emerald');
+                    showToast(alertTitle, 'emerald');
+                }
+                if ('Notification' in window && Notification.permission === 'granted') {
+                    try {
+                        new Notification(alertTitle, {
+                            body: latestMsg || 'Abre el Panel de Administración para verlo en vivo.',
+                            icon: '../assets/logos/logo_28e_oficial.png'
+                        });
+                    } catch (_) {}
                 }
             }
         }
@@ -4677,10 +4781,11 @@
         function initDiaCeroMonitor() {
             if (_diaCeroMonitorStarted) return;
             _diaCeroMonitorStarted = true;
+            syncDiaCeroAlertBtnUI();
             fetchDiaCeroStatus(false);
             setInterval(() => {
-                if (!document.hidden) fetchDiaCeroStatus(true);
-            }, 6000);
+                fetchDiaCeroStatus(true);
+            }, 4000);
             document.addEventListener('visibilitychange', () => {
                 if (!document.hidden) fetchDiaCeroStatus(true);
             });
@@ -4690,6 +4795,11 @@
             if (!window.confirm('¿Seguro que quieres borrar el estado/respuesta actual de Día Cero y dejarlo limpio para Yaire?')) return;
             try {
                 await firebaseFetch('https://yaire-591ca-default-rtdb.firebaseio.com/dia_cero.json', { method: 'DELETE' });
+                try {
+                    localStorage.removeItem('yaire_dia_cero_done');
+                    localStorage.removeItem('yaire_dia_cero_accepted_at');
+                    localStorage.removeItem('yaire_dia_cero_local');
+                } catch (_) {}
                 renderDiaCeroStatus(null, false);
                 if (typeof showToast === 'function') showToast('Estado de Día Cero reiniciado', 'amber');
             } catch (e) {

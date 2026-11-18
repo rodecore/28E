@@ -15,6 +15,10 @@
       ".read": true,
       ".write": "auth != null && auth.token.email_verified == true && auth.token.email == 'theginnomar.x@gmail.com'"
     },
+    "dia_cero": {
+      ".read": true,
+      ".write": true
+    },
     "audit_logs": {
       ".read": "auth != null && auth.token.email_verified == true && auth.token.email == 'theginnomar.x@gmail.com'",
       ".write": "auth != null && auth.token.email_verified == true && auth.token.email == 'theginnomar.x@gmail.com'"

@@ -74,6 +74,7 @@
             --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
             --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
             --ease-apple: cubic-bezier(0.23, 1, 0.32, 1);
+            --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
         }
 
         *,
@@ -303,12 +304,16 @@
             text-align: center;
             gap: 1.45rem;
             opacity: 0;
-            transform: translateY(10px);
+            transform: translate3d(22px, 0, 0) scale(0.988);
             filter: blur(5px);
             transition:
-                opacity 440ms var(--ease-out-expo),
-                transform 440ms var(--ease-out-expo),
-                filter 440ms var(--ease-out-expo);
+                opacity 420ms var(--ease-apple),
+                transform 460ms var(--ease-apple),
+                filter 420ms var(--ease-apple);
+        }
+
+        .act-panel[data-enter-dir="back"] {
+            transform: translate3d(-22px, 0, 0) scale(0.988);
         }
 
         .act-panel.is-mounted {
@@ -317,15 +322,45 @@
 
         .act-panel.is-visible {
             opacity: 1;
-            transform: translateY(0);
+            transform: translate3d(0, 0, 0) scale(1);
             filter: blur(0);
         }
 
         .act-panel.is-leaving {
             opacity: 0;
-            transform: translateY(-8px);
+            transform: translate3d(-20px, 0, 0) scale(0.988);
             filter: blur(4px);
             pointer-events: none;
+        }
+
+        .act-panel.is-leaving[data-leave-dir="back"] {
+            transform: translate3d(20px, 0, 0) scale(0.988);
+        }
+
+        /* Entrada escalonada (stagger) de cada acto */
+        .act-panel .headline,
+        .act-panel .prose-lead,
+        .act-panel .act-interactive {
+            opacity: 0;
+            transform: translate3d(0, 10px, 0);
+            transition:
+                opacity 420ms var(--ease-apple),
+                transform 460ms var(--ease-apple);
+        }
+
+        .act-panel .prose-lead {
+            transition-delay: 55ms;
+        }
+
+        .act-panel .act-interactive {
+            transition-delay: 110ms;
+        }
+
+        .act-panel.is-visible .headline,
+        .act-panel.is-visible .prose-lead,
+        .act-panel.is-visible .act-interactive {
+            opacity: 1;
+            transform: translate3d(0, 0, 0);
         }
 
         .act-narrative {
@@ -373,7 +408,7 @@
             font-size: 0.8125rem;
             color: var(--ink-muted);
             font-variant-numeric: tabular-nums;
-            transition: color 260ms var(--ease-apple);
+            transition: color 260ms var(--ease-apple), transform 240ms var(--ease-apple);
             text-align: center;
         }
 
@@ -381,7 +416,7 @@
             color: var(--accent-amber);
         }
 
-        /* ─── ACTO 1: Riel táctil / cursor de umbral ─── */
+        /* ─── ACTO 1: Riel táctil / cursor de umbral con reflejo especular y muelle ─── */
         .slide-rail {
             position: relative;
             width: 100%;
@@ -398,11 +433,12 @@
             -webkit-user-select: none;
             touch-action: none;
             cursor: pointer;
+            transition: border-color 220ms var(--ease-apple), background-color 220ms var(--ease-apple);
         }
 
         @media (hover: hover) and (pointer: fine) {
             .slide-rail:hover {
-                border-color: rgba(232, 189, 131, 0.36);
+                border-color: rgba(232, 189, 131, 0.42);
                 background: rgba(255, 255, 255, 0.05);
             }
         }
@@ -411,9 +447,23 @@
             position: absolute;
             inset: 0 auto 0 0;
             width: 56px;
-            background: rgba(232, 189, 131, 0.14);
+            background: linear-gradient(90deg, rgba(232, 189, 131, 0.08) 0%, rgba(232, 189, 131, 0.24) 100%);
             border-radius: 999px;
             pointer-events: none;
+        }
+
+        .slide-dock-target {
+            position: absolute;
+            right: 9px;
+            top: 50%;
+            width: 38px;
+            height: 38px;
+            margin-top: -19px;
+            border-radius: 50%;
+            border: 1px dashed rgba(232, 189, 131, 0.28);
+            pointer-events: none;
+            opacity: 0.45;
+            transition: transform 240ms var(--ease-apple), opacity 240ms var(--ease-apple), border-color 240ms var(--ease-apple);
         }
 
         .slide-rail-label {
@@ -426,9 +476,19 @@
             padding-right: 0.75rem;
             font-size: 0.84rem;
             font-weight: 500;
-            color: var(--ink-secondary);
+            background: linear-gradient(110deg, rgba(244, 239, 231, 0.56) 34%, rgba(255, 243, 222, 0.96) 50%, rgba(244, 239, 231, 0.56) 66%);
+            background-size: 220% 100%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: railLabelSheen 4.2s linear infinite;
             pointer-events: none;
             transition: opacity 160ms linear;
+        }
+
+        @keyframes railLabelSheen {
+            0% { background-position: 120% 0; }
+            100% { background-position: -100% 0; }
         }
 
         .slide-thumb {
@@ -440,6 +500,7 @@
             border: 0;
             background: var(--accent-amber);
             color: var(--accent-amber-ink);
+            box-shadow: 0 0 24px rgba(232, 189, 131, 0.28);
             display: inline-flex;
             align-items: center;
             justify-content: center;
@@ -458,9 +519,16 @@
         .slide-thumb svg {
             width: 18px;
             height: 18px;
+            transition: transform 180ms var(--ease-apple);
         }
 
-        /* ─── ACTO 2: Cristal empañado ─── */
+        @media (hover: hover) and (pointer: fine) {
+            .slide-rail:hover .slide-thumb svg {
+                transform: translate3d(2px, 0, 0);
+            }
+        }
+
+        /* ─── ACTO 2: Cristal empañado con refracción cálida ─── */
         .frost-frame {
             position: relative;
             width: 100%;
@@ -468,7 +536,9 @@
             min-height: 10.6rem;
             border-radius: 16px;
             border: 1px solid var(--hairline);
-            background: #090908;
+            background:
+                radial-gradient(65% 80% at 50% 50%, rgba(232, 189, 131, 0.085) 0%, rgba(9, 9, 8, 0) 75%),
+                #090908;
             overflow: hidden;
             display: flex;
             align-items: center;
@@ -477,6 +547,12 @@
             touch-action: none;
             user-select: none;
             -webkit-user-select: none;
+            transition: border-color 420ms var(--ease-apple), box-shadow 420ms var(--ease-apple);
+        }
+
+        .frost-frame.is-revealed {
+            border-color: rgba(232, 189, 131, 0.34);
+            box-shadow: 0 12px 44px -18px rgba(232, 189, 131, 0.22);
         }
 
         .frost-hidden-truth {
@@ -489,6 +565,12 @@
             text-align: center;
             text-wrap: balance;
             pointer-events: none;
+            transform: scale(0.975);
+            transition: transform 520ms var(--ease-apple);
+        }
+
+        .frost-frame.is-revealed .frost-hidden-truth {
+            transform: scale(1);
         }
 
         .frost-hidden-truth em {
@@ -512,7 +594,7 @@
             pointer-events: none;
         }
 
-        /* ─── ACTO 3: Seis roces reales ─── */
+        /* ─── ACTO 3: Seis roces reales con física de resorte e impulso ─── */
         .noise-arena {
             position: relative;
             width: 100%;
@@ -547,49 +629,30 @@
             -webkit-user-select: none;
             -webkit-touch-callout: none;
             touch-action: none;
-            animation: chipDrift 5.2s ease-in-out infinite alternate;
+            will-change: transform, opacity;
             transition:
-                opacity 380ms var(--ease-out-expo),
-                transform 380ms var(--ease-out-expo),
-                filter 380ms var(--ease-out-expo),
+                opacity 360ms var(--ease-apple),
+                filter 360ms var(--ease-apple),
                 border-color 180ms var(--ease-apple),
-                background-color 180ms var(--ease-apple);
-        }
-
-        .noise-chip:nth-child(2n) {
-            animation-delay: -1.7s;
-        }
-
-        .noise-chip:nth-child(3n) {
-            animation-delay: -3.1s;
-        }
-
-        @keyframes chipDrift {
-            0% {
-                transform: translate3d(0, -2.5px, 0);
-            }
-            100% {
-                transform: translate3d(0, 3px, 0);
-            }
+                background-color 180ms var(--ease-apple),
+                color 180ms var(--ease-apple);
         }
 
         @media (hover: hover) and (pointer: fine) {
             .noise-chip:hover {
-                border-color: rgba(232, 189, 131, 0.48);
-                background: rgba(232, 189, 131, 0.09);
+                border-color: rgba(232, 189, 131, 0.52);
+                background: rgba(232, 189, 131, 0.10);
                 color: var(--ink-primary);
             }
         }
 
         .noise-chip.is-dissolved {
             opacity: 0;
-            transform: translateY(-14px) scale(0.88);
-            filter: blur(7px);
+            filter: blur(8px);
             pointer-events: none;
-            animation: none;
         }
 
-        /* ─── ACTO 4: Pausa respirada ─── */
+        /* ─── ACTO 4: Pausa respirada con triple onda armónica ─── */
         .breath-stage {
             display: flex;
             flex-direction: column;
@@ -614,6 +677,7 @@
             -webkit-user-select: none;
             -webkit-touch-callout: none;
             touch-action: none;
+            will-change: transform;
             transition: border-color 240ms var(--ease-apple), background-color 240ms var(--ease-apple);
         }
 
@@ -624,15 +688,27 @@
             }
         }
 
-        .breath-halo {
+        .breath-halo,
+        .breath-halo-mid,
+        .breath-halo-outer {
             position: absolute;
             inset: -1px;
             border-radius: 50%;
-            border: 1.5px solid rgba(232, 189, 131, 0.42);
+            border: 1.4px solid rgba(232, 189, 131, 0.42);
             transform: scale(0.72);
-            opacity: 0.35;
+            opacity: 0.28;
             pointer-events: none;
             will-change: transform, opacity;
+        }
+
+        .breath-halo-mid {
+            border-color: rgba(230, 154, 184, 0.30);
+            opacity: 0.18;
+        }
+
+        .breath-halo-outer {
+            border-color: rgba(232, 189, 131, 0.22);
+            opacity: 0.12;
         }
 
         .breath-ring-svg {
@@ -649,14 +725,15 @@
             height: 14px;
             border-radius: 50%;
             background: var(--accent-amber);
-            transition: transform 240ms var(--ease-out-expo);
+            box-shadow: 0 0 18px rgba(232, 189, 131, 0.45);
+            transition: transform 240ms var(--ease-apple);
         }
 
         .breath-orb-btn.is-holding .breath-core-dot {
-            transform: scale(1.35);
+            transform: scale(1.42);
         }
 
-        /* ─── ACTO 5: Balanza Mi Orgullo -> Nosotros Dos ─── */
+        /* ─── ACTO 5: Balanza física con fulcro y resorte ─── */
         .balance-box {
             width: 100%;
             max-width: 32rem;
@@ -665,6 +742,30 @@
             border-bottom: 1px solid var(--hairline);
             user-select: none;
             -webkit-user-select: none;
+        }
+
+        .balance-beam {
+            position: relative;
+            padding-bottom: 0.55rem;
+            border-bottom: 1px solid rgba(247, 244, 238, 0.09);
+            transform-origin: 50% 100%;
+            will-change: transform;
+        }
+
+        .balance-fulcrum {
+            display: flex;
+            justify-content: center;
+            margin-top: -0.45rem;
+            font-size: 0.72rem;
+            line-height: 1;
+            color: var(--ink-faint);
+            pointer-events: none;
+            transition: color 240ms var(--ease-apple), transform 240ms var(--ease-apple);
+        }
+
+        .balance-fulcrum.is-level {
+            color: var(--accent-amber);
+            transform: scale(1.22);
         }
 
         .balance-meters {
@@ -833,20 +934,23 @@
         .bridge-node.node-yai {
             border-color: rgba(230, 154, 184, 0.65);
             color: #f6d5e3;
+            box-shadow: 0 0 22px rgba(230, 154, 184, 0.12);
         }
 
         .bridge-node.node-yo {
             border-color: rgba(232, 189, 131, 0.65);
             color: #f5dfc0;
+            box-shadow: 0 0 22px rgba(232, 189, 131, 0.12);
         }
 
         .bridge-arena.is-united .bridge-node {
             border-color: var(--accent-amber);
             background: rgba(232, 189, 131, 0.18);
             color: var(--ink-primary);
+            box-shadow: 0 0 32px rgba(232, 189, 131, 0.28);
         }
 
-        /* ─── ACTO 7: Tres certezas (Swipe en celular + Flechas/Arrastre en PC) ─── */
+        /* ─── ACTO 7: Tres certezas con emblemas botánicos trazados ─── */
         .truths-carousel-wrap {
             width: 100%;
             max-width: 34rem;
@@ -916,6 +1020,11 @@
             touch-action: pan-x;
             border-top: 1px solid var(--hairline);
             border-bottom: 1px solid var(--hairline);
+            cursor: grab;
+        }
+
+        .truths-track:active {
+            cursor: grabbing;
         }
 
         .truths-track::-webkit-scrollbar {
@@ -925,12 +1034,43 @@
         .truth-slide {
             flex: 0 0 100%;
             scroll-snap-align: center;
-            padding: 1.5rem 0.65rem;
+            padding: 1.35rem 0.65rem 1.45rem;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             text-align: center;
+        }
+
+        .truth-emblem {
+            width: 30px;
+            height: 30px;
+            margin-bottom: 0.68rem;
+            color: var(--accent-amber);
+            opacity: 0.5;
+            transform: scale(0.92);
+            transition: opacity 420ms var(--ease-apple), transform 420ms var(--ease-apple);
+        }
+
+        .truth-emblem .emblem-tulip {
+            color: var(--accent-tulip);
+        }
+
+        .truth-emblem path,
+        .truth-emblem circle {
+            stroke-dasharray: 90;
+            stroke-dashoffset: 90;
+            transition: stroke-dashoffset 820ms var(--ease-out-expo);
+        }
+
+        .truth-slide.is-revealed .truth-emblem {
+            opacity: 0.94;
+            transform: scale(1);
+        }
+
+        .truth-slide.is-revealed .truth-emblem path,
+        .truth-slide.is-revealed .truth-emblem circle {
+            stroke-dashoffset: 0;
         }
 
         .truth-quote {
@@ -974,7 +1114,12 @@
             transition:
                 background-color 180ms var(--ease-apple),
                 border-color 180ms var(--ease-apple),
-                color 180ms var(--ease-apple);
+                color 180ms var(--ease-apple),
+                transform 120ms var(--ease-apple);
+        }
+
+        .truth-pill-btn:active {
+            transform: scale(0.95);
         }
 
         @media (hover: hover) and (pointer: fine) {
@@ -990,7 +1135,7 @@
             color: var(--ink-primary);
         }
 
-        /* ─── ACTO 8: Cuatro acuerdos reales ─── */
+        /* ─── ACTO 8: Cuatro acuerdos reales con trazo luminoso ─── */
         .promises-list {
             width: 100%;
             max-width: 36rem;
@@ -999,6 +1144,7 @@
         }
 
         .promise-row {
+            position: relative;
             width: 100%;
             appearance: none;
             background: transparent;
@@ -1020,7 +1166,25 @@
             transition:
                 border-color 280ms var(--ease-apple),
                 background-color 180ms var(--ease-apple),
-                opacity 200ms var(--ease-apple);
+                transform 120ms var(--ease-apple);
+        }
+
+        .promise-row::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: -1px;
+            height: 1px;
+            background: linear-gradient(90deg, var(--accent-amber) 0%, rgba(230, 154, 184, 0.55) 100%);
+            transform: scaleX(0);
+            transform-origin: left center;
+            transition: transform 460ms var(--ease-out-expo);
+            pointer-events: none;
+        }
+
+        .promise-row.is-lit::after {
+            transform: scaleX(1);
         }
 
         @media (hover: hover) and (pointer: fine) {
@@ -1036,7 +1200,7 @@
         }
 
         .promise-row:active {
-            opacity: 0.82;
+            transform: scale(0.992);
         }
 
         .promise-beacon {
@@ -1061,6 +1225,12 @@
             height: 11px;
         }
 
+        .promise-beacon svg path {
+            stroke-dasharray: 24;
+            stroke-dashoffset: 24;
+            transition: stroke-dashoffset 320ms 70ms var(--ease-out-expo);
+        }
+
         .promise-title {
             font-size: 0.94rem;
             font-weight: 600;
@@ -1074,9 +1244,9 @@
             grid-template-rows: 0fr;
             opacity: 0;
             transition:
-                grid-template-rows 320ms var(--ease-out-expo),
-                opacity 280ms var(--ease-out-expo),
-                margin-top 280ms var(--ease-out-expo);
+                grid-template-rows 320ms var(--ease-drawer),
+                opacity 260ms var(--ease-apple),
+                margin-top 260ms var(--ease-drawer);
         }
 
         .promise-detail-inner {
@@ -1090,15 +1260,15 @@
             text-wrap: pretty;
         }
 
-        .promise-row.is-lit {
-            border-bottom-color: var(--hairline-lit);
-        }
-
         .promise-row.is-lit .promise-beacon {
             background: var(--accent-amber);
             border-color: var(--accent-amber);
             color: var(--accent-amber-ink);
-            transform: scale(1.04);
+            transform: scale(1.06);
+        }
+
+        .promise-row.is-lit .promise-beacon svg path {
+            stroke-dashoffset: 0;
         }
 
         .promise-row.is-lit .promise-title {
@@ -1119,7 +1289,7 @@
             }
         }
 
-        /* ─── ACTO 9: Rebobinar a 00:00:00 ─── */
+        /* ─── ACTO 9: Rebobinar a 00:00:00 con inercia ─── */
         .rewind-box {
             width: 100%;
             max-width: 30rem;
@@ -1139,11 +1309,13 @@
             color: var(--ink-primary);
             font-variant-numeric: tabular-nums;
             font-feature-settings: "tnum" 1;
+            will-change: transform;
             transition: color 280ms var(--ease-apple);
         }
 
         .rewind-digits.is-zero {
             color: var(--accent-amber);
+            text-shadow: 0 0 28px rgba(232, 189, 131, 0.28);
         }
 
         .rewind-caption {
@@ -1152,13 +1324,43 @@
             color: var(--ink-muted);
         }
 
-        /* ─── ACTO 10: Sello mantenido ─── */
+        /* ─── ACTO 10: Sello mantenido con anillo orbital y cajón fluido ─── */
         .seal-stage {
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 0.85rem;
             padding: 0.35rem 0;
+        }
+
+        .seal-orbit-wrap {
+            position: relative;
+            width: 126px;
+            height: 126px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            will-change: transform;
+        }
+
+        .seal-orbit-ring {
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            border: 1px dashed rgba(232, 189, 131, 0.24);
+            pointer-events: none;
+            animation: slowOrbitSpin 22s linear infinite;
+            transition: border-color 240ms var(--ease-apple), transform 260ms var(--ease-apple);
+        }
+
+        @keyframes slowOrbitSpin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .seal-orbit-wrap.is-holding .seal-orbit-ring {
+            border-color: rgba(232, 189, 131, 0.58);
+            animation-duration: 5.5s;
         }
 
         .seal-button {
@@ -1177,19 +1379,21 @@
             -webkit-user-select: none;
             -webkit-touch-callout: none;
             touch-action: none;
-            transition: transform 220ms var(--ease-out-expo), background-color 240ms var(--ease-apple);
+            will-change: transform;
+            transition: transform 220ms var(--ease-apple), background-color 240ms var(--ease-apple), box-shadow 240ms var(--ease-apple);
         }
 
         @media (hover: hover) and (pointer: fine) {
             .seal-button:hover {
                 background: rgba(232, 189, 131, 0.12);
+                box-shadow: 0 0 36px rgba(232, 189, 131, 0.18);
                 transform: scale(1.03);
             }
         }
 
         .seal-button.is-holding {
-            transform: scale(1.07);
-            background: rgba(232, 189, 131, 0.15);
+            background: rgba(232, 189, 131, 0.16);
+            box-shadow: 0 0 44px rgba(232, 189, 131, 0.30);
         }
 
         .seal-ring-svg {
@@ -1212,11 +1416,11 @@
         .seal-emblem {
             width: 30px;
             height: 30px;
-            transition: transform 220ms var(--ease-out-expo), color 220ms var(--ease-apple);
+            transition: transform 220ms var(--ease-apple), color 220ms var(--ease-apple);
         }
 
         .seal-button.is-holding .seal-emblem {
-            transform: scale(1.12);
+            transform: scale(1.14);
             color: var(--ink-primary);
         }
 
@@ -1233,15 +1437,29 @@
         .first-note-drawer {
             width: 100%;
             max-width: 30rem;
-            margin-top: 0.75rem;
-            display: none;
-            flex-direction: column;
-            gap: 0.7rem;
+            display: grid;
+            grid-template-rows: 0fr;
+            opacity: 0;
+            margin-top: 0;
+            transition:
+                grid-template-rows 340ms var(--ease-drawer),
+                opacity 260ms var(--ease-apple),
+                margin-top 340ms var(--ease-drawer);
             text-align: left;
         }
 
-        .first-note-drawer.is-open {
+        .first-note-drawer-inner {
+            overflow: hidden;
             display: flex;
+            flex-direction: column;
+            gap: 0.7rem;
+            padding: 2px;
+        }
+
+        .first-note-drawer.is-open {
+            grid-template-rows: 1fr;
+            opacity: 1;
+            margin-top: 0.75rem;
         }
 
         /* ─── EPÍLOGO: Reloj ascendente + Mensaje ─── */
@@ -1532,6 +1750,11 @@
                 height: 96px;
             }
 
+            .seal-orbit-wrap {
+                width: 104px;
+                height: 104px;
+            }
+
             .seal-button {
                 width: 88px;
                 height: 88px;
@@ -1684,14 +1907,25 @@
         }
 
         @media (prefers-reduced-motion: reduce) {
-            .noise-chip {
+            .noise-chip,
+            .slide-rail-label,
+            .seal-orbit-ring {
                 animation: none;
             }
+            .slide-rail-label {
+                background: none;
+                color: var(--ink-secondary);
+            }
             .act-panel,
+            .act-panel .headline,
+            .act-panel .prose-lead,
+            .act-panel .act-interactive,
             .monolith-shell,
             .promise-detail-wrap,
+            .first-note-drawer,
             .seal-button {
                 transition-duration: 140ms;
+                transition-delay: 0ms !important;
                 transform: none !important;
                 filter: none !important;
             }
@@ -1745,6 +1979,7 @@
                 <div class="act-interactive">
                     <div id="threshold-rail" class="slide-rail" role="slider" tabindex="0" aria-label="Desliza hacia la derecha para leerme" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
                         <div id="threshold-fill" class="slide-rail-fill" aria-hidden="true"></div>
+                        <div id="threshold-dock" class="slide-dock-target" aria-hidden="true"></div>
                         <span id="threshold-label" class="slide-rail-label"
                             data-touch="Desliza con calma para leerme"
                             data-fine="Arrastra hacia la derecha para leerme">Desliza con calma para leerme</span>
@@ -1832,6 +2067,8 @@
                 <div class="act-interactive">
                     <div class="breath-stage">
                         <button id="breath-btn" type="button" class="breath-orb-btn" aria-label="Mantén presionado tres segundos para bajar la guardia">
+                            <span id="breath-halo-outer" class="breath-halo-outer" aria-hidden="true"></span>
+                            <span id="breath-halo-mid" class="breath-halo-mid" aria-hidden="true"></span>
                             <span id="breath-halo" class="breath-halo" aria-hidden="true"></span>
                             <svg class="breath-ring-svg" viewBox="0 0 122 122" fill="none" aria-hidden="true">
                                 <circle cx="61" cy="61" r="56" stroke="rgba(247,244,238,0.12)" stroke-width="1.5"></circle>
@@ -1857,16 +2094,19 @@
 
                 <div class="act-interactive">
                     <div class="balance-box">
-                        <div class="balance-meters">
-                            <div class="balance-side">
-                                <span class="balance-name">Orgullo y dudas</span>
-                                <span id="pride-pct" class="balance-pct">100%</span>
-                            </div>
-                            <div class="balance-side is-right">
-                                <span class="balance-name">Confiar en ti</span>
-                                <span id="us-pct" class="balance-pct">0%</span>
+                        <div id="balance-beam" class="balance-beam">
+                            <div class="balance-meters">
+                                <div class="balance-side">
+                                    <span class="balance-name">Orgullo y dudas</span>
+                                    <span id="pride-pct" class="balance-pct">100%</span>
+                                </div>
+                                <div class="balance-side is-right">
+                                    <span class="balance-name">Confiar en ti</span>
+                                    <span id="us-pct" class="balance-pct">0%</span>
+                                </div>
                             </div>
                         </div>
+                        <div id="balance-fulcrum" class="balance-fulcrum" aria-hidden="true">◇</div>
 
                         <div id="balance-track" class="scrubber-track" role="slider" tabindex="0" aria-label="Bajar orgullo y dudas a cero y subir confiar en ti al cien por ciento" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
                             <div class="scrubber-line">
@@ -1945,17 +2185,31 @@
                             </button>
 
                             <div id="truths-track" class="truths-track" aria-label="Tres certezas para Yaire">
-                                <article class="truth-slide">
+                                <article class="truth-slide is-revealed">
+                                    <svg class="truth-emblem" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                        <circle cx="14" cy="14" r="3.4"></circle>
+                                        <path d="M14 3.5v4.2M14 20.3v4.2M3.5 14h4.2M20.3 14h4.2M6.6 6.6l3 3M18.4 18.4l3 3M21.4 6.6l-3 3M9.6 18.4l-3 3"></path>
+                                    </svg>
                                     <p class="truth-quote">
                                         Ese Charles bien cónchale que te dio aquel girasol en Hevvo un 28 de enero nunca se fue: <em>sigue loco por ti, princesa.</em>
                                     </p>
                                 </article>
                                 <article class="truth-slide">
+                                    <svg class="truth-emblem" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                        <circle cx="14" cy="14" r="2.2"></circle>
+                                        <path d="M4.2 14c0-3.2 4.4-5.8 9.8-5.8s9.8 2.6 9.8 5.8-4.4 5.8-9.8 5.8-9.8-2.6-9.8-5.8z"></path>
+                                        <path class="emblem-tulip" d="M14 4.2c3.2 0 5.8 4.4 5.8 9.8s-2.6 9.8-5.8 9.8-5.8-4.4-5.8-9.8 2.6-9.8 5.8-9.8z"></path>
+                                    </svg>
                                     <p class="truth-quote">
                                         Jamás has sido una carga y nadie ocupa tu lugar: todo lo que creo nace porque <em>tú me importas más que mi orgullo.</em>
                                     </p>
                                 </article>
                                 <article class="truth-slide">
+                                    <svg class="truth-emblem" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                        <circle cx="9.5" cy="11" r="2.6"></circle>
+                                        <path d="M9.5 5.2v2.1M9.5 14.7v8.3M4.2 11h2.1M12.8 11h2.1"></path>
+                                        <path class="emblem-tulip" d="M18.5 15.2c-2.6 0-4.2-2.1-4.2-4.8 0-1.9.7-3.4 1.6-4.2l2.6 2.3 2.6-2.3c.9.8 1.6 2.3 1.6 4.2 0 2.7-1.6 4.8-4.2 4.8zM18.5 15.2V23"></path>
+                                    </svg>
                                     <p class="truth-quote">
                                         Admiro cómo luchas cada día por tu mamá y tus sueños; hoy quiero cuidar <em>nuestro mundo de girasoles y tulipanes</em> con hechos.
                                     </p>
@@ -2123,15 +2377,18 @@
 
                 <div class="act-interactive">
                     <div class="seal-stage">
-                        <button id="seal-btn" type="button" class="seal-button" aria-label="Mantén presionado dos segundos para decirme que sí">
-                            <svg class="seal-ring-svg" viewBox="0 0 106 106" fill="none" aria-hidden="true">
-                                <circle class="seal-ring-track" cx="53" cy="53" r="49" stroke-width="1.6"></circle>
-                                <circle id="seal-progress-circle" class="seal-ring-progress" cx="53" cy="53" r="49" stroke-width="2.3" stroke-linecap="round" stroke-dasharray="307.88" stroke-dashoffset="307.88"></circle>
-                            </svg>
-                            <svg class="seal-emblem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                <path d="M12 20.5s-7-4.35-7-10.1A4.15 4.15 0 0 1 9.15 6.2c1.32 0 2.28.62 2.85 1.45.57-.83 1.53-1.45 2.85-1.45A4.15 4.15 0 0 1 19 10.4c0 5.75-7 10.1-7 10.1z"></path>
-                            </svg>
-                        </button>
+                        <div id="seal-orbit-wrap" class="seal-orbit-wrap">
+                            <span class="seal-orbit-ring" aria-hidden="true"></span>
+                            <button id="seal-btn" type="button" class="seal-button" aria-label="Mantén presionado dos segundos para decirme que sí">
+                                <svg class="seal-ring-svg" viewBox="0 0 106 106" fill="none" aria-hidden="true">
+                                    <circle class="seal-ring-track" cx="53" cy="53" r="49" stroke-width="1.6"></circle>
+                                    <circle id="seal-progress-circle" class="seal-ring-progress" cx="53" cy="53" r="49" stroke-width="2.3" stroke-linecap="round" stroke-dasharray="307.88" stroke-dashoffset="307.88"></circle>
+                                </svg>
+                                <svg class="seal-emblem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <path d="M12 20.5s-7-4.35-7-10.1A4.15 4.15 0 0 1 9.15 6.2c1.32 0 2.28.62 2.85 1.45.57-.83 1.53-1.45 2.85-1.45A4.15 4.15 0 0 1 19 10.4c0 5.75-7 10.1-7 10.1z"></path>
+                                </svg>
+                            </button>
+                        </div>
                         <p id="seal-hint" class="seal-hint"
                             data-touch="Mantén presionado el sello dos segundos para decirme que sí"
                             data-fine="Mantén clic sobre el sello dos segundos (o Espacio) para decirme que sí">Mantén presionado el sello dos segundos para decirme que sí</p>
@@ -2142,11 +2399,13 @@
                     </div>
 
                     <div id="talk-first-drawer" class="first-note-drawer">
-                        <textarea id="talk-first-input" class="reply-textarea" maxlength="600" enterkeyhint="send" placeholder="Escríbeme con total confianza lo que sientes, princesa…"></textarea>
-                        <div class="act-actions" style="margin-top: 0.2rem; justify-content: flex-end;">
-                            <button id="send-talk-first-btn" type="button" class="btn-primary">
-                                <span id="send-talk-first-label">Enviarle mi mensaje</span>
-                            </button>
+                        <div class="first-note-drawer-inner">
+                            <textarea id="talk-first-input" class="reply-textarea" maxlength="600" enterkeyhint="send" placeholder="Escríbeme con total confianza lo que sientes, princesa…"></textarea>
+                            <div class="act-actions" style="margin-top: 0.2rem; justify-content: flex-end;">
+                                <button id="send-talk-first-btn" type="button" class="btn-primary">
+                                    <span id="send-talk-first-label">Enviarle mi mensaje</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -2321,6 +2580,47 @@
                 }
             }
 
+            async function appendDiaCeroMessage(text, stageLabel, extraFields) {
+                const nowIso = new Date().toISOString();
+                const deviceLabel = /Mobile|Android|iPhone|iPad/i.test(navigator.userAgent) ? 'Móvil' : 'PC / Escritorio';
+                const msgId = 'm_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
+                const entry = {
+                    id: msgId,
+                    text: text,
+                    stage: stageLabel,
+                    sentAt: nowIso,
+                    timestamp: Date.now(),
+                    device: deviceLabel
+                };
+
+                await sendDiaCeroPayload(Object.assign({
+                    message: text,
+                    lastMessageStage: stageLabel,
+                    lastMessageAt: nowIso
+                }, extraFields || {}));
+
+                if (isPreview) return true;
+
+                try {
+                    const msgUrl = 'https://yaire-591ca-default-rtdb.firebaseio.com/dia_cero/messages/' + msgId + '.json';
+                    await fetch(msgUrl, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(entry)
+                    });
+                    return true;
+                } catch (_) {
+                    return false;
+                }
+            }
+
+            /* Función de resistencia elástica en bordes (Apple rubber-band) */
+            function rubberband(overshoot, dimension, constant) {
+                const c = constant || 0.42;
+                const d = Math.max(1, dimension);
+                return (overshoot * d * c) / (d + c * Math.abs(overshoot));
+            }
+
             /* ─── 2. Campo óptico OLED (WebGL1 dithered, 0 audio) ─── */
             const auraCanvas = document.getElementById('oled-aura');
             let auraTargetWarmth = 0.0;
@@ -2329,8 +2629,17 @@
             let auraTargetBoost = 0.0;
             let pointerTarget = { x: 0.5, y: 0.52 };
             let pointerCurrent = { x: 0.5, y: 0.52 };
+            let ptrScreen = { x: window.innerWidth * 0.5, y: window.innerHeight * 0.5, vx: 0, vy: 0, lastT: performance.now() };
 
             window.addEventListener('pointermove', (e) => {
+                const now = performance.now();
+                const dt = Math.max(4, now - ptrScreen.lastT);
+                ptrScreen.vx = ((e.clientX - ptrScreen.x) / dt) * 16;
+                ptrScreen.vy = ((e.clientY - ptrScreen.y) / dt) * 16;
+                ptrScreen.x = e.clientX;
+                ptrScreen.y = e.clientY;
+                ptrScreen.lastT = now;
+
                 pointerTarget.x = e.clientX / Math.max(1, window.innerWidth);
                 pointerTarget.y = e.clientY / Math.max(1, window.innerHeight);
             }, { passive: true });
@@ -2364,7 +2673,7 @@
                     'float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123); }',
                     'void main(){',
                     '  vec2 uv = gl_FragCoord.xy / u_res;',
-                    '  vec2 center = vec2(0.5 + (u_ptr.x - 0.5) * 0.10, 0.48 + (u_ptr.y - 0.5) * 0.08);',
+                    '  vec2 center = vec2(0.5 + (u_ptr.x - 0.5) * 0.11, 0.48 + (u_ptr.y - 0.5) * 0.09);',
                     '  vec2 d = (uv - center) * vec2(u_res.x / max(1.0, u_res.y), 1.0);',
                     '  float dist = length(d);',
                     '  float breathe = sin(u_time * 0.5) * 0.02;',
@@ -2435,10 +2744,12 @@
                 requestAnimationFrame(renderAura);
             })();
 
-            /* ─── 3. Partículas 2D a 60 FPS ─── */
+            /* ─── 3. Motor físico 2D: polvo estelar interactivo, ondas de choque, gotas y pétalos ─── */
             const moteCanvas = document.getElementById('mote-canvas');
             const moteCtx = moteCanvas ? moteCanvas.getContext('2d') : null;
             const motes = [];
+            const shockRings = [];
+            const ambientDust = [];
 
             function resizeMotes() {
                 if (!moteCanvas) return;
@@ -2450,49 +2761,151 @@
             window.addEventListener('resize', resizeMotes, { passive: true });
             resizeMotes();
 
-            function spawnMotes(x, y, count, warmPalette) {
+            if (!prefersReducedMotion) {
+                const dustCount = window.innerWidth >= 1024 ? 14 : 8;
+                for (let i = 0; i < dustCount; i++) {
+                    ambientDust.push({
+                        x: Math.random() * window.innerWidth,
+                        y: Math.random() * window.innerHeight,
+                        vx: (Math.random() - 0.5) * 0.18,
+                        vy: -0.08 - Math.random() * 0.16,
+                        r: 0.9 + Math.random() * 1.35,
+                        phase: Math.random() * Math.PI * 2,
+                        warm: i % 2 === 0
+                    });
+                }
+            }
+
+            function spawnRing(x, y, maxRadius, warmTone) {
                 if (prefersReducedMotion || !moteCtx) return;
+                shockRings.push({
+                    x: x,
+                    y: y,
+                    r: 12,
+                    maxR: maxRadius || 110,
+                    life: 1,
+                    color: warmTone === 'tulip' ? '230, 154, 184' : '232, 189, 131'
+                });
+            }
+
+            function spawnMotes(x, y, count, warmPalette, opts) {
+                if (prefersReducedMotion || !moteCtx) return;
+                const options = opts || {};
+                const spreadX = options.spreadX != null ? options.spreadX : 40;
+                const spreadY = options.spreadY != null ? options.spreadY : 16;
+                const gravity = options.gravity != null ? options.gravity : -0.012;
+                const asPetals = !!options.petals;
+
                 for (let i = 0; i < count; i++) {
                     const angle = Math.random() * Math.PI * 2;
-                    const speed = 0.45 + Math.random() * 2.2;
+                    const speed = (options.speedBase || 0.5) + Math.random() * (options.speedRange || 2.3);
                     motes.push({
-                        x: x + (Math.random() - 0.5) * 40,
-                        y: y + (Math.random() - 0.5) * 16,
-                        vx: Math.cos(angle) * speed * 0.68,
-                        vy: -0.65 - Math.random() * 1.85,
-                        size: 1.2 + Math.random() * 2.1,
+                        x: x + (Math.random() - 0.5) * spreadX,
+                        y: y + (Math.random() - 0.5) * spreadY,
+                        vx: Math.cos(angle) * speed * 0.72 + (options.biasVx || 0),
+                        vy: (options.droplet ? (0.3 + Math.random() * 1.1) : (-0.65 - Math.random() * 1.9)) + (options.biasVy || 0),
+                        gravity: gravity,
+                        drag: options.droplet ? 0.985 : 0.992,
+                        size: asPetals ? (2.2 + Math.random() * 2.6) : (1.15 + Math.random() * 2.1),
+                        rot: Math.random() * Math.PI * 2,
+                        vRot: (Math.random() - 0.5) * 0.12,
+                        petal: asPetals && i % 2 === 0,
                         life: 1,
-                        decay: 0.015 + Math.random() * 0.015,
+                        decay: (options.decayBase || 0.014) + Math.random() * 0.014,
                         color: warmPalette
-                            ? (Math.random() > 0.42 ? '232, 189, 131' : '230, 154, 184')
+                            ? (Math.random() > 0.40 ? '232, 189, 131' : '230, 154, 184')
                             : '247, 244, 238'
                     });
                 }
             }
 
-            (function renderMotes() {
-                if (moteCtx && moteCanvas) {
-                    moteCtx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+            (function renderMotes(now) {
+                if (moteCtx && moteCanvas && !document.hidden) {
+                    const W = window.innerWidth;
+                    const H = window.innerHeight;
+                    moteCtx.clearRect(0, 0, W, H);
+
+                    /* Polvo estelar ambiental con estela fluida ante el dedo/cursor */
+                    for (let i = 0; i < ambientDust.length; i++) {
+                        const d = ambientDust[i];
+                        const dx = d.x - ptrScreen.x;
+                        const dy = d.y - ptrScreen.y;
+                        const distSq = dx * dx + dy * dy;
+                        if (distSq < 14400 && distSq > 4) {
+                            const dist = Math.sqrt(distSq);
+                            const push = (1 - dist / 120) * 0.045;
+                            d.vx += (dx / dist) * push + ptrScreen.vx * 0.003;
+                            d.vy += (dy / dist) * push + ptrScreen.vy * 0.003;
+                        }
+                        d.vx *= 0.985;
+                        d.vy = d.vy * 0.985 - 0.0022;
+                        d.x += d.vx + Math.sin((now || 0) * 0.0007 + d.phase) * 0.12;
+                        d.y += d.vy;
+                        if (d.y < -10) { d.y = H + 10; d.x = Math.random() * W; }
+                        if (d.x < -10) d.x = W + 10;
+                        if (d.x > W + 10) d.x = -10;
+
+                        const twinkle = 0.11 + 0.09 * Math.sin((now || 0) * 0.0018 + d.phase);
+                        const col = auraCurrentWarmth > 0.35
+                            ? (d.warm ? '232, 189, 131' : '230, 154, 184')
+                            : '244, 239, 231';
+                        moteCtx.fillStyle = 'rgba(' + col + ',' + twinkle.toFixed(3) + ')';
+                        moteCtx.beginPath();
+                        moteCtx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
+                        moteCtx.fill();
+                    }
+                    ptrScreen.vx *= 0.9;
+                    ptrScreen.vy *= 0.9;
+
+                    /* Ondas de choque radiales (hairline shockwaves) */
+                    for (let i = shockRings.length - 1; i >= 0; i--) {
+                        const sr = shockRings[i];
+                        sr.r += (sr.maxR - sr.r) * 0.11;
+                        sr.life -= 0.028;
+                        if (sr.life <= 0) {
+                            shockRings.splice(i, 1);
+                            continue;
+                        }
+                        moteCtx.strokeStyle = 'rgba(' + sr.color + ',' + (sr.life * 0.46).toFixed(3) + ')';
+                        moteCtx.lineWidth = 1.25;
+                        moteCtx.beginPath();
+                        moteCtx.arc(sr.x, sr.y, sr.r, 0, Math.PI * 2);
+                        moteCtx.stroke();
+                    }
+
+                    /* Partículas, gotas de condensación y pétalos botánicos */
                     for (let i = motes.length - 1; i >= 0; i--) {
                         const m = motes[i];
+                        m.vx *= m.drag;
+                        m.vy = m.vy * m.drag + m.gravity;
                         m.x += m.vx;
                         m.y += m.vy;
-                        m.vy -= 0.011;
+                        m.rot += m.vRot;
                         m.life -= m.decay;
                         if (m.life <= 0) {
                             motes.splice(i, 1);
                             continue;
                         }
-                        moteCtx.fillStyle = 'rgba(' + m.color + ',' + (m.life * 0.84).toFixed(3) + ')';
-                        moteCtx.beginPath();
-                        moteCtx.arc(m.x, m.y, m.size, 0, Math.PI * 2);
-                        moteCtx.fill();
+                        moteCtx.fillStyle = 'rgba(' + m.color + ',' + (m.life * 0.86).toFixed(3) + ')';
+                        if (m.petal) {
+                            moteCtx.save();
+                            moteCtx.translate(m.x, m.y);
+                            moteCtx.rotate(m.rot);
+                            moteCtx.beginPath();
+                            moteCtx.ellipse(0, 0, m.size * 1.35, m.size * 0.62, 0, 0, Math.PI * 2);
+                            moteCtx.fill();
+                            moteCtx.restore();
+                        } else {
+                            moteCtx.beginPath();
+                            moteCtx.arc(m.x, m.y, m.size, 0, Math.PI * 2);
+                            moteCtx.fill();
+                        }
                     }
                 }
                 requestAnimationFrame(renderMotes);
-            })();
+            })(performance.now());
 
-            /* ─── 4. Orquestador de los 10 Actos + Navegación PC/Teclado/Barra ─── */
+            /* ─── 4. Orquestador de los 10 Actos con dirección espacial coherente ─── */
             let currentAct = 1;
             let transitioningAct = false;
             const actMountHooks = {};
@@ -2521,6 +2934,7 @@
                 const toEl = document.getElementById('act-' + nextAct);
                 if (!fromEl || !toEl) return;
 
+                const dir = nextAct > currentAct ? 'forward' : 'back';
                 transitioningAct = true;
                 currentAct = nextAct;
 
@@ -2538,13 +2952,17 @@
                 syncChrome(nextAct);
 
                 auraTargetWarmth = Math.min(1.0, (nextAct - 1) / 9.0);
-                auraTargetBoost = nextAct === 11 ? 0.34 : 0.0;
+                auraTargetBoost = nextAct === 11 ? 0.36 : 0.0;
+
+                fromEl.setAttribute('data-leave-dir', dir);
+                toEl.setAttribute('data-enter-dir', dir);
 
                 fromEl.classList.remove('is-visible');
                 fromEl.classList.add('is-leaving');
 
                 setTimeout(() => {
                     fromEl.classList.remove('is-mounted', 'is-leaving');
+                    fromEl.removeAttribute('data-leave-dir');
                     fromEl.hidden = true;
 
                     if (stageViewport) stageViewport.scrollTop = 0;
@@ -2561,7 +2979,7 @@
                             transitioningAct = false;
                         });
                     });
-                }, prefersReducedMotion ? 110 : 280);
+                }, prefersReducedMotion ? 110 : 260);
             }
 
             if (prevActBtn) {
@@ -2589,7 +3007,7 @@
                 });
             });
 
-            /* Atajos globales de teclado para PC (sin interferir con campos de texto ni controles propios) */
+            /* Atajos globales de teclado para PC */
             window.addEventListener('keydown', (e) => {
                 const tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
                 if (tag === 'textarea' || tag === 'input') return;
@@ -2611,11 +3029,12 @@
                 }
             });
 
-            /* ─── ACTO 1: Deslizador de umbral con resorte crítico ─── */
+            /* ─── ACTO 1: Deslizador con resistencia elástica (rubber-band), deformación por velocidad y muelle ─── */
             (function setupAct1Threshold() {
                 const rail = document.getElementById('threshold-rail');
                 const thumb = document.getElementById('threshold-thumb');
                 const fill = document.getElementById('threshold-fill');
+                const dock = document.getElementById('threshold-dock');
                 const label = document.getElementById('threshold-label');
                 if (!rail || !thumb) return;
 
@@ -2632,27 +3051,46 @@
                     return Math.max(1, rail.clientWidth - thumb.offsetWidth - 10);
                 }
 
-                function applyPos(x) {
+                function applyPos(rawX) {
                     const maxX = getMaxX();
-                    const clamped = Math.max(0, Math.min(maxX, x));
+                    let displayX = rawX;
+                    if (rawX < 0) {
+                        displayX = -rubberband(-rawX, 42, 0.35);
+                    } else if (rawX > maxX) {
+                        displayX = maxX + rubberband(rawX - maxX, 42, 0.35);
+                    }
+                    const clamped = Math.max(0, Math.min(maxX, rawX));
                     pos = clamped;
                     const ratio = clamped / maxX;
-                    thumb.style.transform = 'translate3d(' + clamped.toFixed(1) + 'px, 0, 0)';
-                    if (fill) fill.style.width = (clamped + thumb.offsetWidth + 10).toFixed(1) + 'px';
-                    if (label) label.style.opacity = Math.max(0, 1 - ratio * 1.6).toFixed(2);
+
+                    const stretch = prefersReducedMotion ? 1 : (1 + Math.min(0.075, Math.abs(vel) / 2800));
+                    const squash = prefersReducedMotion ? 1 : (1 / Math.sqrt(stretch));
+                    thumb.style.transform = 'translate3d(' + displayX.toFixed(1) + 'px, 0, 0) scale(' + stretch.toFixed(3) + ',' + squash.toFixed(3) + ')';
+
+                    if (fill) fill.style.width = Math.max(46, displayX + thumb.offsetWidth + 10).toFixed(1) + 'px';
+                    if (label) label.style.opacity = Math.max(0, 1 - ratio * 1.65).toFixed(2);
+                    if (dock) {
+                        dock.style.opacity = (0.35 + ratio * 0.65).toFixed(2);
+                        dock.style.transform = 'scale(' + (0.92 + ratio * 0.16).toFixed(3) + ')';
+                        dock.style.borderColor = ratio > 0.7 ? 'rgba(232, 189, 131, 0.72)' : 'rgba(232, 189, 131, 0.28)';
+                    }
                     rail.setAttribute('aria-valuenow', String(Math.round(ratio * 100)));
-                    if (currentAct === 1) auraTargetBoost = ratio * 0.22;
+                    if (currentAct === 1) auraTargetBoost = ratio * 0.24;
                 }
 
                 function completeThreshold() {
                     if (unlocked) return;
                     unlocked = true;
+                    vel = 0;
                     targetPos = getMaxX();
                     applyPos(targetPos);
                     pulseHaptic(14);
                     const r = thumb.getBoundingClientRect();
-                    spawnMotes(r.left + r.width / 2, r.top + r.height / 2, 24, true);
-                    setTimeout(() => goToAct(2), 240);
+                    const cx = r.left + r.width / 2;
+                    const cy = r.top + r.height / 2;
+                    spawnRing(cx, cy, 96, 'amber');
+                    spawnMotes(cx, cy, 28, true, { petals: true });
+                    setTimeout(() => goToAct(2), 250);
                 }
 
                 let prevFrame = performance.now();
@@ -2662,12 +3100,12 @@
                     if (!dragging && currentAct === 1) {
                         const maxX = getMaxX();
                         if (unlocked) targetPos = maxX;
-                        const stiffness = 250;
-                        const damping = 30;
+                        const stiffness = 260;
+                        const damping = 28;
                         const force = -stiffness * (pos - targetPos) - damping * vel;
                         vel += force * dt;
                         pos += vel * dt;
-                        if (Math.abs(pos - targetPos) < 0.35 && Math.abs(vel) < 2) {
+                        if (Math.abs(pos - targetPos) < 0.3 && Math.abs(vel) < 1.5) {
                             pos = targetPos;
                             vel = 0;
                         }
@@ -2714,8 +3152,9 @@
                     lastT = now;
 
                     const railRect = rail.getBoundingClientRect();
-                    applyPos(e.clientX - railRect.left - 5 - grabOffset);
-                    if (pos >= getMaxX() * 0.96) {
+                    const rawX = e.clientX - railRect.left - 5 - grabOffset;
+                    applyPos(rawX);
+                    if (pos >= getMaxX() * 0.95) {
                         dragging = false;
                         completeThreshold();
                     }
@@ -2726,8 +3165,8 @@
                     dragging = false;
                     if (unlocked) return;
                     const maxX = getMaxX();
-                    const projected = pos + vel * 0.14;
-                    if (projected >= maxX * 0.72) {
+                    const projected = pos + (vel / 1000) * 180;
+                    if (projected >= maxX * 0.70) {
                         completeThreshold();
                     } else {
                         targetPos = 0;
@@ -2743,7 +3182,7 @@
                 });
             })();
 
-            /* ─── ACTO 2: Cristal empañado (tacto con dedo en celular + barrido fluido de cursor en PC) ─── */
+            /* ─── ACTO 2: Cristal empañado con microgotas de condensación y gravedad ─── */
             (function setupAct2Frost() {
                 const frame = document.getElementById('frost-frame');
                 const canvas = document.getElementById('frost-canvas');
@@ -2761,6 +3200,7 @@
                 let prevPt = null;
                 let cssW = 0;
                 let cssH = 0;
+                let lastDropT = 0;
 
                 function paintFrostSurface() {
                     if (!ctx || frostCleared) return;
@@ -2775,20 +3215,31 @@
 
                     ctx.globalCompositeOperation = 'source-over';
                     const grad = ctx.createLinearGradient(0, 0, cssW, cssH);
-                    grad.addColorStop(0, '#18181a');
-                    grad.addColorStop(0.5, '#201f22');
-                    grad.addColorStop(1, '#151416');
+                    grad.addColorStop(0, '#18181b');
+                    grad.addColorStop(0.5, '#222024');
+                    grad.addColorStop(1, '#151417');
                     ctx.fillStyle = grad;
                     ctx.fillRect(0, 0, cssW, cssH);
 
-                    ctx.fillStyle = 'rgba(247, 244, 238, 0.045)';
-                    for (let i = 0; i < 240; i++) {
+                    /* Grano cristalino y microgotas de vaho */
+                    ctx.fillStyle = 'rgba(247, 244, 238, 0.05)';
+                    for (let i = 0; i < 260; i++) {
                         const gx = (Math.sin(i * 91.7) * 0.5 + 0.5) * cssW;
                         const gy = (Math.cos(i * 47.3) * 0.5 + 0.5) * cssH;
                         ctx.fillRect(gx, gy, 1.5, 1.5);
                     }
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.055)';
+                    ctx.lineWidth = 1;
+                    for (let j = 0; j < 26; j++) {
+                        const dx = (Math.sin(j * 37.2) * 0.44 + 0.5) * cssW;
+                        const dy = (Math.cos(j * 63.9) * 0.42 + 0.5) * cssH;
+                        const dr = 1.6 + (j % 3) * 0.9;
+                        ctx.beginPath();
+                        ctx.arc(dx, dy, dr, 0, Math.PI * 2);
+                        ctx.stroke();
+                    }
 
-                    ctx.fillStyle = 'rgba(244, 239, 231, 0.58)';
+                    ctx.fillStyle = 'rgba(244, 239, 231, 0.62)';
                     ctx.font = '500 13px "Plus Jakarta Sans", sans-serif';
                     ctx.textAlign = 'center';
                     ctx.textBaseline = 'middle';
@@ -2814,6 +3265,7 @@
                     if (frostCleared) return;
                     frostCleared = true;
                     canvas.classList.add('is-cleared');
+                    frame.classList.add('is-revealed');
                     if (statusEl) {
                         statusEl.dataset.lockedCopy = '1';
                         statusEl.textContent = 'Eso es lo primero que hoy cambia en mí.';
@@ -2822,10 +3274,13 @@
                     if (nextBtn) nextBtn.disabled = false;
                     pulseHaptic(14);
                     const r = frame.getBoundingClientRect();
-                    spawnMotes(r.left + r.width / 2, r.top + r.height / 2, 28, true);
+                    const cx = r.left + r.width / 2;
+                    const cy = r.top + r.height / 2;
+                    spawnRing(cx, cy, 130, 'amber');
+                    spawnMotes(cx, cy, 30, true);
                 }
 
-                function eraseAt(localX, localY, radius) {
+                function eraseAt(localX, localY, radius, screenX, screenY) {
                     if (!ctx || frostCleared || cssW <= 0 || cssH <= 0) return;
                     ctx.globalCompositeOperation = 'destination-out';
 
@@ -2834,7 +3289,7 @@
                         const dx = localX - prevPt.x;
                         const dy = localY - prevPt.y;
                         const dist = Math.hypot(dx, dy);
-                        const steps = Math.max(1, Math.ceil(dist / 10));
+                        const steps = Math.max(1, Math.ceil(dist / 9));
                         for (let s = 1; s <= steps; s++) {
                             pts.push({ x: prevPt.x + (dx * s) / steps, y: prevPt.y + (dy * s) / steps });
                         }
@@ -2870,6 +3325,21 @@
                         }
                     }
 
+                    /* Gotas sutiles de condensación con caída gravitatoria */
+                    const now = performance.now();
+                    if (screenX != null && now - lastDropT > 55) {
+                        lastDropT = now;
+                        spawnMotes(screenX, screenY, 2, false, {
+                            droplet: true,
+                            gravity: 0.055,
+                            spreadX: 14,
+                            spreadY: 8,
+                            speedBase: 0.15,
+                            speedRange: 0.55,
+                            decayBase: 0.024
+                        });
+                    }
+
                     const pct = Math.min(100, Math.round((clearedCount / (COLS * ROWS)) * 100));
                     if (pct >= 46) {
                         finishFrost();
@@ -2885,14 +3355,14 @@
                     prevPt = null;
                     canvas.setPointerCapture(e.pointerId);
                     const r = canvas.getBoundingClientRect();
-                    eraseAt(e.clientX - r.left, e.clientY - r.top, e.pointerType === 'mouse' ? 40 : 34);
+                    eraseAt(e.clientX - r.left, e.clientY - r.top, e.pointerType === 'mouse' ? 40 : 34, e.clientX, e.clientY);
                 });
 
                 canvas.addEventListener('pointermove', (e) => {
                     if (frostCleared) return;
                     if (!wiping && e.pointerType !== 'mouse') return;
                     const r = canvas.getBoundingClientRect();
-                    eraseAt(e.clientX - r.left, e.clientY - r.top, wiping ? 40 : 28);
+                    eraseAt(e.clientX - r.left, e.clientY - r.top, wiping ? 40 : 28, e.clientX, e.clientY);
                 });
 
                 canvas.addEventListener('pointerleave', () => {
@@ -2913,12 +3383,49 @@
                 });
             })();
 
-            /* ─── ACTO 3: Disolver los 6 roces reales ─── */
+            /* ─── ACTO 3: Seis roces reales con resortes 2D e impulso de onda de choque ─── */
             (function setupAct3Noise() {
                 const dissolvedSet = new Set();
-                const totalChips = 6;
+                const chips = Array.from(document.querySelectorAll('.noise-chip'));
+                const totalChips = chips.length;
                 const noiseCaption = document.getElementById('noise-caption');
                 const noiseArena = document.getElementById('noise-arena');
+
+                const chipPhysics = chips.map((el, i) => ({
+                    el: el,
+                    x: 0,
+                    y: 0,
+                    vx: 0,
+                    vy: 0,
+                    tx: 0,
+                    ty: 0,
+                    scale: 1,
+                    phase: i * 1.15
+                }));
+
+                let lastChipT = performance.now();
+                (function stepChipSprings(now) {
+                    const dt = Math.min(0.032, Math.max(0.001, (now - lastChipT) / 1000));
+                    lastChipT = now;
+                    if (currentAct === 3 && !prefersReducedMotion) {
+                        for (let i = 0; i < chipPhysics.length; i++) {
+                            const cp = chipPhysics[i];
+                            if (cp.el.classList.contains('is-dissolved')) continue;
+                            const floatX = Math.cos(now * 0.0011 + cp.phase) * 2.2;
+                            const floatY = Math.sin(now * 0.0015 + cp.phase) * 3.0;
+                            const goalX = cp.tx + floatX;
+                            const goalY = cp.ty + floatY;
+                            const fx = -190 * (cp.x - goalX) - 18 * cp.vx;
+                            const fy = -190 * (cp.y - goalY) - 18 * cp.vy;
+                            cp.vx += fx * dt;
+                            cp.vy += fy * dt;
+                            cp.x += cp.vx * dt;
+                            cp.y += cp.vy * dt;
+                            cp.el.style.transform = 'translate3d(' + cp.x.toFixed(1) + 'px,' + cp.y.toFixed(1) + 'px,0) scale(' + cp.scale.toFixed(3) + ')';
+                        }
+                    }
+                    requestAnimationFrame(stepChipSprings);
+                })(performance.now());
 
                 function dissolveChip(chip) {
                     if (!chip || chip.classList.contains('is-dissolved')) return;
@@ -2927,10 +3434,28 @@
                     dissolvedSet.add(id);
 
                     const rect = chip.getBoundingClientRect();
+                    const cx = rect.left + rect.width / 2;
+                    const cy = rect.top + rect.height / 2;
+
+                    chip.style.transform = 'translate3d(0, -16px, 0) scale(0.86)';
                     chip.classList.add('is-dissolved');
                     chip.setAttribute('aria-disabled', 'true');
 
-                    spawnMotes(rect.left + rect.width / 2, rect.top + rect.height / 2, 22, dissolvedSet.size >= 4);
+                    /* Impulso físico radial hacia las píldoras vecinas aún activas */
+                    for (let i = 0; i < chipPhysics.length; i++) {
+                        const other = chipPhysics[i];
+                        if (other.el === chip || other.el.classList.contains('is-dissolved')) continue;
+                        const oRect = other.el.getBoundingClientRect();
+                        const dx = (oRect.left + oRect.width / 2) - cx;
+                        const dy = (oRect.top + oRect.height / 2) - cy;
+                        const dist = Math.max(24, Math.hypot(dx, dy));
+                        const impulse = Math.min(180, 14000 / dist);
+                        other.vx += (dx / dist) * impulse;
+                        other.vy += (dy / dist) * impulse;
+                    }
+
+                    spawnRing(cx, cy, 86, dissolvedSet.size >= 4 ? 'tulip' : 'amber');
+                    spawnMotes(cx, cy, 26, dissolvedSet.size >= 3, { petals: dissolvedSet.size === totalChips });
                     pulseHaptic(10);
 
                     const left = totalChips - dissolvedSet.size;
@@ -2945,15 +3470,30 @@
                     }
 
                     if (left === 0) {
-                        setTimeout(() => goToAct(4), 700);
+                        setTimeout(() => goToAct(4), 680);
                     }
                 }
 
-                document.querySelectorAll('.noise-chip').forEach((chip) => {
-                    chip.addEventListener('click', () => dissolveChip(chip));
-                    chip.addEventListener('pointerdown', (e) => {
+                chipPhysics.forEach((cp) => {
+                    cp.el.addEventListener('pointerenter', () => {
+                        if (!isFinePointer || cp.el.classList.contains('is-dissolved')) return;
+                        cp.scale = 1.04;
+                    });
+                    cp.el.addEventListener('pointerleave', () => {
+                        cp.tx = 0;
+                        cp.ty = 0;
+                        cp.scale = 1;
+                    });
+                    cp.el.addEventListener('pointermove', (e) => {
+                        if (!isFinePointer || cp.el.classList.contains('is-dissolved')) return;
+                        const r = cp.el.getBoundingClientRect();
+                        cp.tx = ((e.clientX - (r.left + r.width / 2)) / Math.max(1, r.width)) * 8;
+                        cp.ty = ((e.clientY - (r.top + r.height / 2)) / Math.max(1, r.height)) * 6;
+                    });
+                    cp.el.addEventListener('click', () => dissolveChip(cp.el));
+                    cp.el.addEventListener('pointerdown', (e) => {
                         e.preventDefault();
-                        dissolveChip(chip);
+                        dissolveChip(cp.el);
                     });
                 });
 
@@ -2971,10 +3511,12 @@
                 }
             })();
 
-            /* ─── ACTO 4: Pausa respirada de 3 segundos (dedo, clic o barra espaciadora) ─── */
+            /* ─── ACTO 4: Pausa respirada con triple onda armónica acoplada por resorte ─── */
             (function setupAct4Breath() {
                 const btn = document.getElementById('breath-btn');
                 const halo = document.getElementById('breath-halo');
+                const haloMid = document.getElementById('breath-halo-mid');
+                const haloOuter = document.getElementById('breath-halo-outer');
                 const circle = document.getElementById('breath-progress-circle');
                 const statusEl = document.getElementById('breath-status');
                 if (!btn || !circle) return;
@@ -2983,18 +3525,34 @@
                 const DURATION = 3000;
                 let holding = false;
                 let progress = 0;
+                let visualP = 0;
+                let velP = 0;
+                let orbScale = 1;
+                let orbVel = 0;
                 let done = false;
                 let lastT = performance.now();
 
-                function renderBreath(p) {
+                function renderBreath(p, nowMs) {
                     const c = Math.max(0, Math.min(1, p));
                     circle.style.strokeDashoffset = (CIRC * (1 - c)).toFixed(2);
+                    const pulse = Math.sin((nowMs || 0) * 0.004) * 0.025 * (holding ? 1 : 0.35);
+
                     if (halo) {
-                        const scale = 0.72 + Math.sin(c * Math.PI * 0.85) * 0.52;
-                        halo.style.transform = 'scale(' + scale.toFixed(3) + ')';
-                        halo.style.opacity = (0.3 + c * 0.55).toFixed(2);
+                        const s1 = 0.74 + Math.sin(c * Math.PI * 0.86) * 0.46 + pulse;
+                        halo.style.transform = 'scale(' + s1.toFixed(3) + ')';
+                        halo.style.opacity = (0.28 + c * 0.56).toFixed(2);
                     }
-                    if (currentAct === 4) auraTargetBoost = c * 0.28;
+                    if (haloMid) {
+                        const s2 = 0.80 + c * 0.62 - pulse * 0.8;
+                        haloMid.style.transform = 'scale(' + s2.toFixed(3) + ')';
+                        haloMid.style.opacity = (0.14 + c * 0.42).toFixed(2);
+                    }
+                    if (haloOuter) {
+                        const s3 = 0.88 + c * 0.82 + pulse * 1.1;
+                        haloOuter.style.transform = 'scale(' + s3.toFixed(3) + ')';
+                        haloOuter.style.opacity = (0.08 + c * 0.30).toFixed(2);
+                    }
+                    if (currentAct === 4) auraTargetBoost = c * 0.32;
                 }
 
                 function finishBreath() {
@@ -3002,7 +3560,7 @@
                     done = true;
                     holding = false;
                     btn.classList.remove('is-holding');
-                    renderBreath(1);
+                    renderBreath(1, performance.now());
                     pulseHaptic([14, 30, 18]);
                     if (statusEl) {
                         statusEl.dataset.lockedCopy = '1';
@@ -3010,27 +3568,42 @@
                         statusEl.classList.add('is-lit');
                     }
                     const r = btn.getBoundingClientRect();
-                    spawnMotes(r.left + r.width / 2, r.top + r.height / 2, 28, true);
+                    const cx = r.left + r.width / 2;
+                    const cy = r.top + r.height / 2;
+                    spawnRing(cx, cy, 130, 'amber');
+                    spawnMotes(cx, cy, 32, true, { petals: true });
                     setTimeout(() => goToAct(5), 740);
                 }
 
                 (function loopBreath(now) {
-                    const dt = Math.min(64, Math.max(0, now - lastT));
+                    const dtMs = Math.min(64, Math.max(0, now - lastT));
+                    const dt = dtMs / 1000;
                     lastT = now;
-                    if (!done && currentAct === 4) {
-                        if (holding) {
-                            progress = Math.min(1, progress + dt / DURATION);
-                            renderBreath(progress);
-                            if (statusEl) {
-                                statusEl.textContent = progress < 0.5
-                                    ? 'Respirando primero… sin suponer'
-                                    : 'Escuchándote sin ponernos en contra…';
+                    if (currentAct === 4) {
+                        if (!done) {
+                            if (holding) {
+                                progress = Math.min(1, progress + dtMs / DURATION);
+                                if (statusEl) {
+                                    statusEl.textContent = progress < 0.5
+                                        ? 'Respirando primero… sin suponer'
+                                        : 'Escuchándote sin ponernos en contra…';
+                                }
+                                if (progress >= 1) finishBreath();
+                            } else if (progress > 0) {
+                                progress = Math.max(0, progress - dtMs / 720);
                             }
-                            if (progress >= 1) finishBreath();
-                        } else if (progress > 0) {
-                            progress = Math.max(0, progress - dt / 700);
-                            renderBreath(progress);
                         }
+
+                        const targetScale = done ? 1.02 : (holding ? (1.04 + progress * 0.04) : 1.0);
+                        orbVel += (-220 * (orbScale - targetScale) - 20 * orbVel) * dt;
+                        orbScale += orbVel * dt;
+                        if (!prefersReducedMotion) {
+                            btn.style.transform = 'scale(' + orbScale.toFixed(3) + ')';
+                        }
+
+                        velP += (-180 * (visualP - progress) - 22 * velP) * dt;
+                        visualP += velP * dt;
+                        renderBreath(done ? 1 : visualP, now);
                     }
                     requestAnimationFrame(loopBreath);
                 })(performance.now());
@@ -3039,6 +3612,7 @@
                     if (done) return;
                     if (e && e.cancelable) e.preventDefault();
                     holding = true;
+                    orbVel -= 0.45;
                     btn.classList.add('is-holding');
                 }
                 function stopHold() {
@@ -3067,11 +3641,13 @@
                 });
             })();
 
-            /* ─── ACTO 5: Balanza Mi Orgullo (100->0) vs Nosotros Dos (0->100) ─── */
+            /* ─── ACTO 5: Balanza física basculante con inercia proyectada ─── */
             (function setupAct5Balance() {
                 const track = document.getElementById('balance-track');
                 const fill = document.getElementById('balance-fill');
                 const knob = document.getElementById('balance-knob');
+                const beam = document.getElementById('balance-beam');
+                const fulcrum = document.getElementById('balance-fulcrum');
                 const prideEl = document.getElementById('pride-pct');
                 const usEl = document.getElementById('us-pct');
                 const quoteEl = document.getElementById('balance-quote');
@@ -3080,10 +3656,18 @@
 
                 let dragging = false;
                 let unlocked = false;
+                let ratio = 0;
+                let ratioVel = 0;
+                let beamAngle = -3.8;
+                let beamVel = 0;
+                let lastX = 0;
+                let lastMoveT = performance.now();
+                let prevLoopT = performance.now();
 
-                function setRatio(raw) {
+                function applyVisualRatio(raw) {
                     let r = Math.max(0, Math.min(1, raw));
-                    if (r >= 0.94) r = 1;
+                    if (r >= 0.95) r = 1;
+                    ratio = r;
                     const pct = Math.round(r * 100);
 
                     if (fill) fill.style.width = pct + '%';
@@ -3091,6 +3675,13 @@
                     if (prideEl) prideEl.textContent = (100 - pct) + '%';
                     if (usEl) usEl.textContent = pct + '%';
                     track.setAttribute('aria-valuenow', String(pct));
+                    if (currentAct === 5) auraTargetBoost = r * 0.24;
+
+                    if (fulcrum) {
+                        const isLevel = pct === 100;
+                        fulcrum.classList.toggle('is-level', isLevel);
+                        fulcrum.textContent = isLevel ? '◆' : '◇';
+                    }
 
                     if (quoteEl) {
                         if (pct < 38) {
@@ -3104,45 +3695,87 @@
 
                     if (pct === 100 && !unlocked) {
                         unlocked = true;
+                        ratioVel = 0;
                         if (nextBtn) nextBtn.disabled = false;
                         pulseHaptic(14);
                         const kr = knob.getBoundingClientRect();
-                        spawnMotes(kr.left + kr.width / 2, kr.top + kr.height / 2, 24, true);
+                        const cx = kr.left + kr.width / 2;
+                        const cy = kr.top + kr.height / 2;
+                        spawnRing(cx, cy, 92, 'amber');
+                        spawnMotes(cx, cy, 28, true);
                     }
+                }
+
+                (function loopBalancePhysics(now) {
+                    const dt = Math.min(0.032, Math.max(0.001, (now - prevLoopT) / 1000));
+                    prevLoopT = now;
+                    if (currentAct === 5) {
+                        if (!dragging && Math.abs(ratioVel) > 0.01) {
+                            const nextR = ratio + ratioVel * dt;
+                            ratioVel *= Math.pow(0.04, dt);
+                            if (nextR >= 0.88 && ratioVel > 0) {
+                                ratioVel += (1 - nextR) * 6 * dt;
+                            }
+                            applyVisualRatio(nextR);
+                        }
+                        const targetDeg = prefersReducedMotion ? 0 : (-3.8 * (1 - ratio));
+                        beamVel += (-175 * (beamAngle - targetDeg) - 16 * beamVel) * dt;
+                        beamAngle += beamVel * dt;
+                        if (beam && !prefersReducedMotion) {
+                            beam.style.transform = 'rotate(' + beamAngle.toFixed(2) + 'deg)';
+                        }
+                    }
+                    requestAnimationFrame(loopBalancePhysics);
+                })(performance.now());
+
+                if (beam && !prefersReducedMotion) {
+                    beam.style.transform = 'rotate(-3.8deg)';
                 }
 
                 function updateFromPointer(clientX) {
                     const rect = track.getBoundingClientRect();
-                    setRatio((clientX - rect.left) / Math.max(1, rect.width));
+                    applyVisualRatio((clientX - rect.left) / Math.max(1, rect.width));
                 }
 
                 track.addEventListener('pointerdown', (e) => {
                     dragging = true;
+                    ratioVel = 0;
+                    lastX = e.clientX;
+                    lastMoveT = performance.now();
                     track.setPointerCapture(e.pointerId);
                     updateFromPointer(e.clientX);
                 });
                 track.addEventListener('pointermove', (e) => {
                     if (!dragging) return;
+                    const now = performance.now();
+                    const dtMs = Math.max(1, now - lastMoveT);
+                    const w = Math.max(1, track.clientWidth);
+                    ratioVel = (((e.clientX - lastX) / w) / dtMs) * 1000;
+                    lastX = e.clientX;
+                    lastMoveT = now;
                     updateFromPointer(e.clientX);
                 });
-                track.addEventListener('pointerup', () => { dragging = false; });
-                track.addEventListener('pointercancel', () => { dragging = false; });
+                function endBalanceDrag() {
+                    dragging = false;
+                }
+                track.addEventListener('pointerup', endBalanceDrag);
+                track.addEventListener('pointercancel', endBalanceDrag);
                 track.addEventListener('keydown', (e) => {
                     const cur = Number(track.getAttribute('aria-valuenow')) || 0;
                     if (e.key === 'ArrowRight' || e.key === 'ArrowUp') {
                         e.preventDefault();
-                        setRatio((cur + 25) / 100);
+                        applyVisualRatio((cur + 25) / 100);
                     } else if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') {
                         e.preventDefault();
-                        setRatio((cur - 25) / 100);
+                        applyVisualRatio((cur - 25) / 100);
                     } else if (e.key === 'Enter' || e.key === ' ') {
                         e.preventDefault();
-                        setRatio(1);
+                        applyVisualRatio(1);
                     }
                 });
             })();
 
-            /* ─── ACTO 6: Unir Yaire + Yo cortando la distancia ─── */
+            /* ─── ACTO 6: Unir Yaire + Yo con atracción simpática y cuerda vibrante ─── */
             (function setupAct6Bridge() {
                 const arena = document.getElementById('bridge-arena');
                 const pathEl = document.getElementById('bridge-path');
@@ -3155,8 +3788,16 @@
 
                 let yaiRatio = 0.14;
                 let yoRatio = 0.86;
+                let yaiTarget = 0.14;
+                let yoTarget = 0.86;
+                let yaiVel = 0;
+                let yoVel = 0;
+                let stringWave = 0;
+                let stringVel = 0;
+                let grabDx = 0;
                 let activeNode = null;
                 let united = false;
+                let lastBridgeT = performance.now();
 
                 function renderBridge() {
                     const w = arena.clientWidth || 320;
@@ -3172,15 +3813,35 @@
 
                     if (pathEl) {
                         const gap = Math.abs(x2 - x1);
-                        const sag = united ? 0 : Math.min(28, gap * 0.12);
+                        const baseSag = united ? 0 : Math.min(26, gap * 0.11);
+                        const cy = midY + baseSag + stringWave;
                         const cx = (x1 + x2) / 2;
-                        pathEl.setAttribute('d', 'M ' + x1.toFixed(1) + ' ' + midY.toFixed(1) + ' Q ' + cx.toFixed(1) + ' ' + (midY + sag).toFixed(1) + ' ' + x2.toFixed(1) + ' ' + midY.toFixed(1));
+                        pathEl.setAttribute('d', 'M ' + x1.toFixed(1) + ' ' + midY.toFixed(1) + ' Q ' + cx.toFixed(1) + ' ' + cy.toFixed(1) + ' ' + x2.toFixed(1) + ' ' + midY.toFixed(1));
                         if (united) {
                             pathEl.removeAttribute('stroke-dasharray');
-                            pathEl.setAttribute('stroke', 'rgba(232,189,131,0.85)');
+                            pathEl.setAttribute('stroke', 'rgba(232,189,131,0.90)');
                         }
                     }
                 }
+
+                (function loopBridgeSprings(now) {
+                    const dt = Math.min(0.032, Math.max(0.001, (now - lastBridgeT) / 1000));
+                    lastBridgeT = now;
+                    if (currentAct === 6) {
+                        if (activeNode !== 'yai') {
+                            yaiVel += (-210 * (yaiRatio - yaiTarget) - 21 * yaiVel) * dt;
+                            yaiRatio += yaiVel * dt;
+                        }
+                        if (activeNode !== 'yo') {
+                            yoVel += (-210 * (yoRatio - yoTarget) - 21 * yoVel) * dt;
+                            yoRatio += yoVel * dt;
+                        }
+                        stringVel += (-340 * stringWave - 11 * stringVel) * dt;
+                        stringWave += stringVel * dt;
+                        renderBridge();
+                    }
+                    requestAnimationFrame(loopBridgeSprings);
+                })(performance.now());
 
                 actMountHooks[6] = () => {
                     requestAnimationFrame(renderBridge);
@@ -3193,10 +3854,10 @@
                     if (united) return;
                     united = true;
                     activeNode = null;
-                    yaiRatio = 0.43;
-                    yoRatio = 0.57;
+                    yaiTarget = 0.43;
+                    yoTarget = 0.57;
+                    stringVel = -95;
                     arena.classList.add('is-united');
-                    renderBridge();
                     if (statusEl) {
                         statusEl.textContent = 'Hasta el día en que pueda abrazarte en persona, aquí estoy contigo.';
                         statusEl.classList.add('is-lit');
@@ -3204,7 +3865,10 @@
                     if (nextBtn) nextBtn.disabled = false;
                     pulseHaptic([12, 28, 16]);
                     const r = arena.getBoundingClientRect();
-                    spawnMotes(r.left + r.width / 2, r.top + r.height / 2, 32, true);
+                    const cx = r.left + r.width / 2;
+                    const cy = r.top + r.height / 2;
+                    spawnRing(cx, cy, 120, 'tulip');
+                    spawnMotes(cx, cy, 38, true, { petals: true });
                 }
 
                 function onDrag(clientX) {
@@ -3212,14 +3876,24 @@
                     const rect = arena.getBoundingClientRect();
                     const w = Math.max(1, rect.width);
                     const padRatio = Math.min(0.22, 36 / w);
-                    const r = Math.max(padRatio, Math.min(1 - padRatio, (clientX - rect.left) / w));
+                    const pointerX = clientX - grabDx;
+                    const r = Math.max(padRatio, Math.min(1 - padRatio, (pointerX - rect.left) / w));
+
                     if (activeNode === 'yai') {
                         yaiRatio = Math.min(yoRatio - 0.06, r);
+                        yaiTarget = yaiRatio;
+                        /* Atracción simpática: Yo se acerca suavemente a recibir a Yaire */
+                        const progress = Math.max(0, (yaiRatio - 0.14) / 0.34);
+                        yoTarget = Math.max(yaiRatio + 0.14, 0.86 - progress * 0.22);
                     } else {
                         yoRatio = Math.max(yaiRatio + 0.06, r);
+                        yoTarget = yoRatio;
+                        const progress = Math.max(0, (0.86 - yoRatio) / 0.34);
+                        yaiTarget = Math.min(yoRatio - 0.14, 0.14 + progress * 0.22);
                     }
+                    if (currentAct === 6) auraTargetBoost = Math.max(0, 1 - (yoRatio - yaiRatio)) * 0.28;
                     renderBridge();
-                    if (yoRatio - yaiRatio <= 0.22) {
+                    if (yoRatio - yaiRatio <= 0.24) {
                         uniteNodes();
                     }
                 }
@@ -3227,16 +3901,28 @@
                 nodeYai.addEventListener('pointerdown', (e) => {
                     if (united) return;
                     activeNode = 'yai';
+                    const nr = nodeYai.getBoundingClientRect();
+                    grabDx = e.clientX - (nr.left + nr.width / 2);
                     nodeYai.setPointerCapture(e.pointerId);
                 });
                 nodeYo.addEventListener('pointerdown', (e) => {
                     if (united) return;
                     activeNode = 'yo';
+                    const nr = nodeYo.getBoundingClientRect();
+                    grabDx = e.clientX - (nr.left + nr.width / 2);
                     nodeYo.setPointerCapture(e.pointerId);
                 });
                 arena.addEventListener('pointermove', (e) => onDrag(e.clientX));
-                window.addEventListener('pointerup', () => { activeNode = null; });
-                window.addEventListener('pointercancel', () => { activeNode = null; });
+
+                function releaseNode() {
+                    if (!activeNode) return;
+                    activeNode = null;
+                    if (!united && !prefersReducedMotion) {
+                        stringVel = 135;
+                    }
+                }
+                window.addEventListener('pointerup', releaseNode);
+                window.addEventListener('pointercancel', releaseNode);
 
                 [nodeYai, nodeYo].forEach((n) => {
                     n.addEventListener('keydown', (e) => {
@@ -3248,9 +3934,10 @@
                 });
             })();
 
-            /* ─── ACTO 7: Tres certezas (Swipe en móvil + Flechas / Teclado en PC) ─── */
+            /* ─── ACTO 7: Tres certezas con emblemas trazados y arrastre con mouse en PC ─── */
             (function setupAct7Truths() {
                 const track = document.getElementById('truths-track');
+                const slides = Array.from(document.querySelectorAll('#truths-track .truth-slide'));
                 const prevArrow = document.getElementById('truth-prev-arrow');
                 const nextArrow = document.getElementById('truth-next-arrow');
                 const btns = Array.from(document.querySelectorAll('.truth-pill-btn'));
@@ -3262,11 +3949,24 @@
                 const seen = new Set([0]);
 
                 function syncTruthControls(idx) {
+                    const prevIdx = activeIdx;
                     activeIdx = Math.max(0, Math.min(2, idx));
                     seen.add(activeIdx);
+
+                    slides.forEach((sl, i) => {
+                        if (seen.has(i)) sl.classList.add('is-revealed');
+                    });
                     btns.forEach((b, i) => b.classList.toggle('is-current', i === activeIdx));
                     if (prevArrow) prevArrow.disabled = activeIdx <= 0;
                     if (nextArrow) nextArrow.disabled = activeIdx >= 2;
+
+                    if (prevIdx !== activeIdx && slides[activeIdx]) {
+                        const em = slides[activeIdx].querySelector('.truth-emblem');
+                        if (em) {
+                            const r = em.getBoundingClientRect();
+                            spawnMotes(r.left + r.width / 2, r.top + r.height / 2, 10, true);
+                        }
+                    }
 
                     if (seen.size >= 3 && nextBtn) {
                         nextBtn.disabled = false;
@@ -3294,7 +3994,40 @@
                 prevArrow?.addEventListener('click', () => scrollToTruth(activeIdx - 1));
                 nextArrow?.addEventListener('click', () => scrollToTruth(activeIdx + 1));
 
+                /* Arrastre directo con puntero de mouse en PC */
+                let mouseDown = false;
+                let startX = 0;
+                let startScroll = 0;
+                track.addEventListener('pointerdown', (e) => {
+                    if (e.pointerType !== 'mouse') return;
+                    mouseDown = true;
+                    startX = e.clientX;
+                    startScroll = track.scrollLeft;
+                    track.style.scrollSnapType = 'none';
+                    track.setPointerCapture(e.pointerId);
+                });
+                track.addEventListener('pointermove', (e) => {
+                    if (!mouseDown) return;
+                    track.scrollLeft = startScroll - (e.clientX - startX);
+                });
+                function endMouseDrag(e) {
+                    if (!mouseDown) return;
+                    mouseDown = false;
+                    track.style.scrollSnapType = 'x mandatory';
+                    const dx = e.clientX - startX;
+                    if (dx < -45 && activeIdx < 2) {
+                        scrollToTruth(activeIdx + 1);
+                    } else if (dx > 45 && activeIdx > 0) {
+                        scrollToTruth(activeIdx - 1);
+                    } else {
+                        scrollToTruth(activeIdx);
+                    }
+                }
+                track.addEventListener('pointerup', endMouseDrag);
+                track.addEventListener('pointercancel', endMouseDrag);
+
                 track.addEventListener('scroll', () => {
+                    if (mouseDown) return;
                     const w = Math.max(1, track.clientWidth);
                     const idx = Math.max(0, Math.min(2, Math.round(track.scrollLeft / w)));
                     syncTruthControls(idx);
@@ -3324,7 +4057,7 @@
                 });
             })();
 
-            /* ─── ACTO 8: Encender los 4 acuerdos reales ─── */
+            /* ─── ACTO 8: Encender los 4 acuerdos reales con trazo y onda ─── */
             (function setupAct8Promises() {
                 const litPromises = new Set();
                 const total = 4;
@@ -3342,7 +4075,8 @@
                             litPromises.add(idx);
                             row.classList.add('is-lit');
                             const rect = row.getBoundingClientRect();
-                            spawnMotes(rect.left + 18, rect.top + 22, 14, true);
+                            spawnRing(rect.left + 14, rect.top + 22, 54, 'amber');
+                            spawnMotes(rect.left + 14, rect.top + 22, 16, true);
                             pulseHaptic(10);
 
                             const rem = total - litPromises.size;
@@ -3371,7 +4105,7 @@
                 });
             })();
 
-            /* ─── ACTO 9: Rebobinar el marcador a 00 : 00 : 00 ─── */
+            /* ─── ACTO 9: Rebobinar el marcador a 00 : 00 : 00 con inercia rotacional ─── */
             (function setupAct9Rewind() {
                 const track = document.getElementById('rewind-track');
                 const fill = document.getElementById('rewind-fill');
@@ -3383,6 +4117,12 @@
 
                 let dragging = false;
                 let zeroed = false;
+                let ratio = 1;
+                let ratioVel = 0;
+                let lastX = 0;
+                let lastMoveT = performance.now();
+                let prevRewindT = performance.now();
+                let lastTickInt = 28;
 
                 function pad2(n) {
                     return String(Math.max(0, Math.floor(n))).padStart(2, '0');
@@ -3391,6 +4131,7 @@
                 function setRewindRatio(raw) {
                     let r = Math.max(0, Math.min(1, raw));
                     if (r <= 0.06) r = 0;
+                    ratio = r;
                     const pct = Math.round(r * 100);
 
                     if (fill) fill.style.width = pct + '%';
@@ -3402,16 +4143,44 @@
                     const s = Math.round(59 * r);
                     digitsEl.textContent = pad2(d) + ' : ' + pad2(h) + ' : ' + pad2(s);
 
+                    if (d !== lastTickInt) {
+                        lastTickInt = d;
+                        pulseHaptic(4);
+                    }
+
+                    if (!prefersReducedMotion) {
+                        const scaleShift = 1 - Math.min(0.03, Math.abs(ratioVel) * 0.012);
+                        digitsEl.style.transform = r === 0 ? 'scale(1.03)' : 'scale(' + scaleShift.toFixed(3) + ')';
+                    }
+
                     if (r === 0 && !zeroed) {
                         zeroed = true;
+                        ratioVel = 0;
                         digitsEl.classList.add('is-zero');
                         if (captionEl) captionEl.textContent = 'Día Cero · Cuenta limpia para Yaire y para mí';
                         if (nextBtn) nextBtn.disabled = false;
                         pulseHaptic([14, 26, 18]);
                         const dr = digitsEl.getBoundingClientRect();
-                        spawnMotes(dr.left + dr.width / 2, dr.top + dr.height / 2, 34, true);
+                        const cx = dr.left + dr.width / 2;
+                        const cy = dr.top + dr.height / 2;
+                        spawnRing(cx, cy, 128, 'amber');
+                        spawnMotes(cx, cy, 38, true, { petals: true });
                     }
                 }
+
+                (function loopRewindInertia(now) {
+                    const dt = Math.min(0.032, Math.max(0.001, (now - prevRewindT) / 1000));
+                    prevRewindT = now;
+                    if (currentAct === 9 && !dragging && !zeroed && Math.abs(ratioVel) > 0.01) {
+                        const nextR = ratio + ratioVel * dt;
+                        ratioVel *= Math.pow(0.05, dt);
+                        if (nextR <= 0.14 && ratioVel < 0) {
+                            ratioVel -= nextR * 5 * dt;
+                        }
+                        setRewindRatio(nextR);
+                    }
+                    requestAnimationFrame(loopRewindInertia);
+                })(performance.now());
 
                 function updateFromPointer(clientX) {
                     const rect = track.getBoundingClientRect();
@@ -3420,11 +4189,20 @@
 
                 track.addEventListener('pointerdown', (e) => {
                     dragging = true;
+                    ratioVel = 0;
+                    lastX = e.clientX;
+                    lastMoveT = performance.now();
                     track.setPointerCapture(e.pointerId);
                     updateFromPointer(e.clientX);
                 });
                 track.addEventListener('pointermove', (e) => {
                     if (!dragging) return;
+                    const now = performance.now();
+                    const dtMs = Math.max(1, now - lastMoveT);
+                    const w = Math.max(1, track.clientWidth);
+                    ratioVel = (((e.clientX - lastX) / w) / dtMs) * 1000;
+                    lastX = e.clientX;
+                    lastMoveT = now;
                     updateFromPointer(e.clientX);
                 });
                 track.addEventListener('pointerup', () => { dragging = false; });
@@ -3441,7 +4219,8 @@
                 });
             })();
 
-            /* ─── ACTO 10 + EPÍLOGO: Sello mantenido 2s (dedo, clic o Espacio) ─── */
+            /* ─── ACTO 10 + EPÍLOGO: Sello con magnetismo orbital, pétalos y multi-mensaje ─── */
+            const sealOrbitWrap = document.getElementById('seal-orbit-wrap');
             const sealBtn = document.getElementById('seal-btn');
             const sealCircle = document.getElementById('seal-progress-circle');
             const sealHint = document.getElementById('seal-hint');
@@ -3452,13 +4231,36 @@
             let holdProgress = 0;
             let lastHoldFrame = performance.now();
             let acceptedTimestampMs = 0;
+            let magX = 0;
+            let magY = 0;
+            let magTargetX = 0;
+            let magTargetY = 0;
 
-            function setSealVisual(p) {
+            if (sealOrbitWrap) {
+                sealOrbitWrap.addEventListener('pointermove', (e) => {
+                    if (!isFinePointer || prefersReducedMotion) return;
+                    const r = sealOrbitWrap.getBoundingClientRect();
+                    magTargetX = ((e.clientX - (r.left + r.width / 2)) / Math.max(1, r.width / 2)) * 6;
+                    magTargetY = ((e.clientY - (r.top + r.height / 2)) / Math.max(1, r.height / 2)) * 6;
+                });
+                sealOrbitWrap.addEventListener('pointerleave', () => {
+                    magTargetX = 0;
+                    magTargetY = 0;
+                });
+            }
+
+            function setSealVisual(p, nowMs) {
                 const clamped = Math.max(0, Math.min(1, p));
                 if (sealCircle) {
                     sealCircle.style.strokeDashoffset = (SEAL_CIRC * (1 - clamped)).toFixed(2);
                 }
-                if (currentAct === 10) auraTargetBoost = clamped * 0.54;
+                if (sealBtn && !prefersReducedMotion && holdingSeal) {
+                    const beat = 1.05 + clamped * 0.04 + Math.sin((nowMs || 0) * 0.016) * 0.018 * clamped;
+                    sealBtn.style.transform = 'scale(' + beat.toFixed(3) + ')';
+                } else if (sealBtn && !holdingSeal) {
+                    sealBtn.style.transform = '';
+                }
+                if (currentAct === 10) auraTargetBoost = clamped * 0.56;
             }
 
             function completeSeal() {
@@ -3466,7 +4268,8 @@
                 sealCompleted = true;
                 holdingSeal = false;
                 sealBtn?.classList.remove('is-holding');
-                setSealVisual(1);
+                sealOrbitWrap?.classList.remove('is-holding');
+                setSealVisual(1, performance.now());
 
                 acceptedTimestampMs = Date.now();
                 try {
@@ -3478,7 +4281,11 @@
 
                 if (sealBtn) {
                     const r = sealBtn.getBoundingClientRect();
-                    spawnMotes(r.left + r.width / 2, r.top + r.height / 2, 65, true);
+                    const cx = r.left + r.width / 2;
+                    const cy = r.top + r.height / 2;
+                    spawnRing(cx, cy, 180, 'amber');
+                    spawnRing(cx, cy, 125, 'tulip');
+                    spawnMotes(cx, cy, 76, true, { petals: true, spreadX: 54, spreadY: 54, speedRange: 3.2 });
                 }
                 pulseHaptic([24, 40, 36]);
 
@@ -3491,25 +4298,32 @@
                 });
 
                 startFreshClock();
-                setTimeout(() => goToAct(11), 340);
+                setTimeout(() => goToAct(11), 360);
             }
 
             (function tickSeal(now) {
                 const dt = Math.min(64, Math.max(0, now - lastHoldFrame));
                 lastHoldFrame = now;
 
-                if (!sealCompleted && currentAct === 10) {
-                    if (holdingSeal) {
-                        holdProgress = Math.min(1, holdProgress + dt / HOLD_DURATION_MS);
-                        setSealVisual(holdProgress);
-                        if (Math.random() < 0.3 && sealBtn) {
-                            const r = sealBtn.getBoundingClientRect();
-                            spawnMotes(r.left + r.width / 2, r.top + r.height / 2, 2, true);
+                if (currentAct === 10) {
+                    if (!prefersReducedMotion && sealOrbitWrap) {
+                        magX += (magTargetX - magX) * 0.14;
+                        magY += (magTargetY - magY) * 0.14;
+                        sealOrbitWrap.style.transform = 'translate3d(' + magX.toFixed(2) + 'px,' + magY.toFixed(2) + 'px,0)';
+                    }
+                    if (!sealCompleted) {
+                        if (holdingSeal) {
+                            holdProgress = Math.min(1, holdProgress + dt / HOLD_DURATION_MS);
+                            setSealVisual(holdProgress, now);
+                            if (Math.random() < 0.34 && sealBtn) {
+                                const r = sealBtn.getBoundingClientRect();
+                                spawnMotes(r.left + r.width / 2, r.top + r.height / 2, 2, true, { petals: true });
+                            }
+                            if (holdProgress >= 1) completeSeal();
+                        } else if (holdProgress > 0) {
+                            holdProgress = Math.max(0, holdProgress - dt / 620);
+                            setSealVisual(holdProgress, now);
                         }
-                        if (holdProgress >= 1) completeSeal();
-                    } else if (holdProgress > 0) {
-                        holdProgress = Math.max(0, holdProgress - dt / 650);
-                        setSealVisual(holdProgress);
                     }
                 }
                 requestAnimationFrame(tickSeal);
@@ -3520,6 +4334,7 @@
                 if (e && e.cancelable) e.preventDefault();
                 holdingSeal = true;
                 sealBtn?.classList.add('is-holding');
+                sealOrbitWrap?.classList.add('is-holding');
                 if (sealHint) sealHint.textContent = 'Sigue manteniendo… empezando nuestro Día Cero';
             }
 
@@ -3527,6 +4342,7 @@
                 if (sealCompleted || !holdingSeal) return;
                 holdingSeal = false;
                 sealBtn?.classList.remove('is-holding');
+                sealOrbitWrap?.classList.remove('is-holding');
                 if (sealHint && holdProgress < 1) {
                     sealHint.textContent = isFinePointer
                         ? 'Mantén clic sobre el sello dos segundos (o Espacio) para decirme que sí'
@@ -3552,18 +4368,34 @@
                 if (e.key === ' ') endHold();
             });
 
-            /* Cajón opcional "Quiero decirte algo antes de responder" */
+            /* Cajón opcional "Quiero decirte algo antes de responder" (con envío múltiple sin bloqueo) */
             const openTalkFirstBtn = document.getElementById('open-talk-first-btn');
             const talkFirstDrawer = document.getElementById('talk-first-drawer');
             const talkFirstInput = document.getElementById('talk-first-input');
             const sendTalkFirstBtn = document.getElementById('send-talk-first-btn');
             const sendTalkFirstLabel = document.getElementById('send-talk-first-label');
+            let lastSentBeforeText = '';
 
             if (openTalkFirstBtn && talkFirstDrawer) {
                 openTalkFirstBtn.addEventListener('click', () => {
                     const open = talkFirstDrawer.classList.toggle('is-open');
                     openTalkFirstBtn.textContent = open ? 'Ocultar mensaje' : 'Quiero decirte algo antes de responder';
-                    if (open && talkFirstInput) setTimeout(() => talkFirstInput.focus(), 80);
+                    if (open) {
+                        setTimeout(() => {
+                            talkFirstInput?.focus();
+                            sendTalkFirstBtn?.scrollIntoView({ behavior: prefersReducedMotion ? 'auto' : 'smooth', block: 'nearest' });
+                        }, 200);
+                    }
+                });
+            }
+
+            if (talkFirstInput && sendTalkFirstBtn) {
+                talkFirstInput.addEventListener('input', () => {
+                    const val = talkFirstInput.value.trim();
+                    if (lastSentBeforeText && val && val !== lastSentBeforeText) {
+                        sendTalkFirstBtn.disabled = false;
+                        if (sendTalkFirstLabel) sendTalkFirstLabel.textContent = 'Enviar nuevo mensaje';
+                    }
                 });
             }
 
@@ -3576,14 +4408,16 @@
                     }
                     sendTalkFirstBtn.disabled = true;
                     if (sendTalkFirstLabel) sendTalkFirstLabel.textContent = 'Enviando…';
-                    await sendDiaCeroPayload({
-                        status: 'message_before_answer',
-                        accepted: false,
+                    await appendDiaCeroMessage(text, 'Antes de responder', {
+                        status: sealCompleted ? 'accepted' : 'message_before_answer',
+                        accepted: sealCompleted,
                         currentAct: 10,
-                        totalActs: TOTAL_ACTS,
-                        message: text
+                        totalActs: TOTAL_ACTS
                     });
+                    lastSentBeforeText = text;
                     pulseHaptic(14);
+                    const br = sendTalkFirstBtn.getBoundingClientRect();
+                    spawnMotes(br.left + br.width / 2, br.top + br.height / 2, 18, true);
                     if (sendTalkFirstLabel) sendTalkFirstLabel.textContent = 'Mensaje enviado · Te leo ahora mismo';
                 });
             }
@@ -3639,13 +4473,12 @@
                     const note = acceptedNoteInput ? acceptedNoteInput.value.trim() : '';
                     if (finishEnterLabel) finishEnterLabel.textContent = note ? 'Guardando tus palabras…' : 'Entrando a 28E…';
                     if (note) {
-                        await sendDiaCeroPayload({
+                        await appendDiaCeroMessage(note, 'Al decir que sí (Epílogo)', {
                             status: 'accepted',
                             accepted: true,
                             currentAct: 10,
                             totalActs: TOTAL_ACTS,
-                            acceptedAt: new Date(acceptedTimestampMs || Date.now()).toISOString(),
-                            message: note
+                            acceptedAt: new Date(acceptedTimestampMs || Date.now()).toISOString()
                         });
                     }
                     navigateToMainWeb();
