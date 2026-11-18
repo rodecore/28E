@@ -452,10 +452,12 @@
                 90deg,
                 rgba(247, 244, 238, 0) 0%,
                 var(--horizon-line) 22%,
-                rgba(247, 244, 238, 0.22) 50%,
+                rgba(247, 244, 238, 0.20) 50%,
                 var(--horizon-line) 78%,
                 rgba(247, 244, 238, 0) 100%
             );
+            -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 12%, #000 88%, transparent 100%);
+            mask-image: linear-gradient(90deg, transparent 0%, #000 12%, #000 88%, transparent 100%);
             overflow: hidden;
         }
 
@@ -464,29 +466,25 @@
             top: 0;
             left: 0;
             height: 100%;
-            width: 38%;
+            width: 40%;
             background: linear-gradient(
                 90deg,
                 rgba(232, 189, 131, 0) 0%,
-                rgba(232, 189, 131, 0.85) 50%,
-                rgba(230, 154, 184, 0.65) 75%,
+                rgba(232, 189, 131, 0.85) 36%,
+                rgba(255, 249, 238, 0.96) 52%,
+                rgba(230, 154, 184, 0.78) 72%,
                 rgba(230, 154, 184, 0) 100%
             );
-            transform: translateX(82%);
-            transition: transform 900ms var(--ease-apple);
+            animation: horizonSweep 3.6s cubic-bezier(0.77, 0, 0.175, 1) infinite alternate;
             will-change: transform;
-        }
-
-        .horizon-rail.is-indefinite .horizon-glow {
-            animation: horizonSweep 4.8s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate;
         }
 
         @keyframes horizonSweep {
             0% {
-                transform: translateX(-18%);
+                transform: translate3d(-35%, 0, 0);
             }
             100% {
-                transform: translateX(180%);
+                transform: translate3d(185%, 0, 0);
             }
         }
 
@@ -638,15 +636,15 @@
 
             .monolith-shell,
             .sound-pill,
-            .horizon-glow,
             #oled-aura {
                 transition-duration: 180ms;
                 transform: none !important;
             }
 
-            .horizon-rail.is-indefinite .horizon-glow {
+            .horizon-glow {
                 animation: none;
-                transform: translateX(82%);
+                transform: translate3d(75%, 0, 0);
+                opacity: 0.75;
             }
         }
 
@@ -1474,14 +1472,6 @@
             setUnitValue(unitEls.minutes, mStr, hasBootstrappedDigits);
             setUnitValue(unitEls.seconds, sStr, hasBootstrappedDigits);
             hasBootstrappedDigits = true;
-
-            if (horizonGlowEl && state.kind !== 'indefinite') {
-                const spanStart = state.kind === 'opening' ? OPENING_WINDOW_START_MS : (scheduledStartRefMs - 60000);
-                const totalSpan = Math.max(60000, state.targetMs - spanStart);
-                const progress = Math.max(0, Math.min(1, (nowMs - spanStart) / totalSpan));
-                const translatePct = -15 + progress * 195;
-                horizonGlowEl.style.transform = `translateX(${translatePct.toFixed(1)}%)`;
-            }
         }
 
         tick();
