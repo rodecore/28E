@@ -968,7 +968,7 @@
                                             </span>
                                         </div>
                                         <p class="text-xs text-zinc-400 mt-1">
-                                            Experiencia interactiva para soltar las peleas, encender 3 compromisos y pedirle volver a empezar de cero.
+                                            Recorrido interactivo de 10 actos en silencio: cristal empañado, soltar los roces, pausa respirada, balanza, distancia, acuerdos y sello final.
                                         </p>
                                     </div>
                                 </div>
@@ -4612,7 +4612,7 @@
                 return;
             }
 
-            const sig = JSON.stringify([data.status || '', data.acceptedAt || '', data.message || '', data.updatedAt || '']);
+            const sig = JSON.stringify([data.status || '', data.currentAct || '', data.acceptedAt || '', data.message || '', data.updatedAt || '']);
             const changed = _lastDiaCeroSig && _lastDiaCeroSig !== 'empty' && _lastDiaCeroSig !== sig;
             const firstArrival = _lastDiaCeroSig === 'empty' && sig !== 'empty';
             _lastDiaCeroSig = sig;
@@ -4631,6 +4631,13 @@
                 badge.className = 'text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/35';
                 meta.textContent = whenStr ? `Aceptó empezar de cero el ${whenStr}` : 'Aceptó empezar de cero.';
                 if (card) card.className = 'yaire-card p-8 bg-zinc-950 border border-emerald-500/30 transition-all duration-500';
+            } else if (data.status === 'reading') {
+                const actN = data.currentAct || 1;
+                const totN = data.totalActs || 10;
+                badge.textContent = `Leyendo · Acto ${actN} de ${totN}`;
+                badge.className = 'text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/35';
+                meta.textContent = whenStr ? `Avanzó al acto ${actN}/${totN} (${whenStr})` : `Avanzando por el acto ${actN} de ${totN}.`;
+                if (card) card.className = 'yaire-card p-8 bg-zinc-950 border border-amber-500/30 transition-all duration-500';
             } else {
                 badge.textContent = 'Te dejó un mensaje';
                 badge.className = 'text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-pink-500/20 text-pink-300 border border-pink-500/35';
@@ -4647,7 +4654,7 @@
                 msgBox.classList.add('hidden');
             }
 
-            if (notifyOnChange && (changed || firstArrival)) {
+            if (notifyOnChange && (changed || firstArrival) && data.status !== 'reading') {
                 if (typeof addLog === 'function') {
                     addLog('Día Cero', data.accepted ? '¡Yai aceptó empezar desde cero!' : 'Yai envió un mensaje en Día Cero.', 'emerald-500');
                 }

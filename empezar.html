@@ -55,21 +55,20 @@
 
         :root {
             --oled-black: #000000;
-            --surface-subtle: rgba(255, 255, 255, 0.035);
-            --surface-elevated: #0d0c0b;
+            --surface-elevated: #0c0c0b;
+            --surface-control: rgba(255, 255, 255, 0.045);
+            --surface-control-hover: rgba(255, 255, 255, 0.085);
             --ink-primary: #f7f4ee;
             --ink-italic: #f2dac6;
             --ink-secondary: rgba(244, 239, 231, 0.74);
             --ink-muted: rgba(236, 229, 218, 0.50);
-            --ink-faint: rgba(236, 229, 218, 0.30);
+            --ink-faint: rgba(236, 229, 218, 0.28);
             --accent-amber: #e8bd83;
-            --accent-amber-ink: #1e170e;
+            --accent-amber-ink: #1d160d;
             --accent-tulip: #e69ab8;
             --hairline: rgba(247, 244, 238, 0.11);
-            --hairline-lit: rgba(232, 189, 131, 0.36);
-            --glass-bg: rgba(255, 255, 255, 0.055);
-            --glass-bg-hover: rgba(255, 255, 255, 0.095);
-            --glass-border: rgba(247, 244, 238, 0.13);
+            --hairline-strong: rgba(247, 244, 238, 0.18);
+            --hairline-lit: rgba(232, 189, 131, 0.38);
             --font-display: 'Sebenta', Georgia, serif;
             --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
             --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
@@ -102,7 +101,7 @@
             -moz-osx-font-smoothing: grayscale;
             overscroll-behavior: none;
             scrollbar-width: thin;
-            scrollbar-color: rgba(232, 189, 131, 0.28) transparent;
+            scrollbar-color: rgba(232, 189, 131, 0.26) transparent;
         }
 
         .aura-layer {
@@ -111,7 +110,7 @@
             z-index: 1;
             pointer-events: none;
             background:
-                radial-gradient(66% 44% at 50% 56%, rgba(140, 146, 158, 0.08) 0%, rgba(0, 0, 0, 0) 76%),
+                radial-gradient(64% 42% at 50% 54%, rgba(128, 134, 146, 0.07) 0%, rgba(0, 0, 0, 0) 76%),
                 var(--oled-black);
         }
 
@@ -148,11 +147,14 @@
             display: grid;
             grid-template-rows: auto 1fr auto;
             padding:
-                max(1.25rem, env(safe-area-inset-top, 0px) + 0.85rem)
+                max(1.15rem, env(safe-area-inset-top, 0px) + 0.8rem)
                 max(1.35rem, env(safe-area-inset-right, 0px) + 1rem)
-                max(1.25rem, env(safe-area-inset-bottom, 0px) + 0.85rem)
+                max(1.1rem, env(safe-area-inset-bottom, 0px) + 0.75rem)
                 max(1.35rem, env(safe-area-inset-left, 0px) + 1rem);
-            transition: opacity 750ms var(--ease-apple), transform 750ms var(--ease-apple), filter 750ms var(--ease-apple);
+            transition:
+                opacity 720ms var(--ease-apple),
+                transform 720ms var(--ease-apple),
+                filter 720ms var(--ease-apple);
         }
 
         .monolith-shell.is-exiting {
@@ -161,6 +163,7 @@
             filter: blur(8px);
         }
 
+        /* ─── Cabecera superior minimalista (sin controles de música) ─── */
         .chrome-top {
             display: flex;
             align-items: center;
@@ -169,6 +172,7 @@
             max-width: 68rem;
             width: 100%;
             margin: 0 auto;
+            min-height: 44px;
         }
 
         .brand-mark {
@@ -181,94 +185,89 @@
         }
 
         .brand-mark img {
-            height: 29px;
+            height: 28px;
             width: auto;
             display: block;
             object-fit: contain;
             opacity: 0.94;
         }
 
-        .top-controls {
+        .top-nav {
             display: inline-flex;
             align-items: center;
-            gap: 0.6rem;
+            gap: 0.55rem;
         }
 
-        .sound-pill {
+        .back-pill {
             appearance: none;
-            border: 1px solid var(--glass-border);
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px) saturate(165%);
-            -webkit-backdrop-filter: blur(20px) saturate(165%);
-            color: var(--ink-primary);
+            border: 1px solid var(--hairline);
+            background: transparent;
+            color: var(--ink-secondary);
             min-height: 44px;
-            padding: 0 0.95rem 0 0.8rem;
+            padding: 0 0.9rem 0 0.72rem;
             border-radius: 999px;
             display: inline-flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.35rem;
             font-family: var(--font-sans);
             font-size: 0.8125rem;
             font-weight: 500;
-            letter-spacing: -0.005em;
             cursor: pointer;
             user-select: none;
             -webkit-user-select: none;
             -webkit-touch-callout: none;
             touch-action: manipulation;
             transition:
-                transform 140ms var(--ease-apple),
-                background-color 200ms var(--ease-apple),
-                border-color 200ms var(--ease-apple);
+                transform 120ms var(--ease-apple),
+                color 180ms var(--ease-apple),
+                border-color 180ms var(--ease-apple),
+                background-color 180ms var(--ease-apple);
+        }
+
+        .back-pill[hidden] {
+            display: none;
         }
 
         @media (hover: hover) and (pointer: fine) {
-            .sound-pill:hover {
-                background: var(--glass-bg-hover);
-                border-color: rgba(247, 244, 238, 0.24);
+            .back-pill:hover {
+                color: var(--ink-primary);
+                border-color: var(--hairline-strong);
+                background: var(--surface-control);
             }
         }
 
-        .sound-pill:active {
+        .back-pill:active {
             transform: scale(0.96);
         }
 
-        .sound-pill:focus-visible,
-        .btn-primary:focus-visible,
-        .btn-quiet:focus-visible,
-        .noise-chip:focus-visible,
-        .promise-row:focus-visible,
-        .seal-button:focus-visible {
+        .back-pill svg {
+            width: 15px;
+            height: 15px;
+            flex-shrink: 0;
+        }
+
+        .act-counter-pill {
+            min-height: 36px;
+            padding: 0 0.85rem;
+            border-radius: 999px;
+            border: 1px solid var(--hairline);
+            background: rgba(255, 255, 255, 0.03);
+            display: inline-flex;
+            align-items: center;
+            font-size: 0.78rem;
+            font-weight: 500;
+            color: var(--ink-muted);
+            font-variant-numeric: tabular-nums;
+            font-feature-settings: "tnum" 1;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        /* ─── Focus accesible global ─── */
+        button:focus-visible,
+        [tabindex]:focus-visible {
             outline: 2px solid var(--accent-amber);
             outline-offset: 3px;
-        }
-
-        .sound-pill svg {
-            width: 16px;
-            height: 16px;
-            flex-shrink: 0;
-            color: var(--accent-amber);
-        }
-
-        .sound-pill[aria-pressed="false"] svg {
-            color: var(--ink-muted);
-        }
-
-        .sound-wave {
-            transition: opacity 200ms var(--ease-apple);
-        }
-
-        .sound-pill[aria-pressed="false"] .sound-wave {
-            opacity: 0;
-        }
-
-        .sound-mute-slash {
-            opacity: 0;
-            transition: opacity 200ms var(--ease-apple);
-        }
-
-        .sound-pill[aria-pressed="false"] .sound-mute-slash {
-            opacity: 1;
         }
 
         /* ─── Contenedor central por actos ─── */
@@ -281,8 +280,9 @@
             align-items: center;
             justify-content: center;
             overflow-y: auto;
+            overflow-x: hidden;
             overscroll-behavior: contain;
-            padding: 0.5rem 0;
+            padding: 0.4rem 0;
         }
 
         .act-panel {
@@ -295,9 +295,9 @@
             transform: translateY(10px);
             filter: blur(5px);
             transition:
-                opacity 520ms var(--ease-out-expo),
-                transform 520ms var(--ease-out-expo),
-                filter 520ms var(--ease-out-expo);
+                opacity 460ms var(--ease-out-expo),
+                transform 460ms var(--ease-out-expo),
+                filter 460ms var(--ease-out-expo);
         }
 
         .act-panel.is-mounted {
@@ -313,18 +313,18 @@
         .act-panel.is-leaving {
             opacity: 0;
             transform: translateY(-8px);
-            filter: blur(5px);
+            filter: blur(4px);
             pointer-events: none;
         }
 
         .headline {
             font-family: var(--font-display);
             font-weight: 500;
-            font-size: clamp(2.15rem, 5.4vw, 3.85rem);
+            font-size: clamp(2.05rem, 5.1vw, 3.65rem);
             line-height: 1.07;
             letter-spacing: -0.025em;
             color: var(--ink-primary);
-            max-width: 17ch;
+            max-width: 17.5ch;
             text-wrap: balance;
         }
 
@@ -334,29 +334,164 @@
         }
 
         .prose-lead {
-            margin-top: 1rem;
-            font-size: clamp(0.95rem, 1.4vw, 1.08rem);
-            line-height: 1.62;
+            margin-top: 0.9rem;
+            font-size: clamp(0.93rem, 1.35vw, 1.05rem);
+            line-height: 1.6;
             letter-spacing: -0.005em;
             color: var(--ink-secondary);
-            max-width: 48ch;
+            max-width: 47ch;
             text-wrap: pretty;
         }
 
-        /* ─── ACTO I: Campo táctil para disolver el ruido ─── */
-        .noise-arena {
+        .micro-status {
+            margin-top: 0.95rem;
+            font-size: 0.8125rem;
+            color: var(--ink-muted);
+            font-variant-numeric: tabular-nums;
+            transition: color 260ms var(--ease-apple);
+        }
+
+        .micro-status.is-lit {
+            color: var(--accent-amber);
+        }
+
+        /* ─── ACTO 1: Riel táctil de umbral con resorte 1:1 ─── */
+        .slide-rail {
+            position: relative;
+            width: 100%;
+            max-width: 22rem;
+            height: 58px;
+            margin-top: 2.2rem;
+            border-radius: 999px;
+            border: 1px solid var(--hairline-strong);
+            background: rgba(255, 255, 255, 0.035);
+            display: flex;
+            align-items: center;
+            padding: 5px;
+            overflow: hidden;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: none;
+        }
+
+        .slide-rail-fill {
+            position: absolute;
+            inset: 0 auto 0 0;
+            width: 56px;
+            background: rgba(232, 189, 131, 0.14);
+            border-radius: 999px;
+            pointer-events: none;
+        }
+
+        .slide-rail-label {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding-left: 2.2rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--ink-secondary);
+            pointer-events: none;
+            transition: opacity 160ms linear;
+        }
+
+        .slide-thumb {
+            position: relative;
+            z-index: 2;
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            border: 0;
+            background: var(--accent-amber);
+            color: var(--accent-amber-ink);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: grab;
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+            will-change: transform;
+        }
+
+        .slide-thumb:active {
+            cursor: grabbing;
+        }
+
+        .slide-thumb svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        /* ─── ACTO 2: Cristal empañado para limpiar con el dedo ─── */
+        .frost-frame {
             position: relative;
             width: 100%;
             max-width: 34rem;
-            min-height: 13.5rem;
-            margin-top: 2rem;
-            padding: 0.75rem 0.25rem;
+            min-height: 11.5rem;
+            margin-top: 1.75rem;
+            border-radius: 16px;
+            border: 1px solid var(--hairline);
+            background: #090908;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.65rem 1.4rem;
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .frost-hidden-truth {
+            font-family: var(--font-display);
+            font-size: clamp(1.3rem, 2.7vw, 1.75rem);
+            line-height: 1.32;
+            letter-spacing: -0.015em;
+            color: var(--ink-primary);
+            max-width: 28ch;
+            text-wrap: balance;
+            pointer-events: none;
+        }
+
+        .frost-hidden-truth em {
+            color: var(--ink-italic);
+            font-style: italic;
+        }
+
+        #frost-canvas {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            display: block;
+            cursor: crosshair;
+            touch-action: none;
+            transition: opacity 620ms var(--ease-out-expo);
+        }
+
+        #frost-canvas.is-cleared {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* ─── ACTO 3: Seis roces reales que se disuelven al tocar o barrer ─── */
+        .noise-arena {
+            position: relative;
+            width: 100%;
+            max-width: 36rem;
+            min-height: 11rem;
+            margin-top: 1.6rem;
+            padding: 0.4rem 0.15rem;
             display: flex;
             flex-wrap: wrap;
             align-items: center;
             justify-content: center;
             align-content: center;
-            gap: 0.85rem 0.95rem;
+            gap: 0.7rem 0.75rem;
             touch-action: none;
             user-select: none;
             -webkit-user-select: none;
@@ -367,11 +502,11 @@
             border: 1px solid rgba(244, 239, 231, 0.14);
             background: rgba(255, 255, 255, 0.035);
             color: rgba(244, 239, 231, 0.84);
-            min-height: 46px;
-            padding: 0.72rem 1.25rem;
+            min-height: 44px;
+            padding: 0.62rem 1.1rem;
             border-radius: 999px;
             font-family: var(--font-sans);
-            font-size: 0.9375rem;
+            font-size: 0.88rem;
             font-weight: 500;
             letter-spacing: -0.01em;
             cursor: pointer;
@@ -379,33 +514,29 @@
             -webkit-user-select: none;
             -webkit-touch-callout: none;
             touch-action: none;
-            animation: chipFloat 5.4s ease-in-out infinite alternate;
+            animation: chipDrift 5.2s ease-in-out infinite alternate;
             transition:
-                opacity 420ms var(--ease-out-expo),
-                transform 420ms var(--ease-out-expo),
-                filter 420ms var(--ease-out-expo),
-                border-color 200ms var(--ease-apple),
-                background-color 200ms var(--ease-apple);
+                opacity 380ms var(--ease-out-expo),
+                transform 380ms var(--ease-out-expo),
+                filter 380ms var(--ease-out-expo),
+                border-color 180ms var(--ease-apple),
+                background-color 180ms var(--ease-apple);
         }
 
-        .noise-chip:nth-child(2) {
-            animation-delay: -1.4s;
+        .noise-chip:nth-child(2n) {
+            animation-delay: -1.7s;
         }
 
-        .noise-chip:nth-child(3) {
-            animation-delay: -2.9s;
+        .noise-chip:nth-child(3n) {
+            animation-delay: -3.1s;
         }
 
-        .noise-chip:nth-child(4) {
-            animation-delay: -4.1s;
-        }
-
-        @keyframes chipFloat {
+        @keyframes chipDrift {
             0% {
-                transform: translate3d(0, -3px, 0);
+                transform: translate3d(0, -2.5px, 0);
             }
             100% {
-                transform: translate3d(0, 4px, 0);
+                transform: translate3d(0, 3px, 0);
             }
         }
 
@@ -417,61 +548,338 @@
             }
         }
 
-        .noise-chip:active {
-            transform: scale(0.95);
-        }
-
         .noise-chip.is-dissolved {
             opacity: 0;
-            transform: translateY(-16px) scale(0.88);
-            filter: blur(8px);
+            transform: translateY(-14px) scale(0.88);
+            filter: blur(7px);
             pointer-events: none;
             animation: none;
         }
 
-        .gesture-caption {
-            margin-top: 1.15rem;
-            font-size: 0.8125rem;
-            color: var(--ink-muted);
-            letter-spacing: 0.01em;
-            font-variant-numeric: tabular-nums;
-            transition: color 320ms var(--ease-apple), opacity 320ms var(--ease-apple);
+        /* ─── ACTO 4: Pausa respirada (enfriar el impulso) ─── */
+        .breath-stage {
+            margin-top: 1.9rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
         }
 
-        .gesture-caption.is-cleared {
+        .breath-orb-btn {
+            position: relative;
+            width: 118px;
+            height: 118px;
+            border-radius: 50%;
+            border: 1px solid rgba(247, 244, 238, 0.16);
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--ink-primary);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+            touch-action: none;
+            transition: border-color 240ms var(--ease-apple), background-color 240ms var(--ease-apple);
+        }
+
+        .breath-halo {
+            position: absolute;
+            inset: -1px;
+            border-radius: 50%;
+            border: 1.5px solid rgba(232, 189, 131, 0.42);
+            transform: scale(0.72);
+            opacity: 0.35;
+            pointer-events: none;
+            will-change: transform, opacity;
+        }
+
+        .breath-ring-svg {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg);
+            pointer-events: none;
+        }
+
+        .breath-core-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--accent-amber);
+            transition: transform 240ms var(--ease-out-expo);
+        }
+
+        .breath-orb-btn.is-holding .breath-core-dot {
+            transform: scale(1.35);
+        }
+
+        /* ─── ACTO 5: Balanza directa Mi Orgullo -> Nosotros Dos ─── */
+        .balance-box {
+            width: 100%;
+            max-width: 32rem;
+            margin-top: 1.85rem;
+            padding: 1.4rem 0;
+            border-top: 1px solid var(--hairline);
+            border-bottom: 1px solid var(--hairline);
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .balance-meters {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 1rem;
+            font-variant-numeric: tabular-nums;
+            font-feature-settings: "tnum" 1;
+        }
+
+        .balance-side {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.15rem;
+        }
+
+        .balance-side.is-right {
+            align-items: flex-end;
+        }
+
+        .balance-name {
+            font-size: 0.8rem;
+            color: var(--ink-muted);
+        }
+
+        .balance-pct {
+            font-size: 1.65rem;
+            font-weight: 600;
+            letter-spacing: -0.03em;
+            color: var(--ink-primary);
+            transition: color 200ms var(--ease-apple);
+        }
+
+        .balance-side.is-right .balance-pct {
             color: var(--accent-amber);
         }
 
-        /* ─── ACTO II: Carta sincera ─── */
-        .letter-body {
-            margin-top: 1.65rem;
-            max-width: 44ch;
-            text-align: left;
+        .scrubber-track {
+            position: relative;
+            width: calc(100% - 36px);
+            height: 48px;
+            margin: 1rem auto 0;
             display: flex;
-            flex-direction: column;
-            gap: 1.15rem;
-            padding: 1.5rem 0;
+            align-items: center;
+            cursor: pointer;
+            touch-action: none;
+        }
+
+        .scrubber-line {
+            position: relative;
+            width: 100%;
+            height: 4px;
+            border-radius: 999px;
+            background: rgba(247, 244, 238, 0.12);
+            overflow: hidden;
+        }
+
+        .scrubber-fill {
+            position: absolute;
+            inset: 0 auto 0 0;
+            width: 0%;
+            background: var(--accent-amber);
+            border-radius: 999px;
+        }
+
+        .scrubber-knob {
+            position: absolute;
+            top: 50%;
+            left: 0%;
+            width: 32px;
+            height: 32px;
+            margin-top: -16px;
+            margin-left: -16px;
+            border-radius: 50%;
+            border: 2px solid var(--accent-amber);
+            background: #14120f;
+            cursor: grab;
+            touch-action: none;
+            transition: transform 120ms var(--ease-apple);
+        }
+
+        .scrubber-knob:active {
+            cursor: grabbing;
+            transform: scale(1.12);
+        }
+
+        .balance-quote {
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            line-height: 1.55;
+            color: var(--ink-secondary);
+            min-height: 2.8em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ─── ACTO 6: Unir dos puntos a través de la distancia ─── */
+        .bridge-arena {
+            position: relative;
+            width: 100%;
+            max-width: 33rem;
+            height: 132px;
+            margin-top: 1.85rem;
+            border-top: 1px solid var(--hairline);
+            border-bottom: 1px solid var(--hairline);
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
+            overflow: hidden;
+        }
+
+        .bridge-svg {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .bridge-node {
+            position: absolute;
+            top: 50%;
+            width: 58px;
+            height: 58px;
+            margin-top: -29px;
+            margin-left: -29px;
+            border-radius: 50%;
+            border: 1.5px solid rgba(247, 244, 238, 0.25);
+            background: #11100f;
+            color: var(--ink-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: grab;
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+            transition: border-color 220ms var(--ease-apple), background-color 220ms var(--ease-apple);
+        }
+
+        .bridge-node:active {
+            cursor: grabbing;
+        }
+
+        .bridge-node.node-yai {
+            border-color: rgba(230, 154, 184, 0.65);
+            color: #f6d5e3;
+        }
+
+        .bridge-node.node-yo {
+            border-color: rgba(232, 189, 131, 0.65);
+            color: #f5dfc0;
+        }
+
+        .bridge-arena.is-united .bridge-node {
+            border-color: var(--accent-amber);
+            background: rgba(232, 189, 131, 0.18);
+            color: var(--ink-primary);
+        }
+
+        /* ─── ACTO 7: Tres certezas deslizables (Snap Track) ─── */
+        .truths-carousel-wrap {
+            width: 100%;
+            max-width: 34rem;
+            margin-top: 1.65rem;
+        }
+
+        .truths-track {
+            display: flex;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            touch-action: pan-x;
             border-top: 1px solid var(--hairline);
             border-bottom: 1px solid var(--hairline);
         }
 
-        .letter-body p {
-            font-size: clamp(0.97rem, 1.35vw, 1.08rem);
-            line-height: 1.68;
-            color: var(--ink-secondary);
-            text-wrap: pretty;
+        .truths-track::-webkit-scrollbar {
+            display: none;
         }
 
-        .letter-body strong {
+        .truth-slide {
+            flex: 0 0 100%;
+            scroll-snap-align: center;
+            padding: 1.6rem 0.75rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            text-align: center;
+        }
+
+        .truth-quote {
+            font-family: var(--font-display);
+            font-size: clamp(1.28rem, 2.6vw, 1.68rem);
+            line-height: 1.34;
+            letter-spacing: -0.015em;
+            color: var(--ink-primary);
+            max-width: 28ch;
+            text-wrap: balance;
+        }
+
+        .truth-quote em {
+            font-style: italic;
+            color: var(--ink-italic);
+        }
+
+        .truth-nav {
+            margin-top: 0.95rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .truth-pill-btn {
+            appearance: none;
+            border: 1px solid var(--hairline);
+            background: transparent;
+            color: var(--ink-muted);
+            min-width: 44px;
+            min-height: 36px;
+            padding: 0 0.75rem;
+            border-radius: 999px;
+            font-family: var(--font-sans);
+            font-size: 0.78rem;
             font-weight: 500;
+            font-variant-numeric: tabular-nums;
+            cursor: pointer;
+            touch-action: manipulation;
+            transition:
+                background-color 180ms var(--ease-apple),
+                border-color 180ms var(--ease-apple),
+                color 180ms var(--ease-apple);
+        }
+
+        .truth-pill-btn.is-current {
+            border-color: var(--accent-amber);
+            background: rgba(232, 189, 131, 0.12);
             color: var(--ink-primary);
         }
 
-        /* ─── ACTO III: Tres acuerdos sobre líneas editoriales (sin tarjetas) ─── */
+        /* ─── ACTO 8: Cuatro acuerdos sobre líneas editoriales ─── */
         .promises-list {
             width: 100%;
             max-width: 38rem;
-            margin-top: 1.65rem;
+            margin-top: 1.35rem;
             border-top: 1px solid var(--hairline);
             text-align: left;
         }
@@ -482,10 +890,10 @@
             background: transparent;
             border: 0;
             border-bottom: 1px solid var(--hairline);
-            padding: 1.05rem 0.25rem;
+            padding: 0.85rem 0.2rem;
             display: grid;
-            grid-template-columns: 24px 1fr;
-            gap: 0.9rem;
+            grid-template-columns: 22px 1fr;
+            gap: 0.85rem;
             align-items: start;
             text-align: left;
             color: var(--ink-primary);
@@ -495,7 +903,7 @@
             -webkit-user-select: none;
             -webkit-touch-callout: none;
             touch-action: manipulation;
-            transition: border-color 320ms var(--ease-apple), opacity 280ms var(--ease-apple);
+            transition: border-color 280ms var(--ease-apple), opacity 200ms var(--ease-apple);
         }
 
         @media (hover: hover) and (pointer: fine) {
@@ -512,8 +920,8 @@
         }
 
         .promise-beacon {
-            width: 22px;
-            height: 22px;
+            width: 20px;
+            height: 20px;
             margin-top: 0.1rem;
             border-radius: 50%;
             border: 1.5px solid rgba(244, 239, 231, 0.26);
@@ -522,23 +930,23 @@
             justify-content: center;
             color: transparent;
             transition:
-                background-color 280ms var(--ease-out-expo),
-                border-color 280ms var(--ease-out-expo),
-                color 240ms var(--ease-out-expo),
-                transform 280ms var(--ease-out-expo);
+                background-color 260ms var(--ease-out-expo),
+                border-color 260ms var(--ease-out-expo),
+                color 220ms var(--ease-out-expo),
+                transform 260ms var(--ease-out-expo);
         }
 
         .promise-beacon svg {
-            width: 12px;
-            height: 12px;
+            width: 11px;
+            height: 11px;
         }
 
         .promise-title {
-            font-size: 1rem;
+            font-size: 0.95rem;
             font-weight: 600;
-            letter-spacing: -0.015em;
+            letter-spacing: -0.012em;
             color: rgba(247, 244, 238, 0.68);
-            transition: color 280ms var(--ease-apple);
+            transition: color 240ms var(--ease-apple);
         }
 
         .promise-detail-wrap {
@@ -546,9 +954,9 @@
             grid-template-rows: 0fr;
             opacity: 0;
             transition:
-                grid-template-rows 360ms var(--ease-out-expo),
-                opacity 320ms var(--ease-out-expo),
-                margin-top 320ms var(--ease-out-expo);
+                grid-template-rows 320ms var(--ease-out-expo),
+                opacity 280ms var(--ease-out-expo),
+                margin-top 280ms var(--ease-out-expo);
         }
 
         .promise-detail-inner {
@@ -556,8 +964,8 @@
         }
 
         .promise-detail {
-            font-size: 0.9rem;
-            line-height: 1.58;
+            font-size: 0.86rem;
+            line-height: 1.52;
             color: var(--ink-secondary);
             text-wrap: pretty;
         }
@@ -580,22 +988,55 @@
         .promise-row.is-lit .promise-detail-wrap {
             grid-template-rows: 1fr;
             opacity: 1;
-            margin-top: 0.42rem;
+            margin-top: 0.34rem;
         }
 
-        /* ─── ACTO IV: Día Cero + Sello táctil mantenido ─── */
+        /* ─── ACTO 9: Rebobinar el marcador a 00:00:00 ─── */
+        .rewind-box {
+            width: 100%;
+            max-width: 30rem;
+            margin-top: 1.75rem;
+            padding: 1.35rem 0;
+            border-top: 1px solid var(--hairline);
+            border-bottom: 1px solid var(--hairline);
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .rewind-digits {
+            font-size: clamp(2.35rem, 6.2vw, 3.6rem);
+            font-weight: 600;
+            letter-spacing: -0.035em;
+            line-height: 1;
+            color: var(--ink-primary);
+            font-variant-numeric: tabular-nums;
+            font-feature-settings: "tnum" 1;
+            transition: color 280ms var(--ease-apple);
+        }
+
+        .rewind-digits.is-zero {
+            color: var(--accent-amber);
+        }
+
+        .rewind-caption {
+            margin-top: 0.55rem;
+            font-size: 0.8125rem;
+            color: var(--ink-muted);
+        }
+
+        /* ─── ACTO 10: Sello mantenido de propuesta ─── */
         .seal-stage {
-            margin-top: 2.15rem;
+            margin-top: 1.85rem;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 0.95rem;
+            gap: 0.85rem;
         }
 
         .seal-button {
             position: relative;
-            width: 100px;
-            height: 100px;
+            width: 102px;
+            height: 102px;
             border-radius: 50%;
             border: 0;
             background: rgba(232, 189, 131, 0.06);
@@ -608,7 +1049,7 @@
             -webkit-user-select: none;
             -webkit-touch-callout: none;
             touch-action: none;
-            transition: transform 220ms var(--ease-out-expo), background-color 260ms var(--ease-apple);
+            transition: transform 220ms var(--ease-out-expo), background-color 240ms var(--ease-apple);
         }
 
         @media (hover: hover) and (pointer: fine) {
@@ -637,13 +1078,12 @@
 
         .seal-ring-progress {
             stroke: var(--accent-amber);
-            transition: stroke 240ms linear;
         }
 
         .seal-emblem {
             width: 30px;
             height: 30px;
-            transition: transform 240ms var(--ease-out-expo), color 240ms var(--ease-apple);
+            transition: transform 220ms var(--ease-out-expo), color 220ms var(--ease-apple);
         }
 
         .seal-button.is-holding .seal-emblem {
@@ -655,7 +1095,6 @@
             font-size: 0.84rem;
             font-weight: 500;
             color: var(--ink-secondary);
-            letter-spacing: -0.005em;
             user-select: none;
             -webkit-user-select: none;
         }
@@ -663,10 +1102,10 @@
         .first-note-drawer {
             width: 100%;
             max-width: 30rem;
-            margin-top: 1rem;
+            margin-top: 0.85rem;
             display: none;
             flex-direction: column;
-            gap: 0.75rem;
+            gap: 0.7rem;
             text-align: left;
         }
 
@@ -674,10 +1113,10 @@
             display: flex;
         }
 
-        /* ─── ACTO V: Nuevo comienzo en marcha + Mensaje ─── */
+        /* ─── EPÍLOGO (ACTO 11): Reloj ascendente + Mensaje para ti ─── */
         .fresh-clock {
-            margin-top: 1.5rem;
-            padding: 0.9rem 0;
+            margin-top: 1.4rem;
+            padding: 0.85rem 0;
             border-top: 1px solid var(--hairline);
             border-bottom: 1px solid var(--hairline);
             width: 100%;
@@ -697,7 +1136,7 @@
         }
 
         .fresh-num {
-            font-size: clamp(1.55rem, 3.8vw, 2.2rem);
+            font-size: clamp(1.5rem, 3.6vw, 2.15rem);
             font-weight: 600;
             letter-spacing: -0.03em;
             color: var(--accent-amber);
@@ -710,32 +1149,32 @@
 
         .fresh-sep {
             color: var(--ink-faint);
-            font-size: 1.15rem;
+            font-size: 1.1rem;
         }
 
         .reply-composer {
             width: 100%;
             max-width: 31rem;
-            margin-top: 1.35rem;
+            margin-top: 1.25rem;
             display: flex;
             flex-direction: column;
-            gap: 0.85rem;
+            gap: 0.75rem;
             text-align: left;
         }
 
         .reply-label {
-            font-size: 0.85rem;
+            font-size: 0.84rem;
             color: var(--ink-secondary);
         }
 
         .reply-textarea {
             width: 100%;
-            min-height: 92px;
-            max-height: 170px;
+            min-height: 88px;
+            max-height: 160px;
             resize: vertical;
-            padding: 0.85rem 0.95rem;
+            padding: 0.8rem 0.95rem;
             border-radius: 14px;
-            border: 1px solid var(--glass-border);
+            border: 1px solid var(--hairline-strong);
             background: var(--surface-elevated);
             color: var(--ink-primary);
             caret-color: var(--accent-amber);
@@ -756,7 +1195,7 @@
 
         /* ─── Botones compartidos ─── */
         .act-actions {
-            margin-top: 1.75rem;
+            margin-top: 1.45rem;
             display: flex;
             flex-wrap: wrap;
             align-items: center;
@@ -769,17 +1208,17 @@
             border: 0;
             border-radius: 999px;
             min-height: 48px;
-            padding: 0 1.5rem;
+            padding: 0 1.45rem;
             background: var(--accent-amber);
             color: var(--accent-amber-ink);
             font-family: var(--font-sans);
-            font-size: 0.9375rem;
+            font-size: 0.92rem;
             font-weight: 600;
             letter-spacing: -0.01em;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 0.5rem;
+            gap: 0.48rem;
             cursor: pointer;
             user-select: none;
             -webkit-user-select: none;
@@ -802,7 +1241,7 @@
         }
 
         .btn-primary:disabled {
-            opacity: 0.34;
+            opacity: 0.3;
             cursor: not-allowed;
         }
 
@@ -841,41 +1280,43 @@
             transform: scale(0.97);
         }
 
-        /* ─── Pie con progreso discreto ─── */
+        /* ─── Barra inferior de 10 segmentos ─── */
         .chrome-bottom {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 0.55rem;
+            gap: 0.5rem;
             min-height: 28px;
         }
 
-        .step-dots {
+        .step-rail {
             display: inline-flex;
             align-items: center;
-            gap: 0.45rem;
+            gap: 5px;
         }
 
-        .step-dot {
-            width: 6px;
-            height: 6px;
+        .step-seg {
+            width: 14px;
+            height: 3px;
             border-radius: 999px;
-            background: rgba(247, 244, 238, 0.18);
-            transition: width 280ms var(--ease-out-expo), background-color 280ms var(--ease-apple);
+            background: rgba(247, 244, 238, 0.14);
+            transition:
+                width 260ms var(--ease-out-expo),
+                background-color 260ms var(--ease-apple);
         }
 
-        .step-dot.is-active {
-            width: 20px;
+        .step-seg.is-active {
+            width: 26px;
             background: var(--accent-amber);
         }
 
-        .step-dot.is-done {
-            background: rgba(232, 189, 131, 0.48);
+        .step-seg.is-done {
+            background: rgba(232, 189, 131, 0.46);
         }
 
         .footer-note {
-            font-size: 0.75rem;
+            font-size: 0.74rem;
             color: var(--ink-faint);
             text-align: center;
             font-variant-numeric: tabular-nums;
@@ -884,66 +1325,65 @@
         @media (max-width: 560px) {
             .monolith-shell {
                 padding:
-                    max(1rem, env(safe-area-inset-top, 0px) + 0.65rem)
-                    max(1.1rem, env(safe-area-inset-right, 0px) + 0.9rem)
-                    max(1rem, env(safe-area-inset-bottom, 0px) + 0.65rem)
-                    max(1.1rem, env(safe-area-inset-left, 0px) + 0.9rem);
+                    max(0.95rem, env(safe-area-inset-top, 0px) + 0.6rem)
+                    max(1.05rem, env(safe-area-inset-right, 0px) + 0.85rem)
+                    max(0.95rem, env(safe-area-inset-bottom, 0px) + 0.6rem)
+                    max(1.05rem, env(safe-area-inset-left, 0px) + 0.85rem);
             }
 
             .headline {
-                font-size: clamp(1.9rem, 8.2vw, 2.55rem);
+                font-size: clamp(1.82rem, 7.9vw, 2.45rem);
+            }
+
+            .frost-frame {
+                min-height: 10.2rem;
+                padding: 1.35rem 1.1rem;
+                margin-top: 1.35rem;
             }
 
             .noise-arena {
-                min-height: 11.5rem;
-                margin-top: 1.45rem;
-                gap: 0.65rem;
+                margin-top: 1.25rem;
+                gap: 0.55rem;
             }
 
             .noise-chip {
-                padding: 0.65rem 1.05rem;
-                font-size: 0.875rem;
+                padding: 0.56rem 0.95rem;
+                font-size: 0.84rem;
             }
 
-            .letter-body {
-                margin-top: 1.25rem;
-                padding: 1.15rem 0;
-                gap: 0.95rem;
+            .step-seg {
+                width: 11px;
             }
 
-            .promises-list {
-                margin-top: 1.25rem;
-            }
-
-            .promise-row {
-                padding: 0.9rem 0.15rem;
-            }
-
-            .seal-stage {
-                margin-top: 1.55rem;
+            .step-seg.is-active {
+                width: 22px;
             }
         }
 
         @media (max-height: 760px) {
             .headline {
-                font-size: clamp(1.75rem, 6.8vw, 2.4rem);
+                font-size: clamp(1.7rem, 6.5vw, 2.3rem);
             }
 
             .prose-lead {
-                margin-top: 0.65rem;
-                font-size: 0.92rem;
+                margin-top: 0.6rem;
+                font-size: 0.9rem;
             }
 
             .promises-list {
-                margin-top: 0.95rem;
+                margin-top: 0.9rem;
             }
 
             .promise-row {
-                padding: 0.72rem 0.15rem;
+                padding: 0.65rem 0.15rem;
+            }
+
+            .promise-detail {
+                font-size: 0.82rem;
             }
 
             .act-actions {
-                margin-top: 1.15rem;
+                margin-top: 1.05rem;
             }
         }
 
@@ -970,9 +1410,9 @@
         @media (prefers-contrast: more) {
             :root {
                 --ink-secondary: rgba(250, 248, 244, 0.92);
-                --ink-muted: rgba(250, 248, 244, 0.78);
+                --ink-muted: rgba(250, 248, 244, 0.80);
                 --hairline: rgba(255, 255, 255, 0.34);
-                --glass-border: rgba(255, 255, 255, 0.45);
+                --hairline-strong: rgba(255, 255, 255, 0.48);
             }
         }
     </style>
@@ -990,54 +1430,57 @@
                 <img src="./assets/logos/logo_28e_oficial.png" alt="28E" width="96" height="36" decoding="async">
             </div>
 
-            <div class="top-controls">
-                <button id="ambient-btn" class="sound-pill" type="button" aria-pressed="true" aria-label="Silenciar música de fondo">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <path d="M11 5L6.5 9H3.5v6h3L11 19V5z"></path>
-                        <path class="sound-wave" d="M15.2 8.8a4.6 4.6 0 0 1 0 6.4"></path>
-                        <path class="sound-wave" d="M18.2 6.2a8.2 8.2 0 0 1 0 11.6"></path>
-                        <path class="sound-mute-slash" d="M16 9.5l5 5M21 9.5l-5 5"></path>
+            <div class="top-nav">
+                <button id="prev-act-btn" class="back-pill" type="button" hidden aria-label="Volver al paso anterior">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M19 12H5"></path>
+                        <path d="M11 18l-6-6 6-6"></path>
                     </svg>
-                    <span id="ambient-label">Sonido</span>
+                    <span>Atrás</span>
                 </button>
+                <div id="act-counter" class="act-counter-pill" aria-live="polite">1 / 10</div>
             </div>
         </header>
 
-        <main class="stage-viewport">
-            <!-- ACTO 1: SOLTAR EL RUIDO -->
+        <main id="stage-viewport" class="stage-viewport">
+            <!-- ACTO 1: EL UMBRAL EN SILENCIO -->
             <section id="act-1" class="act-panel is-mounted is-visible" aria-labelledby="act1-title">
-                <h1 id="act1-title" class="headline">No quiero fingir que aquí <em>no pasó nada, Yai.</em></h1>
+                <h1 id="act1-title" class="headline">Hola, <em>Yai.</em></h1>
                 <p class="prose-lead">
-                    Tuvimos días hermosos y también bajadas que nos cansaron. Antes de decirte lo que guardo hoy, suelta conmigo todo lo que nos pesó.
+                    Dejé esta página en completo silencio a propósito. No quiero distraerte ni convencerte con adornos: solo quiero hablarte sin escudos y desde la calma.
                 </p>
 
-                <div id="noise-arena" class="noise-arena" aria-label="Toca o desliza sobre cada frase para soltarla">
-                    <button type="button" class="noise-chip" data-noise="0">El orgullo</button>
-                    <button type="button" class="noise-chip" data-noise="1">Contestar en caliente</button>
-                    <button type="button" class="noise-chip" data-noise="2">Los silencios que alejan</button>
-                    <button type="button" class="noise-chip" data-noise="3">Dejar que la distancia pese</button>
+                <div id="threshold-rail" class="slide-rail" role="slider" tabindex="0" aria-label="Desliza hacia la derecha para entrar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                    <div id="threshold-fill" class="slide-rail-fill" aria-hidden="true"></div>
+                    <span id="threshold-label" class="slide-rail-label">Desliza con calma para entrar</span>
+                    <div id="threshold-thumb" class="slide-thumb" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M5 12h14"></path>
+                            <path d="M13 6l6 6-6 6"></path>
+                        </svg>
+                    </div>
                 </div>
-
-                <p id="noise-caption" class="gesture-caption">Toca o desliza tu dedo sobre cada una para dejarlas atrás · 4 restantes</p>
             </section>
 
-            <!-- ACTO 2: CARTA HONESTA -->
+            <!-- ACTO 2: DESEMPAÑAR LA VERDAD -->
             <section id="act-2" class="act-panel" aria-labelledby="act2-title" hidden>
-                <h2 id="act2-title" class="headline">A veces cuidé más mi orgullo <em>que a nosotros.</em></h2>
+                <h2 id="act2-title" class="headline">Últimamente nos tapó <em>demasiado el ruido.</em></h2>
+                <p class="prose-lead">
+                    Pasa tu dedo por el cristal empañado para ver lo que siempre se quedó intacto debajo de tantas subidas y bajadas.
+                </p>
 
-                <div class="letter-body">
-                    <p>
-                        Hubo momentos en que respondí en caliente cuando tocaba respirar, veces en que callé cosas que debía hablarte claro y días en que dejé que la distancia se sintiera todavía más grande entre los dos.
+                <div id="frost-frame" class="frost-frame">
+                    <p class="frost-hidden-truth">
+                        Debajo del cansancio y de cada discusión sin sentido, <em>nunca dejé de sentir que eres tú</em> la persona con la que quiero estar en paz.
                     </p>
-                    <p>
-                        No te escribo esto para tapar lo que pasó, sino porque me enseñó algo que tengo clarísimo: <strong>prefiero aprender a cuidarte bien mil veces antes que acostumbrarme a una vida sin ti.</strong>
-                    </p>
+                    <canvas id="frost-canvas" tabindex="0" role="button" aria-label="Pasa tu dedo o presiona Enter para limpiar el cristal"></canvas>
                 </div>
 
+                <p id="frost-status" class="micro-status">Desliza tu dedo sobre el cristal para despejarlo</p>
+
                 <div class="act-actions">
-                    <button type="button" class="btn-quiet" data-goto="1">Volver</button>
-                    <button type="button" class="btn-primary" data-goto="3">
-                        <span>Lo que quiero cambiar</span>
+                    <button id="act2-next-btn" type="button" class="btn-primary" data-goto="3" disabled>
+                        <span>Continuar</span>
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                             <path d="M5 12h14"></path>
                             <path d="M13 6l6 6-6 6"></path>
@@ -1046,12 +1489,163 @@
                 </div>
             </section>
 
-            <!-- ACTO 3: TRES ACUERDOS REALES -->
+            <!-- ACTO 3: SOLTAR LOS SEIS ROCES REALES -->
             <section id="act-3" class="act-panel" aria-labelledby="act3-title" hidden>
-                <h2 id="act3-title" class="headline">Si empezamos de cero, <em>no va a ser igual.</em></h2>
-                <p class="prose-lead">Toca cada promesa para encender cómo quiero cuidarte desde hoy.</p>
+                <h2 id="act3-title" class="headline">No quiero fingir que <em>aquí no pasó nada.</em></h2>
+                <p class="prose-lead">
+                    Toca o barre con tu dedo cada una de las cosas que nos desgastaron para soltarlas antes de seguir.
+                </p>
 
-                <div class="promises-list" role="group" aria-label="Mis tres compromisos contigo">
+                <div id="noise-arena" class="noise-arena" aria-label="Toca o desliza sobre cada frase para soltarla">
+                    <button type="button" class="noise-chip" data-noise="0">El orgullo</button>
+                    <button type="button" class="noise-chip" data-noise="1">Contestar en caliente</button>
+                    <button type="button" class="noise-chip" data-noise="2">Callar lo que sentimos</button>
+                    <button type="button" class="noise-chip" data-noise="3">Querer tener la razón</button>
+                    <button type="button" class="noise-chip" data-noise="4">Enfriarnos en silencio</button>
+                    <button type="button" class="noise-chip" data-noise="5">Dejar que la distancia gane</button>
+                </div>
+
+                <p id="noise-caption" class="micro-status">Toca o pasa tu dedo por las 6 para dejarlas atrás</p>
+            </section>
+
+            <!-- ACTO 4: LA PAUSA ANTES DEL IMPULSO -->
+            <section id="act-4" class="act-panel" aria-labelledby="act4-title" hidden>
+                <h2 id="act4-title" class="headline">Aprendí cuánto lastima <em>hablar en caliente.</em></h2>
+                <p class="prose-lead">
+                    Muchas discusiones crecieron porque respondí desde el impulso cuando tocaba respirar primero. Haz esta pausa de tres segundos conmigo.
+                </p>
+
+                <div class="breath-stage">
+                    <button id="breath-btn" type="button" class="breath-orb-btn" aria-label="Mantén presionado tres segundos para hacer una pausa en calma">
+                        <span id="breath-halo" class="breath-halo" aria-hidden="true"></span>
+                        <svg class="breath-ring-svg" viewBox="0 0 118 118" fill="none" aria-hidden="true">
+                            <circle cx="59" cy="59" r="54" stroke="rgba(247,244,238,0.12)" stroke-width="1.5"></circle>
+                            <circle id="breath-progress-circle" cx="59" cy="59" r="54" stroke="#e8bd83" stroke-width="2" stroke-linecap="round" stroke-dasharray="339.29" stroke-dashoffset="339.29"></circle>
+                        </svg>
+                        <span class="breath-core-dot" aria-hidden="true"></span>
+                    </button>
+                    <p id="breath-status" class="micro-status">Mantén tu dedo en el centro para enfriar el impulso</p>
+                </div>
+            </section>
+
+            <!-- ACTO 5: BAJAR EL ORGULLO A CERO -->
+            <section id="act-5" class="act-panel" aria-labelledby="act5-title" hidden>
+                <h2 id="act5-title" class="headline">Tener la razón no sirve de nada <em>si te pierdo a ti.</em></h2>
+                <p class="prose-lead">
+                    A veces cuidé más mi orgullo que nuestra tranquilidad. Lleva esta barra hasta el final para poner las cosas en su lugar.
+                </p>
+
+                <div class="balance-box">
+                    <div class="balance-meters">
+                        <div class="balance-side">
+                            <span class="balance-name">Mi orgullo</span>
+                            <span id="pride-pct" class="balance-pct">100%</span>
+                        </div>
+                        <div class="balance-side is-right">
+                            <span class="balance-name">Nosotros dos</span>
+                            <span id="us-pct" class="balance-pct">0%</span>
+                        </div>
+                    </div>
+
+                    <div id="balance-track" class="scrubber-track" role="slider" tabindex="0" aria-label="Bajar el orgullo a cero y subir nosotros dos al cien por ciento" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                        <div class="scrubber-line">
+                            <div id="balance-fill" class="scrubber-fill"></div>
+                        </div>
+                        <div id="balance-knob" class="scrubber-knob" aria-hidden="true"></div>
+                    </div>
+
+                    <p id="balance-quote" class="balance-quote">Defender mi orgullo solo nos ponía en bandos opuestos.</p>
+                </div>
+
+                <div class="act-actions">
+                    <button id="act5-next-btn" type="button" class="btn-primary" data-goto="6" disabled>
+                        <span>Continuar</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M5 12h14"></path>
+                            <path d="M13 6l6 6-6 6"></path>
+                        </svg>
+                    </button>
+                </div>
+            </section>
+
+            <!-- ACTO 6: ACORTAR LA DISTANCIA -->
+            <section id="act-6" class="act-panel" aria-labelledby="act6-title" hidden>
+                <h2 id="act6-title" class="headline">La distancia solo gana cuando <em>nos soltamos por dentro.</em></h2>
+                <p class="prose-lead">
+                    Arrastra cualquiera de los dos círculos con tu dedo hasta volver a juntarnos en el centro.
+                </p>
+
+                <div id="bridge-arena" class="bridge-arena">
+                    <svg class="bridge-svg" id="bridge-svg" preserveAspectRatio="none" aria-hidden="true">
+                        <path id="bridge-path" fill="none" stroke="rgba(232,189,131,0.45)" stroke-width="1.6" stroke-dasharray="4 5"></path>
+                    </svg>
+                    <button id="node-yai" type="button" class="bridge-node node-yai" aria-label="Arrastra a Yai hacia el centro">Yai</button>
+                    <button id="node-yo" type="button" class="bridge-node node-yo" aria-label="Arrastra a Yo hacia el centro">Yo</button>
+                </div>
+
+                <p id="bridge-status" class="micro-status">Acércalos para cortar la distancia</p>
+
+                <div class="act-actions">
+                    <button id="act6-next-btn" type="button" class="btn-primary" data-goto="7" disabled>
+                        <span>Continuar</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M5 12h14"></path>
+                            <path d="M13 6l6 6-6 6"></path>
+                        </svg>
+                    </button>
+                </div>
+            </section>
+
+            <!-- ACTO 7: TRES VERDADES QUE SOBREVIVIERON A TODO -->
+            <section id="act-7" class="act-panel" aria-labelledby="act7-title" hidden>
+                <h2 id="act7-title" class="headline">Ni en nuestras peores rachas <em>dudé de esto.</em></h2>
+                <p class="prose-lead">
+                    Desliza hacia los lados o toca cada parte para leer las tres certezas que ninguna pelea pudo borrar.
+                </p>
+
+                <div class="truths-carousel-wrap">
+                    <div id="truths-track" class="truths-track" aria-label="Tres certezas sobre nosotros">
+                        <article class="truth-slide">
+                            <p class="truth-quote">
+                                Cómo me cambia el día entero cuando estamos bien, nos reímos sin tensión y <em>te siento tranquila conmigo.</em>
+                            </p>
+                        </article>
+                        <article class="truth-slide">
+                            <p class="truth-quote">
+                                Que incluso cuando discutíamos fuerte, mi mente jamás buscó otro lugar: <em>siempre buscó cómo arreglarlo contigo.</em>
+                            </p>
+                        </article>
+                        <article class="truth-slide">
+                            <p class="truth-quote">
+                                Que prefiero aprender a cuidarte mejor mil veces antes que <em>acostumbrarme a una vida sin ti.</em>
+                            </p>
+                        </article>
+                    </div>
+
+                    <div class="truth-nav" role="tablist" aria-label="Seleccionar certeza">
+                        <button type="button" class="truth-pill-btn is-current" data-truth-idx="0">1 / 3</button>
+                        <button type="button" class="truth-pill-btn" data-truth-idx="1">2 / 3</button>
+                        <button type="button" class="truth-pill-btn" data-truth-idx="2">3 / 3</button>
+                    </div>
+                </div>
+
+                <div class="act-actions">
+                    <button id="act7-next-btn" type="button" class="btn-primary" data-goto="8" disabled>
+                        <span id="act7-next-label">Lee las 3 partes para seguir</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M5 12h14"></path>
+                            <path d="M13 6l6 6-6 6"></path>
+                        </svg>
+                    </button>
+                </div>
+            </section>
+
+            <!-- ACTO 8: CUATRO ACUERDOS REALES -->
+            <section id="act-8" class="act-panel" aria-labelledby="act8-title" hidden>
+                <h2 id="act8-title" class="headline">Si empezamos de cero, <em>no va a ser igual.</em></h2>
+                <p class="prose-lead">Toca cada línea para encender los cuatro compromisos que asumo contigo desde hoy.</p>
+
+                <div class="promises-list" role="group" aria-label="Mis cuatro compromisos contigo">
                     <button type="button" class="promise-row" data-promise="0" aria-expanded="false">
                         <span class="promise-beacon" aria-hidden="true">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
@@ -1062,7 +1656,7 @@
                             <span class="promise-title">Respirar antes de contestar en caliente</span>
                             <span class="promise-detail-wrap">
                                 <span class="promise-detail-inner">
-                                    <span class="promise-detail">Cuando algo duela o incomode, bajar la guardia primero. Nunca volver a hablarte desde el impulso ni usar mis palabras para herirnos.</span>
+                                    <span class="promise-detail">Cuando algo duela o incomode, bajar la guardia primero. Nunca volver a hablarte desde el impulso ni usar palabras para herirnos.</span>
                                 </span>
                             </span>
                         </span>
@@ -1075,10 +1669,10 @@
                             </svg>
                         </span>
                         <span>
-                            <span class="promise-title">Elegir nuestra paz antes que tener la razón</span>
+                            <span class="promise-title">Poner nuestra paz por encima del orgullo</span>
                             <span class="promise-detail-wrap">
                                 <span class="promise-detail-inner">
-                                    <span class="promise-detail">Dejar el orgullo afuera. En un desacuerdo no eres mi rival, Yai: somos tú y yo del mismo lado cuidando lo que tenemos.</span>
+                                    <span class="promise-detail">Dejar de competir por quién tiene la razón. En cualquier desacuerdo no eres mi rival, Yai: somos tú y yo del mismo lado.</span>
                                 </span>
                             </span>
                         </span>
@@ -1091,10 +1685,26 @@
                             </svg>
                         </span>
                         <span>
-                            <span class="promise-title">Hablar claro y acortar la distancia</span>
+                            <span class="promise-title">Hablar claro sin castigarnos con silencios</span>
                             <span class="promise-detail-wrap">
                                 <span class="promise-detail-inner">
-                                    <span class="promise-detail">No guardarme lo que siento ni enfriarme en silencio. Hacerte sentir acompañada y cerca todos los días, estemos donde estemos.</span>
+                                    <span class="promise-detail">Decir lo que sentimos a tiempo y con honestidad tranquila, sin guardarnos cosas ni enfriarnos durante días.</span>
+                                </span>
+                            </span>
+                        </span>
+                    </button>
+
+                    <button type="button" class="promise-row" data-promise="3" aria-expanded="false">
+                        <span class="promise-beacon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20 6L9 17l-5-5"></path>
+                            </svg>
+                        </span>
+                        <span>
+                            <span class="promise-title">Hacerme presente a pesar de la distancia</span>
+                            <span class="promise-detail-wrap">
+                                <span class="promise-detail-inner">
+                                    <span class="promise-detail">Cuidar los detalles cotidianos para que te sientas acompañada, escuchada y cerca de mí todos los días, estemos donde estemos.</span>
                                 </span>
                             </span>
                         </span>
@@ -1102,9 +1712,8 @@
                 </div>
 
                 <div class="act-actions">
-                    <button type="button" class="btn-quiet" data-goto="2">Volver</button>
-                    <button id="to-act4-btn" type="button" class="btn-primary" data-goto="4" disabled>
-                        <span>Encender las 3 para seguir</span>
+                    <button id="act8-next-btn" type="button" class="btn-primary" data-goto="9" disabled>
+                        <span id="act8-next-label">Enciende los 4 acuerdos para seguir</span>
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                             <path d="M5 12h14"></path>
                             <path d="M13 6l6 6-6 6"></path>
@@ -1113,33 +1722,63 @@
                 </div>
             </section>
 
-            <!-- ACTO 4: LA PREGUNTA + SELLO DE LUZ -->
-            <section id="act-4" class="act-panel" aria-labelledby="act4-title" hidden>
-                <h2 id="act4-title" class="headline">Yai, ¿empezamos desde cero? <em>¿Quieres ser mi novia?</em></h2>
+            <!-- ACTO 9: PONER EL RELOJ EN CERO -->
+            <section id="act-9" class="act-panel" aria-labelledby="act9-title" hidden>
+                <h2 id="act9-title" class="headline">Borremos la cuenta <em>de todo lo malo.</em></h2>
                 <p class="prose-lead">
-                    Sin arrastrar las peleas de ayer. Con todo lo que aprendimos y con el corazón tranquilo para hacerlo bien contigo.
+                    Arrastra el control hacia la izquierda hasta llevar todo el historial de discusiones a cero absoluto.
+                </p>
+
+                <div class="rewind-box">
+                    <div id="rewind-digits" class="rewind-digits">28 : 14 : 59</div>
+                    <p id="rewind-caption" class="rewind-caption">Altas y bajas acumuladas · Desliza hacia atrás</p>
+
+                    <div id="rewind-track" class="scrubber-track" role="slider" tabindex="0" aria-label="Rebobinar el contador hasta cero" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100">
+                        <div class="scrubber-line">
+                            <div id="rewind-fill" class="scrubber-fill" style="width: 100%;"></div>
+                        </div>
+                        <div id="rewind-knob" class="scrubber-knob" style="left: 100%;" aria-hidden="true"></div>
+                    </div>
+                </div>
+
+                <div class="act-actions">
+                    <button id="act9-next-btn" type="button" class="btn-primary" data-goto="10" disabled>
+                        <span>Ir a mi pregunta</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M5 12h14"></path>
+                            <path d="M13 6l6 6-6 6"></path>
+                        </svg>
+                    </button>
+                </div>
+            </section>
+
+            <!-- ACTO 10: LA PREGUNTA + SELLO DE LUZ -->
+            <section id="act-10" class="act-panel" aria-labelledby="act10-title" hidden>
+                <h2 id="act10-title" class="headline">Yai, ¿empezamos desde cero? <em>¿Quieres ser mi novia?</em></h2>
+                <p class="prose-lead">
+                    Sin arrastrar las peleas de ayer. Con todo lo que aprendimos y con el corazón en calma para hacerlo bien contigo.
                 </p>
 
                 <div class="seal-stage">
                     <button id="seal-btn" type="button" class="seal-button" aria-label="Mantén presionado dos segundos para decir que sí">
-                        <svg class="seal-ring-svg" viewBox="0 0 100 100" fill="none" aria-hidden="true">
-                            <circle class="seal-ring-track" cx="50" cy="50" r="46" stroke-width="1.6"></circle>
-                            <circle id="seal-progress-circle" class="seal-ring-progress" cx="50" cy="50" r="46" stroke-width="2.2" stroke-linecap="round" stroke-dasharray="289.03" stroke-dashoffset="289.03"></circle>
+                        <svg class="seal-ring-svg" viewBox="0 0 102 102" fill="none" aria-hidden="true">
+                            <circle class="seal-ring-track" cx="51" cy="51" r="47" stroke-width="1.6"></circle>
+                            <circle id="seal-progress-circle" class="seal-ring-progress" cx="51" cy="51" r="47" stroke-width="2.3" stroke-linecap="round" stroke-dasharray="295.31" stroke-dashoffset="295.31"></circle>
                         </svg>
                         <svg class="seal-emblem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                             <path d="M12 20.5s-7-4.35-7-10.1A4.15 4.15 0 0 1 9.15 6.2c1.32 0 2.28.62 2.85 1.45.57-.83 1.53-1.45 2.85-1.45A4.15 4.15 0 0 1 19 10.4c0 5.75-7 10.1-7 10.1z"></path>
                         </svg>
                     </button>
-                    <p id="seal-hint" class="seal-hint">Mantén presionado el sello para decir que sí</p>
+                    <p id="seal-hint" class="seal-hint">Mantén presionado el sello dos segundos para decir que sí</p>
                 </div>
 
-                <div class="act-actions" style="margin-top: 1.1rem;">
+                <div class="act-actions" style="margin-top: 1rem;">
                     <button id="open-talk-first-btn" type="button" class="btn-quiet">Quiero escribirte algo antes</button>
                 </div>
 
                 <div id="talk-first-drawer" class="first-note-drawer">
                     <textarea id="talk-first-input" class="reply-textarea" maxlength="600" enterkeyhint="send" placeholder="Escríbeme con calma lo que sientes, Yai…"></textarea>
-                    <div class="act-actions" style="margin-top: 0.25rem; justify-content: flex-end;">
+                    <div class="act-actions" style="margin-top: 0.2rem; justify-content: flex-end;">
                         <button id="send-talk-first-btn" type="button" class="btn-primary">
                             <span id="send-talk-first-label">Enviarle mi mensaje</span>
                         </button>
@@ -1147,11 +1786,11 @@
                 </div>
             </section>
 
-            <!-- ACTO 5: SELLADO · NUESTRO DÍA CERO -->
-            <section id="act-5" class="act-panel" aria-labelledby="act5-title" hidden>
-                <h2 id="act5-title" class="headline">Gracias por darme <em>este nuevo comienzo, Yai.</em></h2>
+            <!-- EPÍLOGO (ACTO 11): SELLADO · NUESTRO DÍA CERO -->
+            <section id="act-11" class="act-panel" aria-labelledby="act11-title" hidden>
+                <h2 id="act11-title" class="headline">Gracias por darme <em>este nuevo comienzo, Yai.</em></h2>
                 <p class="prose-lead">
-                    Hoy nuestro reloj empieza limpio. Prometo cuidar tu paz y lo nuestro todos los días.
+                    Desde este segundo nuestra cuenta empieza limpia. Prometo cuidar tu tranquilidad y lo nuestro todos los días.
                 </p>
 
                 <div class="fresh-clock" role="timer" aria-label="Tiempo desde nuestro nuevo comienzo">
@@ -1165,7 +1804,7 @@
                 </div>
 
                 <div class="reply-composer">
-                    <label for="accepted-note-input" class="reply-label">Si quieres dejarme unas palabras para guardar este momento, me llegan directo ahora mismo:</label>
+                    <label for="accepted-note-input" class="reply-label">Si quieres dejarme unas palabras para guardar este momento, te leo ahora mismo:</label>
                     <textarea id="accepted-note-input" class="reply-textarea" maxlength="600" enterkeyhint="send" placeholder="Escribe lo que quieras decirme, Yai…"></textarea>
                 </div>
 
@@ -1183,37 +1822,41 @@
         </main>
 
         <footer class="chrome-bottom">
-            <div class="step-dots" aria-hidden="true">
-                <span class="step-dot is-active" data-dot="1"></span>
-                <span class="step-dot" data-dot="2"></span>
-                <span class="step-dot" data-dot="3"></span>
-                <span class="step-dot" data-dot="4"></span>
+            <div id="step-rail" class="step-rail" aria-hidden="true">
+                <span class="step-seg is-active" data-seg="1"></span>
+                <span class="step-seg" data-seg="2"></span>
+                <span class="step-seg" data-seg="3"></span>
+                <span class="step-seg" data-seg="4"></span>
+                <span class="step-seg" data-seg="5"></span>
+                <span class="step-seg" data-seg="6"></span>
+                <span class="step-seg" data-seg="7"></span>
+                <span class="step-seg" data-seg="8"></span>
+                <span class="step-seg" data-seg="9"></span>
+                <span class="step-seg" data-seg="10"></span>
             </div>
-            <p id="footer-note" class="footer-note">Día Cero · 28E</p>
+            <p id="footer-note" class="footer-note">Día Cero · En silencio</p>
         </footer>
     </div>
-
-    <audio id="ambient-audio" preload="none" playsinline></audio>
 
     <script>
         (function () {
             'use strict';
 
+            const TOTAL_ACTS = 10;
             const FIREBASE_DIA_CERO_URL = 'https://yaire-591ca-default-rtdb.firebaseio.com/dia_cero.json';
-            const PLAYLIST = [
-                { src: './sounds/ost/save-me-instrumental.mp3', gain: 0.56 },
-                { src: './sounds/ost/saw-halo.mp3', gain: 0.54 },
-                { src: './sounds/ost/dancing-in-the-dark.mp3', gain: 0.56 }
-            ];
 
             const urlParams = new URLSearchParams(window.location.search);
             const isPreview = urlParams.get('preview') === '1' || urlParams.get('preview') === 'true';
             const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
             const shellEl = document.getElementById('monolith-shell');
+            const stageViewport = document.getElementById('stage-viewport');
+            const prevActBtn = document.getElementById('prev-act-btn');
+            const actCounterEl = document.getElementById('act-counter');
             const footerNoteEl = document.getElementById('footer-note');
+
             if (isPreview && footerNoteEl) {
-                footerNoteEl.textContent = 'Vista previa segura · Tus pruebas no sobrescriben la respuesta real';
+                footerNoteEl.textContent = 'Vista previa segura · No sobrescribe la respuesta real';
             }
 
             if (urlParams.get('auto') === '1' && !isPreview) {
@@ -1228,164 +1871,62 @@
                     .catch(() => {});
             }
 
-            /* ─── 1. Síntesis armónica Web Audio (latencia cero) + Música ambiental ─── */
-            const audioEl = document.getElementById('ambient-audio');
-            const ambientBtn = document.getElementById('ambient-btn');
-            const ambientLabel = document.getElementById('ambient-label');
+            function pulseHaptic(pattern) {
+                if (navigator.vibrate) {
+                    try { navigator.vibrate(pattern); } catch (_) {}
+                }
+            }
 
-            let soundWanted = true;
+            /* ─── 1. Telemetría en tiempo real hacia Firebase (Admin Panel) ─── */
+            let sessionReplyId = '';
             try {
-                const savedPref = localStorage.getItem('yaire_maint_sound');
-                if (savedPref === '0') soundWanted = false;
-            } catch (_) {}
-
-            let trackIdx = 0;
-            let audioStarted = false;
-            let audioUnlocked = false;
-            let sfxCtx = null;
-
-            function ensureAudioCtx() {
-                if (!soundWanted) return null;
-                try {
-                    const Ctx = window.AudioContext || window.webkitAudioContext;
-                    if (!Ctx) return null;
-                    if (!sfxCtx) sfxCtx = new Ctx();
-                    if (sfxCtx.state === 'suspended') sfxCtx.resume().catch(() => {});
-                    return sfxCtx;
-                } catch (_) {
-                    return null;
+                sessionReplyId = localStorage.getItem('yaire_dia_cero_id') || '';
+                if (!sessionReplyId) {
+                    sessionReplyId = 'dc_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 7);
+                    localStorage.setItem('yaire_dia_cero_id', sessionReplyId);
                 }
+            } catch (_) {
+                sessionReplyId = 'dc_' + Date.now().toString(36);
             }
 
-            function playHarmonicTone(freq, durationSec, peakGain) {
-                const ctx = ensureAudioCtx();
-                if (!ctx) return;
+            let highestReachedAct = 1;
+            let sealCompleted = false;
+
+            async function sendDiaCeroPayload(fields) {
+                const nowIso = new Date().toISOString();
+                const payload = Object.assign({
+                    sessionId: sessionReplyId,
+                    updatedAt: nowIso,
+                    timestamp: Date.now(),
+                    userAgent: /Mobile|Android|iPhone|iPad/i.test(navigator.userAgent) ? 'Móvil' : 'Escritorio'
+                }, fields);
+
                 try {
-                    const now = ctx.currentTime;
-                    const osc = ctx.createOscillator();
-                    const overtone = ctx.createOscillator();
-                    const gain = ctx.createGain();
-
-                    osc.type = 'sine';
-                    osc.frequency.setValueAtTime(freq, now);
-                    overtone.type = 'triangle';
-                    overtone.frequency.setValueAtTime(freq * 2, now);
-
-                    const overGain = ctx.createGain();
-                    overGain.gain.setValueAtTime(0.14, now);
-
-                    gain.gain.setValueAtTime(0.0001, now);
-                    gain.gain.exponentialRampToValueAtTime(peakGain || 0.045, now + 0.035);
-                    gain.gain.exponentialRampToValueAtTime(0.0001, now + (durationSec || 0.65));
-
-                    osc.connect(gain);
-                    overtone.connect(overGain);
-                    overGain.connect(gain);
-                    gain.connect(ctx.destination);
-
-                    osc.start(now);
-                    overtone.start(now);
-                    osc.stop(now + (durationSec || 0.65) + 0.05);
-                    overtone.stop(now + (durationSec || 0.65) + 0.05);
+                    localStorage.setItem('yaire_dia_cero_local', JSON.stringify(payload));
                 } catch (_) {}
-            }
 
-            function playWarmChord(notes, dur) {
-                notes.forEach((f, idx) => {
-                    setTimeout(() => playHarmonicTone(f, dur || 1.1, 0.032), idx * 55);
-                });
-            }
+                if (isPreview) return true;
 
-            function syncSoundPill() {
-                if (!ambientBtn || !ambientLabel) return;
-                ambientBtn.setAttribute('aria-pressed', soundWanted ? 'true' : 'false');
-                ambientBtn.setAttribute('aria-label', soundWanted ? 'Silenciar música de fondo' : 'Activar música de fondo');
-                ambientLabel.textContent = soundWanted ? 'Sonido' : 'Silencio';
-            }
-            syncSoundPill();
-
-            function fadeElementAudio(targetVol, ms) {
-                if (!audioEl) return;
-                const startVol = audioEl.volume;
-                const startT = performance.now();
-                function step(now) {
-                    const p = Math.min(1, (now - startT) / ms);
-                    const eased = 1 - Math.pow(1 - p, 3);
-                    audioEl.volume = Math.max(0, Math.min(1, startVol + (targetVol - startVol) * eased));
-                    if (p < 1) requestAnimationFrame(step);
-                    else if (targetVol === 0) audioEl.pause();
-                }
-                requestAnimationFrame(step);
-            }
-
-            function startAmbientIfWanted() {
-                if (!soundWanted || !audioEl) return;
-                const item = PLAYLIST[trackIdx % PLAYLIST.length];
-                if (!audioEl.getAttribute('src')) {
-                    audioEl.src = item.src;
-                }
-                if (!audioStarted || audioEl.paused) {
-                    audioEl.volume = 0.01;
-                    const p = audioEl.play();
-                    if (p && typeof p.then === 'function') {
-                        p.then(() => {
-                            audioStarted = true;
-                            audioUnlocked = true;
-                            fadeElementAudio(item.gain, 1500);
-                        }).catch(() => {});
-                    }
+                try {
+                    const res = await fetch(FIREBASE_DIA_CERO_URL, {
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    return res.ok;
+                } catch (_) {
+                    return false;
                 }
             }
 
-            if (audioEl) {
-                audioEl.addEventListener('ended', () => {
-                    trackIdx = (trackIdx + 1) % PLAYLIST.length;
-                    const next = PLAYLIST[trackIdx];
-                    audioEl.src = next.src;
-                    if (soundWanted) {
-                        audioEl.volume = next.gain;
-                        audioEl.play().catch(() => {});
-                    }
-                });
-            }
-
-            if (ambientBtn) {
-                ambientBtn.addEventListener('click', () => {
-                    soundWanted = !soundWanted;
-                    try { localStorage.setItem('yaire_maint_sound', soundWanted ? '1' : '0'); } catch (_) {}
-                    syncSoundPill();
-                    if (soundWanted) {
-                        ensureAudioCtx();
-                        startAmbientIfWanted();
-                    } else if (audioEl) {
-                        fadeElementAudio(0, 320);
-                    }
-                });
-            }
-
-            const unlockAudioOnFirstGesture = () => {
-                ensureAudioCtx();
-                if (soundWanted && !audioUnlocked) {
-                    startAmbientIfWanted();
-                }
-            };
-            window.addEventListener('pointerdown', unlockAudioOnFirstGesture, { passive: true });
-            window.addEventListener('keydown', unlockAudioOnFirstGesture, { passive: true });
-
-            if (document.readyState === 'complete') {
-                setTimeout(startAmbientIfWanted, 120);
-            } else {
-                window.addEventListener('load', () => setTimeout(startAmbientIfWanted, 120), { once: true });
-            }
-
-            /* ─── 2. Campo óptico WebGL1 con transición cromática por acto ─── */
+            /* ─── 2. Campo óptico OLED (WebGL1 dithered, 0 audio) ─── */
             const auraCanvas = document.getElementById('oled-aura');
-            let auraTargetWarmth = 0.0; // 0 = gris ceniza sereno, 1 = ámbar + rosa tulipán pleno
+            let auraTargetWarmth = 0.0;
             let auraCurrentWarmth = 0.0;
             let auraBoost = 0.0;
             let auraTargetBoost = 0.0;
-            let pointerTarget = { x: 0.5, y: 0.54 };
-            let pointerCurrent = { x: 0.5, y: 0.54 };
+            let pointerTarget = { x: 0.5, y: 0.52 };
+            let pointerCurrent = { x: 0.5, y: 0.52 };
 
             window.addEventListener('pointermove', (e) => {
                 pointerTarget.x = e.clientX / Math.max(1, window.innerWidth);
@@ -1424,16 +1965,16 @@
                     '  vec2 center = vec2(0.5 + (u_ptr.x - 0.5) * 0.08, 0.46 + (u_ptr.y - 0.5) * 0.06);',
                     '  vec2 d = (uv - center) * vec2(u_res.x / max(1.0, u_res.y), 1.0);',
                     '  float dist = length(d);',
-                    '  float breathe = sin(u_time * 0.55) * 0.022;',
-                    '  float radius = 0.30 + u_warmth * 0.08 + u_boost * 0.16 + breathe;',
+                    '  float breathe = sin(u_time * 0.5) * 0.02;',
+                    '  float radius = 0.29 + u_warmth * 0.09 + u_boost * 0.16 + breathe;',
                     '  float ring = exp(-pow((dist - radius) * 4.4, 2.0));',
-                    '  float core = exp(-dist * (3.1 - u_boost * 0.8));',
-                    '  vec3 coolCol = vec3(0.42, 0.45, 0.52);',
+                    '  float core = exp(-dist * (3.2 - u_boost * 0.8));',
+                    '  vec3 coolCol = vec3(0.38, 0.41, 0.48);',
                     '  vec3 amberCol = vec3(0.91, 0.74, 0.51);',
                     '  vec3 tulipCol = vec3(0.90, 0.60, 0.72);',
-                    '  vec3 warmMix = mix(amberCol, tulipCol, clamp(uv.x * 0.65 + sin(u_time * 0.25) * 0.2, 0.0, 1.0));',
+                    '  vec3 warmMix = mix(amberCol, tulipCol, clamp(uv.x * 0.65 + sin(u_time * 0.22) * 0.2, 0.0, 1.0));',
                     '  vec3 hue = mix(coolCol, warmMix, clamp(u_warmth, 0.0, 1.0));',
-                    '  float intensity = (ring * 0.11 + core * 0.085) * (0.72 + u_warmth * 0.45 + u_boost * 0.95);',
+                    '  float intensity = (ring * 0.105 + core * 0.08) * (0.68 + u_warmth * 0.48 + u_boost * 0.95);',
                     '  vec3 col = hue * intensity;',
                     '  float dither = (hash(gl_FragCoord.xy + fract(u_time)) - 0.5) / 255.0;',
                     '  gl_FragColor = vec4(max(col + dither, 0.0), 1.0);',
@@ -1492,7 +2033,7 @@
                 requestAnimationFrame(renderAura);
             })();
 
-            /* ─── 3. Sistema de partículas ligeras para disolver el ruido y sellar ─── */
+            /* ─── 3. Partículas sutiles 2D a 60 FPS ─── */
             const moteCanvas = document.getElementById('mote-canvas');
             const moteCtx = moteCanvas ? moteCanvas.getContext('2d') : null;
             const motes = [];
@@ -1511,17 +2052,17 @@
                 if (prefersReducedMotion || !moteCtx) return;
                 for (let i = 0; i < count; i++) {
                     const angle = Math.random() * Math.PI * 2;
-                    const speed = 0.5 + Math.random() * 2.3;
+                    const speed = 0.45 + Math.random() * 2.2;
                     motes.push({
-                        x: x + (Math.random() - 0.5) * 44,
+                        x: x + (Math.random() - 0.5) * 40,
                         y: y + (Math.random() - 0.5) * 16,
-                        vx: Math.cos(angle) * speed * 0.7,
-                        vy: -0.7 - Math.random() * 1.9,
-                        size: 1.2 + Math.random() * 2.2,
+                        vx: Math.cos(angle) * speed * 0.68,
+                        vy: -0.65 - Math.random() * 1.85,
+                        size: 1.2 + Math.random() * 2.1,
                         life: 1,
-                        decay: 0.014 + Math.random() * 0.016,
+                        decay: 0.015 + Math.random() * 0.015,
                         color: warmPalette
-                            ? (Math.random() > 0.4 ? '232, 189, 131' : '230, 154, 184')
+                            ? (Math.random() > 0.42 ? '232, 189, 131' : '230, 154, 184')
                             : '247, 244, 238'
                     });
                 }
@@ -1534,13 +2075,13 @@
                         const m = motes[i];
                         m.x += m.vx;
                         m.y += m.vy;
-                        m.vy -= 0.012;
+                        m.vy -= 0.011;
                         m.life -= m.decay;
                         if (m.life <= 0) {
                             motes.splice(i, 1);
                             continue;
                         }
-                        moteCtx.fillStyle = 'rgba(' + m.color + ',' + (m.life * 0.85).toFixed(3) + ')';
+                        moteCtx.fillStyle = 'rgba(' + m.color + ',' + (m.life * 0.84).toFixed(3) + ')';
                         moteCtx.beginPath();
                         moteCtx.arc(m.x, m.y, m.size, 0, Math.PI * 2);
                         moteCtx.fill();
@@ -1549,16 +2090,23 @@
                 requestAnimationFrame(renderMotes);
             })();
 
-            /* ─── 4. Navegación suave entre actos ─── */
+            /* ─── 4. Orquestador de los 10 Actos + Epílogo ─── */
             let currentAct = 1;
             let transitioningAct = false;
+            const actMountHooks = {};
 
-            function updateStepDots(actNum) {
-                const capped = Math.min(4, actNum);
-                document.querySelectorAll('.step-dot').forEach((dot) => {
-                    const n = Number(dot.getAttribute('data-dot'));
-                    dot.classList.toggle('is-active', n === capped);
-                    dot.classList.toggle('is-done', n < capped || actNum === 5);
+            function syncChrome(actNum) {
+                const displayAct = Math.min(TOTAL_ACTS, actNum);
+                if (actCounterEl) {
+                    actCounterEl.textContent = actNum === 11 ? 'Día Cero' : displayAct + ' / ' + TOTAL_ACTS;
+                }
+                if (prevActBtn) {
+                    prevActBtn.hidden = actNum <= 1 || actNum >= 11;
+                }
+                document.querySelectorAll('.step-seg').forEach((seg) => {
+                    const n = Number(seg.getAttribute('data-seg'));
+                    seg.classList.toggle('is-active', n === displayAct && actNum <= TOTAL_ACTS);
+                    seg.classList.toggle('is-done', n < displayAct || actNum === 11);
                 });
             }
 
@@ -1570,15 +2118,20 @@
 
                 transitioningAct = true;
                 currentAct = nextAct;
-                updateStepDots(nextAct);
+                syncChrome(nextAct);
 
-                if (nextAct === 1) auraTargetWarmth = dissolvedSet.size * 0.14;
-                else if (nextAct === 2) auraTargetWarmth = 0.58;
-                else if (nextAct === 3) auraTargetWarmth = 0.68 + litPromises.size * 0.08;
-                else if (nextAct === 4) auraTargetWarmth = 0.92;
-                else if (nextAct === 5) {
-                    auraTargetWarmth = 1.0;
-                    auraTargetBoost = 0.32;
+                auraTargetWarmth = Math.min(1.0, (nextAct - 1) / 9.0);
+                if (nextAct === 11) auraTargetBoost = 0.34;
+                else auraTargetBoost = 0.0;
+
+                if (nextAct <= TOTAL_ACTS && nextAct > highestReachedAct && !sealCompleted) {
+                    highestReachedAct = nextAct;
+                    sendDiaCeroPayload({
+                        status: 'reading',
+                        accepted: false,
+                        currentAct: nextAct,
+                        totalActs: TOTAL_ACTS
+                    });
                 }
 
                 fromEl.classList.remove('is-visible');
@@ -1588,185 +2141,808 @@
                     fromEl.classList.remove('is-mounted', 'is-leaving');
                     fromEl.hidden = true;
 
+                    if (stageViewport) stageViewport.scrollTop = 0;
+
                     toEl.hidden = false;
                     toEl.classList.add('is-mounted');
+                    if (typeof actMountHooks[nextAct] === 'function') {
+                        actMountHooks[nextAct]();
+                    }
+
                     requestAnimationFrame(() => {
                         requestAnimationFrame(() => {
                             toEl.classList.add('is-visible');
                             transitioningAct = false;
                         });
                     });
-                }, prefersReducedMotion ? 120 : 340);
+                }, prefersReducedMotion ? 110 : 300);
+            }
+
+            if (prevActBtn) {
+                prevActBtn.addEventListener('click', () => {
+                    if (currentAct > 1 && currentAct <= TOTAL_ACTS) {
+                        goToAct(currentAct - 1);
+                    }
+                });
             }
 
             document.querySelectorAll('[data-goto]').forEach((btn) => {
                 btn.addEventListener('click', () => {
-                    const target = Number(btn.getAttribute('data-goto'));
-                    playHarmonicTone(523.25, 0.45, 0.028);
-                    goToAct(target);
+                    if (btn.disabled) return;
+                    pulseHaptic(8);
+                    goToAct(Number(btn.getAttribute('data-goto')));
                 });
             });
 
-            /* ─── 5. ACTO I: Soltar las 4 tensiones con toque o barrido del dedo ─── */
-            const dissolvedSet = new Set();
-            const releaseNotes = [349.23, 440.0, 523.25, 659.25];
-            const noiseCaption = document.getElementById('noise-caption');
-            const noiseArena = document.getElementById('noise-arena');
+            /* ─── ACTO 1: Deslizador de umbral con resorte crítico ─── */
+            (function setupAct1Threshold() {
+                const rail = document.getElementById('threshold-rail');
+                const thumb = document.getElementById('threshold-thumb');
+                const fill = document.getElementById('threshold-fill');
+                const label = document.getElementById('threshold-label');
+                if (!rail || !thumb) return;
 
-            function dissolveChip(chip) {
-                if (!chip || chip.classList.contains('is-dissolved')) return;
-                const id = chip.getAttribute('data-noise');
-                if (dissolvedSet.has(id)) return;
-                dissolvedSet.add(id);
+                let dragging = false;
+                let grabOffset = 0;
+                let pos = 0;
+                let vel = 0;
+                let targetPos = 0;
+                let unlocked = false;
+                let lastX = 0;
+                let lastT = 0;
 
-                const rect = chip.getBoundingClientRect();
-                const cx = rect.left + rect.width / 2;
-                const cy = rect.top + rect.height / 2;
-
-                chip.classList.add('is-dissolved');
-                chip.setAttribute('aria-disabled', 'true');
-
-                spawnMotes(cx, cy, 26, dissolvedSet.size >= 3);
-                playHarmonicTone(releaseNotes[(dissolvedSet.size - 1) % releaseNotes.length], 0.75, 0.042);
-                if (navigator.vibrate) {
-                    try { navigator.vibrate(12); } catch (_) {}
+                function getMaxX() {
+                    return Math.max(1, rail.clientWidth - thumb.offsetWidth - 10);
                 }
 
-                auraTargetWarmth = Math.min(0.56, dissolvedSet.size * 0.14);
+                function applyPos(x) {
+                    const maxX = getMaxX();
+                    const clamped = Math.max(0, Math.min(maxX, x));
+                    pos = clamped;
+                    const ratio = clamped / maxX;
+                    thumb.style.transform = 'translate3d(' + clamped.toFixed(1) + 'px, 0, 0)';
+                    if (fill) fill.style.width = (clamped + thumb.offsetWidth + 10).toFixed(1) + 'px';
+                    if (label) label.style.opacity = Math.max(0, 1 - ratio * 1.6).toFixed(2);
+                    rail.setAttribute('aria-valuenow', String(Math.round(ratio * 100)));
+                    if (currentAct === 1) auraTargetBoost = ratio * 0.22;
+                }
 
-                const left = 4 - dissolvedSet.size;
-                if (noiseCaption) {
-                    if (left > 0) {
-                        noiseCaption.textContent = left === 1
-                            ? 'Queda 1 por soltar'
-                            : 'Toca o desliza tu dedo sobre cada una · ' + left + ' restantes';
+                function completeThreshold() {
+                    if (unlocked) return;
+                    unlocked = true;
+                    targetPos = getMaxX();
+                    applyPos(targetPos);
+                    pulseHaptic(14);
+                    const r = thumb.getBoundingClientRect();
+                    spawnMotes(r.left + r.width / 2, r.top + r.height / 2, 24, true);
+                    setTimeout(() => goToAct(2), 240);
+                }
+
+                let prevFrame = performance.now();
+                function springLoop(now) {
+                    const dt = Math.min(0.032, Math.max(0.001, (now - prevFrame) / 1000));
+                    prevFrame = now;
+                    if (!dragging && currentAct === 1) {
+                        const maxX = getMaxX();
+                        if (unlocked) targetPos = maxX;
+                        const stiffness = 250;
+                        const damping = 30;
+                        const force = -stiffness * (pos - targetPos) - damping * vel;
+                        vel += force * dt;
+                        pos += vel * dt;
+                        if (Math.abs(pos - targetPos) < 0.35 && Math.abs(vel) < 2) {
+                            pos = targetPos;
+                            vel = 0;
+                        }
+                        applyPos(pos);
+                    }
+                    requestAnimationFrame(springLoop);
+                }
+                requestAnimationFrame(springLoop);
+
+                actMountHooks[1] = () => {
+                    unlocked = false;
+                    targetPos = 0;
+                    pos = 0;
+                    vel = 0;
+                    applyPos(0);
+                };
+
+                rail.addEventListener('pointerdown', (e) => {
+                    if (unlocked) return;
+                    dragging = true;
+                    rail.setPointerCapture(e.pointerId);
+                    const thumbRect = thumb.getBoundingClientRect();
+                    if (e.clientX >= thumbRect.left && e.clientX <= thumbRect.right) {
+                        grabOffset = e.clientX - thumbRect.left;
                     } else {
-                        noiseCaption.textContent = 'Sin ruido. Sin escudos.';
-                        noiseCaption.classList.add('is-cleared');
+                        grabOffset = thumb.offsetWidth / 2;
+                    }
+                    lastX = e.clientX;
+                    lastT = performance.now();
+                    const railRect = rail.getBoundingClientRect();
+                    applyPos(e.clientX - railRect.left - 5 - grabOffset);
+                });
+
+                rail.addEventListener('pointermove', (e) => {
+                    if (!dragging || unlocked) return;
+                    const now = performance.now();
+                    const dtMs = Math.max(1, now - lastT);
+                    vel = ((e.clientX - lastX) / dtMs) * 1000;
+                    lastX = e.clientX;
+                    lastT = now;
+
+                    const railRect = rail.getBoundingClientRect();
+                    applyPos(e.clientX - railRect.left - 5 - grabOffset);
+                    if (pos >= getMaxX() * 0.96) {
+                        dragging = false;
+                        completeThreshold();
+                    }
+                });
+
+                function releaseThumb() {
+                    if (!dragging) return;
+                    dragging = false;
+                    if (unlocked) return;
+                    const maxX = getMaxX();
+                    const projected = pos + vel * 0.14;
+                    if (projected >= maxX * 0.72) {
+                        completeThreshold();
+                    } else {
+                        targetPos = 0;
                     }
                 }
+                rail.addEventListener('pointerup', releaseThumb);
+                rail.addEventListener('pointercancel', releaseThumb);
+                rail.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowRight') {
+                        e.preventDefault();
+                        completeThreshold();
+                    }
+                });
+            })();
 
-                if (left === 0) {
-                    setTimeout(() => {
-                        playWarmChord([440, 554.37, 659.25], 1.15);
-                        goToAct(2);
-                    }, 820);
+            /* ─── ACTO 2: Cristal empañado con borrado por trazo ─── */
+            (function setupAct2Frost() {
+                const frame = document.getElementById('frost-frame');
+                const canvas = document.getElementById('frost-canvas');
+                const statusEl = document.getElementById('frost-status');
+                const nextBtn = document.getElementById('act2-next-btn');
+                if (!frame || !canvas) return;
+
+                const ctx = canvas.getContext('2d');
+                const COLS = 12;
+                const ROWS = 6;
+                let cells = new Uint8Array(COLS * ROWS);
+                let clearedCount = 0;
+                let frostCleared = false;
+                let wiping = false;
+                let prevPt = null;
+                let cssW = 0;
+                let cssH = 0;
+
+                function paintFrostSurface() {
+                    if (!ctx || frostCleared) return;
+                    const rect = frame.getBoundingClientRect();
+                    if (rect.width < 10 || rect.height < 10) return;
+                    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+                    cssW = rect.width;
+                    cssH = rect.height;
+                    canvas.width = Math.floor(cssW * dpr);
+                    canvas.height = Math.floor(cssH * dpr);
+                    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+                    ctx.globalCompositeOperation = 'source-over';
+                    const grad = ctx.createLinearGradient(0, 0, cssW, cssH);
+                    grad.addColorStop(0, '#18181a');
+                    grad.addColorStop(0.5, '#201f22');
+                    grad.addColorStop(1, '#151416');
+                    ctx.fillStyle = grad;
+                    ctx.fillRect(0, 0, cssW, cssH);
+
+                    ctx.fillStyle = 'rgba(247, 244, 238, 0.045)';
+                    for (let i = 0; i < 220; i++) {
+                        const gx = (Math.sin(i * 91.7) * 0.5 + 0.5) * cssW;
+                        const gy = (Math.cos(i * 47.3) * 0.5 + 0.5) * cssH;
+                        ctx.fillRect(gx, gy, 1.5, 1.5);
+                    }
+
+                    ctx.fillStyle = 'rgba(244, 239, 231, 0.56)';
+                    ctx.font = '500 13px "Plus Jakarta Sans", sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText('Pasa tu dedo aquí para desempañar', cssW / 2, cssH / 2);
+
+                    cells = new Uint8Array(COLS * ROWS);
+                    clearedCount = 0;
                 }
-            }
 
-            document.querySelectorAll('.noise-chip').forEach((chip) => {
-                chip.addEventListener('click', () => dissolveChip(chip));
-                chip.addEventListener('pointerdown', (e) => {
-                    e.preventDefault();
-                    dissolveChip(chip);
-                });
-            });
+                actMountHooks[2] = () => {
+                    if (!frostCleared) {
+                        requestAnimationFrame(paintFrostSurface);
+                    }
+                };
+                window.addEventListener('resize', () => {
+                    if (currentAct === 2 && !frostCleared) paintFrostSurface();
+                }, { passive: true });
 
-            if (noiseArena) {
-                let sweeping = false;
-                noiseArena.addEventListener('pointerdown', () => { sweeping = true; });
-                window.addEventListener('pointerup', () => { sweeping = false; });
-                window.addEventListener('pointercancel', () => { sweeping = false; });
-                noiseArena.addEventListener('pointermove', (e) => {
-                    if (!sweeping && e.pointerType === 'mouse' && e.buttons === 0) return;
-                    const hit = document.elementFromPoint(e.clientX, e.clientY);
-                    const chip = hit && hit.closest ? hit.closest('.noise-chip') : null;
-                    if (chip) dissolveChip(chip);
-                });
-            }
+                function finishFrost() {
+                    if (frostCleared) return;
+                    frostCleared = true;
+                    canvas.classList.add('is-cleared');
+                    if (statusEl) {
+                        statusEl.textContent = 'Cristal despejado';
+                        statusEl.classList.add('is-lit');
+                    }
+                    if (nextBtn) nextBtn.disabled = false;
+                    pulseHaptic(14);
+                    const r = frame.getBoundingClientRect();
+                    spawnMotes(r.left + r.width / 2, r.top + r.height / 2, 28, true);
+                }
 
-            /* ─── 6. ACTO III: Encender los 3 acuerdos reales ─── */
-            const litPromises = new Set();
-            const promiseNotes = [392.0, 493.88, 587.33];
-            const toAct4Btn = document.getElementById('to-act4-btn');
+                function eraseAt(localX, localY) {
+                    if (!ctx || frostCleared || cssW <= 0 || cssH <= 0) return;
+                    ctx.globalCompositeOperation = 'destination-out';
 
-            document.querySelectorAll('.promise-row').forEach((row) => {
-                row.addEventListener('click', () => {
-                    const idx = Number(row.getAttribute('data-promise'));
-                    if (!litPromises.has(idx)) {
-                        litPromises.add(idx);
-                        row.classList.add('is-lit');
-                        row.setAttribute('aria-expanded', 'true');
-                        const rect = row.getBoundingClientRect();
-                        spawnMotes(rect.left + 20, rect.top + 24, 14, true);
-                        playHarmonicTone(promiseNotes[idx % promiseNotes.length], 0.7, 0.04);
-                        if (navigator.vibrate) {
-                            try { navigator.vibrate(10); } catch (_) {}
+                    const pts = [];
+                    if (prevPt) {
+                        const dx = localX - prevPt.x;
+                        const dy = localY - prevPt.y;
+                        const dist = Math.hypot(dx, dy);
+                        const steps = Math.max(1, Math.ceil(dist / 10));
+                        for (let s = 1; s <= steps; s++) {
+                            pts.push({ x: prevPt.x + (dx * s) / steps, y: prevPt.y + (dy * s) / steps });
                         }
-                        auraTargetWarmth = Math.min(0.9, 0.68 + litPromises.size * 0.07);
+                    } else {
+                        pts.push({ x: localX, y: localY });
+                    }
+                    prevPt = { x: localX, y: localY };
 
-                        if (toAct4Btn) {
-                            const rem = 3 - litPromises.size;
-                            const span = toAct4Btn.querySelector('span');
-                            if (rem > 0) {
-                                if (span) span.textContent = rem === 1 ? 'Falta 1 promesa por encender' : 'Faltan ' + rem + ' promesas por encender';
-                            } else {
-                                toAct4Btn.disabled = false;
-                                if (span) span.textContent = 'Ir a mi pregunta';
+                    const radius = 34;
+                    for (let i = 0; i < pts.length; i++) {
+                        const p = pts[i];
+                        const g = ctx.createRadialGradient(p.x, p.y, 6, p.x, p.y, radius);
+                        g.addColorStop(0, 'rgba(0,0,0,1)');
+                        g.addColorStop(1, 'rgba(0,0,0,0)');
+                        ctx.fillStyle = g;
+                        ctx.beginPath();
+                        ctx.arc(p.x, p.y, radius, 0, Math.PI * 2);
+                        ctx.fill();
+
+                        const cMin = Math.max(0, Math.floor(((p.x - 22) / cssW) * COLS));
+                        const cMax = Math.min(COLS - 1, Math.floor(((p.x + 22) / cssW) * COLS));
+                        const rMin = Math.max(0, Math.floor(((p.y - 22) / cssH) * ROWS));
+                        const rMax = Math.min(ROWS - 1, Math.floor(((p.y + 22) / cssH) * ROWS));
+                        for (let r = rMin; r <= rMax; r++) {
+                            for (let c = cMin; c <= cMax; c++) {
+                                const idx = r * COLS + c;
+                                if (!cells[idx]) {
+                                    cells[idx] = 1;
+                                    clearedCount++;
+                                }
                             }
                         }
                     }
+
+                    const pct = Math.min(100, Math.round((clearedCount / (COLS * ROWS)) * 100));
+                    if (pct >= 46) {
+                        finishFrost();
+                    } else if (statusEl) {
+                        statusEl.textContent = 'Despejando… ' + Math.min(99, Math.round((pct / 46) * 100)) + '%';
+                    }
+                }
+
+                canvas.addEventListener('pointerdown', (e) => {
+                    if (frostCleared) return;
+                    wiping = true;
+                    prevPt = null;
+                    canvas.setPointerCapture(e.pointerId);
+                    const r = canvas.getBoundingClientRect();
+                    eraseAt(e.clientX - r.left, e.clientY - r.top);
                 });
-            });
 
-            /* ─── 7. Sincronización en tiempo real con Firebase (Admin Panel) ─── */
-            let sessionReplyId = '';
-            try {
-                sessionReplyId = localStorage.getItem('yaire_dia_cero_id') || '';
-                if (!sessionReplyId) {
-                    sessionReplyId = 'dc_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 7);
-                    localStorage.setItem('yaire_dia_cero_id', sessionReplyId);
+                canvas.addEventListener('pointermove', (e) => {
+                    if (!wiping || frostCleared) return;
+                    const r = canvas.getBoundingClientRect();
+                    eraseAt(e.clientX - r.left, e.clientY - r.top);
+                });
+
+                function stopWipe() {
+                    wiping = false;
+                    prevPt = null;
                 }
-            } catch (_) {
-                sessionReplyId = 'dc_' + Date.now().toString(36);
-            }
+                canvas.addEventListener('pointerup', stopWipe);
+                canvas.addEventListener('pointercancel', stopWipe);
+                canvas.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        finishFrost();
+                    }
+                });
+            })();
 
-            async function sendDiaCeroPayload(fields) {
-                const nowIso = new Date().toISOString();
-                const payload = Object.assign({
-                    sessionId: sessionReplyId,
-                    updatedAt: nowIso,
-                    timestamp: Date.now(),
-                    userAgent: /Mobile|Android|iPhone|iPad/i.test(navigator.userAgent) ? 'Móvil' : 'Escritorio'
-                }, fields);
+            /* ─── ACTO 3: Disolver los 6 roces reales ─── */
+            (function setupAct3Noise() {
+                const dissolvedSet = new Set();
+                const totalChips = 6;
+                const noiseCaption = document.getElementById('noise-caption');
+                const noiseArena = document.getElementById('noise-arena');
 
-                try {
-                    localStorage.setItem('yaire_dia_cero_local', JSON.stringify(payload));
-                } catch (_) {}
+                function dissolveChip(chip) {
+                    if (!chip || chip.classList.contains('is-dissolved')) return;
+                    const id = chip.getAttribute('data-noise');
+                    if (dissolvedSet.has(id)) return;
+                    dissolvedSet.add(id);
 
-                if (isPreview) return true;
+                    const rect = chip.getBoundingClientRect();
+                    chip.classList.add('is-dissolved');
+                    chip.setAttribute('aria-disabled', 'true');
 
-                try {
-                    const res = await fetch(FIREBASE_DIA_CERO_URL, {
-                        method: 'PATCH',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
+                    spawnMotes(rect.left + rect.width / 2, rect.top + rect.height / 2, 22, dissolvedSet.size >= 4);
+                    pulseHaptic(10);
+
+                    const left = totalChips - dissolvedSet.size;
+                    if (noiseCaption) {
+                        if (left > 0) {
+                            noiseCaption.textContent = left === 1 ? 'Queda 1 por soltar' : 'Quedan ' + left + ' por soltar';
+                        } else {
+                            noiseCaption.textContent = 'Todo ese peso se queda aquí.';
+                            noiseCaption.classList.add('is-lit');
+                        }
+                    }
+
+                    if (left === 0) {
+                        setTimeout(() => goToAct(4), 720);
+                    }
+                }
+
+                document.querySelectorAll('.noise-chip').forEach((chip) => {
+                    chip.addEventListener('click', () => dissolveChip(chip));
+                    chip.addEventListener('pointerdown', (e) => {
+                        e.preventDefault();
+                        dissolveChip(chip);
                     });
-                    return res.ok;
-                } catch (_) {
-                    return false;
-                }
-            }
+                });
 
-            /* ─── 8. ACTO IV: Sello mantenido 1.85s + Opción honesta para escribir antes ─── */
+                if (noiseArena) {
+                    let sweeping = false;
+                    noiseArena.addEventListener('pointerdown', () => { sweeping = true; });
+                    window.addEventListener('pointerup', () => { sweeping = false; });
+                    window.addEventListener('pointercancel', () => { sweeping = false; });
+                    noiseArena.addEventListener('pointermove', (e) => {
+                        if (!sweeping && e.pointerType === 'mouse' && e.buttons === 0) return;
+                        const hit = document.elementFromPoint(e.clientX, e.clientY);
+                        const chip = hit && hit.closest ? hit.closest('.noise-chip') : null;
+                        if (chip) dissolveChip(chip);
+                    });
+                }
+            })();
+
+            /* ─── ACTO 4: Pausa respirada de 3 segundos ─── */
+            (function setupAct4Breath() {
+                const btn = document.getElementById('breath-btn');
+                const halo = document.getElementById('breath-halo');
+                const circle = document.getElementById('breath-progress-circle');
+                const statusEl = document.getElementById('breath-status');
+                if (!btn || !circle) return;
+
+                const CIRC = 339.29;
+                const DURATION = 3000;
+                let holding = false;
+                let progress = 0;
+                let done = false;
+                let lastT = performance.now();
+
+                function renderBreath(p) {
+                    const c = Math.max(0, Math.min(1, p));
+                    circle.style.strokeDashoffset = (CIRC * (1 - c)).toFixed(2);
+                    if (halo) {
+                        const scale = 0.72 + Math.sin(c * Math.PI * 0.85) * 0.52;
+                        halo.style.transform = 'scale(' + scale.toFixed(3) + ')';
+                        halo.style.opacity = (0.3 + c * 0.55).toFixed(2);
+                    }
+                    if (currentAct === 4) auraTargetBoost = c * 0.28;
+                }
+
+                function finishBreath() {
+                    if (done) return;
+                    done = true;
+                    holding = false;
+                    btn.classList.remove('is-holding');
+                    renderBreath(1);
+                    pulseHaptic([14, 30, 18]);
+                    if (statusEl) {
+                        statusEl.textContent = 'Así quiero escucharte siempre: en calma.';
+                        statusEl.classList.add('is-lit');
+                    }
+                    const r = btn.getBoundingClientRect();
+                    spawnMotes(r.left + r.width / 2, r.top + r.height / 2, 28, true);
+                    setTimeout(() => goToAct(5), 760);
+                }
+
+                (function loopBreath(now) {
+                    const dt = Math.min(64, Math.max(0, now - lastT));
+                    lastT = now;
+                    if (!done && currentAct === 4) {
+                        if (holding) {
+                            progress = Math.min(1, progress + dt / DURATION);
+                            renderBreath(progress);
+                            if (statusEl) {
+                                statusEl.textContent = progress < 0.5
+                                    ? 'Respira hondo… sin prisa'
+                                    : 'Bajando la guardia…';
+                            }
+                            if (progress >= 1) finishBreath();
+                        } else if (progress > 0) {
+                            progress = Math.max(0, progress - dt / 700);
+                            renderBreath(progress);
+                        }
+                    }
+                    requestAnimationFrame(loopBreath);
+                })(performance.now());
+
+                function startHold(e) {
+                    if (done) return;
+                    if (e && e.cancelable) e.preventDefault();
+                    holding = true;
+                    btn.classList.add('is-holding');
+                }
+                function stopHold() {
+                    if (done || !holding) return;
+                    holding = false;
+                    btn.classList.remove('is-holding');
+                    if (statusEl && progress < 1) {
+                        statusEl.textContent = 'Mantén tu dedo en el centro para enfriar el impulso';
+                    }
+                }
+
+                btn.addEventListener('pointerdown', startHold);
+                window.addEventListener('pointerup', stopHold);
+                window.addEventListener('pointercancel', stopHold);
+                btn.addEventListener('contextmenu', (e) => e.preventDefault());
+                btn.addEventListener('keydown', (e) => {
+                    if ((e.key === 'Enter' || e.key === ' ') && !holding) startHold(e);
+                });
+                btn.addEventListener('keyup', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') stopHold();
+                });
+            })();
+
+            /* ─── ACTO 5: Balanza Mi Orgullo (100->0) vs Nosotros Dos (0->100) ─── */
+            (function setupAct5Balance() {
+                const track = document.getElementById('balance-track');
+                const fill = document.getElementById('balance-fill');
+                const knob = document.getElementById('balance-knob');
+                const prideEl = document.getElementById('pride-pct');
+                const usEl = document.getElementById('us-pct');
+                const quoteEl = document.getElementById('balance-quote');
+                const nextBtn = document.getElementById('act5-next-btn');
+                if (!track || !knob) return;
+
+                let dragging = false;
+                let unlocked = false;
+
+                function setRatio(raw) {
+                    let r = Math.max(0, Math.min(1, raw));
+                    if (r >= 0.94) r = 1;
+                    const pct = Math.round(r * 100);
+
+                    if (fill) fill.style.width = pct + '%';
+                    knob.style.left = pct + '%';
+                    if (prideEl) prideEl.textContent = (100 - pct) + '%';
+                    if (usEl) usEl.textContent = pct + '%';
+                    track.setAttribute('aria-valuenow', String(pct));
+
+                    if (quoteEl) {
+                        if (pct < 38) {
+                            quoteEl.textContent = 'Defender mi orgullo solo nos ponía en bandos opuestos.';
+                        } else if (pct < 92) {
+                            quoteEl.textContent = 'Soltar la terquedad abre espacio para escucharte de verdad.';
+                        } else {
+                            quoteEl.textContent = 'Cero orgullo entre tú y yo. Primero nuestra paz.';
+                        }
+                    }
+
+                    if (pct === 100 && !unlocked) {
+                        unlocked = true;
+                        if (nextBtn) nextBtn.disabled = false;
+                        pulseHaptic(14);
+                        const kr = knob.getBoundingClientRect();
+                        spawnMotes(kr.left + kr.width / 2, kr.top + kr.height / 2, 24, true);
+                    }
+                }
+
+                function updateFromPointer(clientX) {
+                    const rect = track.getBoundingClientRect();
+                    setRatio((clientX - rect.left) / Math.max(1, rect.width));
+                }
+
+                track.addEventListener('pointerdown', (e) => {
+                    dragging = true;
+                    track.setPointerCapture(e.pointerId);
+                    updateFromPointer(e.clientX);
+                });
+                track.addEventListener('pointermove', (e) => {
+                    if (!dragging) return;
+                    updateFromPointer(e.clientX);
+                });
+                track.addEventListener('pointerup', () => { dragging = false; });
+                track.addEventListener('pointercancel', () => { dragging = false; });
+                track.addEventListener('keydown', (e) => {
+                    const cur = Number(track.getAttribute('aria-valuenow')) || 0;
+                    if (e.key === 'ArrowRight' || e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        setRatio((cur + 20) / 100);
+                    } else if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        setRatio(1);
+                    }
+                });
+            })();
+
+            /* ─── ACTO 6: Unir Yai + Yo cortando la distancia ─── */
+            (function setupAct6Bridge() {
+                const arena = document.getElementById('bridge-arena');
+                const pathEl = document.getElementById('bridge-path');
+                const svgEl = document.getElementById('bridge-svg');
+                const nodeYai = document.getElementById('node-yai');
+                const nodeYo = document.getElementById('node-yo');
+                const statusEl = document.getElementById('bridge-status');
+                const nextBtn = document.getElementById('act6-next-btn');
+                if (!arena || !nodeYai || !nodeYo) return;
+
+                let yaiRatio = 0.14;
+                let yoRatio = 0.86;
+                let activeNode = null;
+                let united = false;
+
+                function renderBridge() {
+                    const w = arena.clientWidth || 320;
+                    const h = arena.clientHeight || 132;
+                    if (svgEl) svgEl.setAttribute('viewBox', '0 0 ' + w + ' ' + h);
+
+                    const x1 = yaiRatio * w;
+                    const x2 = yoRatio * w;
+                    const midY = h / 2;
+
+                    nodeYai.style.left = x1.toFixed(1) + 'px';
+                    nodeYo.style.left = x2.toFixed(1) + 'px';
+
+                    if (pathEl) {
+                        const gap = Math.abs(x2 - x1);
+                        const sag = united ? 0 : Math.min(28, gap * 0.12);
+                        const cx = (x1 + x2) / 2;
+                        pathEl.setAttribute('d', 'M ' + x1.toFixed(1) + ' ' + midY.toFixed(1) + ' Q ' + cx.toFixed(1) + ' ' + (midY + sag).toFixed(1) + ' ' + x2.toFixed(1) + ' ' + midY.toFixed(1));
+                        if (united) {
+                            pathEl.removeAttribute('stroke-dasharray');
+                            pathEl.setAttribute('stroke', 'rgba(232,189,131,0.85)');
+                        }
+                    }
+                }
+
+                actMountHooks[6] = () => {
+                    requestAnimationFrame(renderBridge);
+                };
+                window.addEventListener('resize', () => {
+                    if (currentAct === 6) renderBridge();
+                }, { passive: true });
+
+                function uniteNodes() {
+                    if (united) return;
+                    united = true;
+                    activeNode = null;
+                    yaiRatio = 0.44;
+                    yoRatio = 0.56;
+                    arena.classList.add('is-united');
+                    renderBridge();
+                    if (statusEl) {
+                        statusEl.textContent = 'Aunque haya kilómetros, nunca más quiero hacerte sentir lejos de mí.';
+                        statusEl.classList.add('is-lit');
+                    }
+                    if (nextBtn) nextBtn.disabled = false;
+                    pulseHaptic([12, 28, 16]);
+                    const r = arena.getBoundingClientRect();
+                    spawnMotes(r.left + r.width / 2, r.top + r.height / 2, 32, true);
+                }
+
+                function onDrag(clientX) {
+                    if (!activeNode || united) return;
+                    const rect = arena.getBoundingClientRect();
+                    const w = Math.max(1, rect.width);
+                    const padRatio = Math.min(0.22, 32 / w);
+                    const r = Math.max(padRatio, Math.min(1 - padRatio, (clientX - rect.left) / w));
+                    if (activeNode === 'yai') {
+                        yaiRatio = Math.min(yoRatio - 0.06, r);
+                    } else {
+                        yoRatio = Math.max(yaiRatio + 0.06, r);
+                    }
+                    renderBridge();
+                    if (yoRatio - yaiRatio <= 0.22) {
+                        uniteNodes();
+                    }
+                }
+
+                nodeYai.addEventListener('pointerdown', (e) => {
+                    if (united) return;
+                    activeNode = 'yai';
+                    nodeYai.setPointerCapture(e.pointerId);
+                });
+                nodeYo.addEventListener('pointerdown', (e) => {
+                    if (united) return;
+                    activeNode = 'yo';
+                    nodeYo.setPointerCapture(e.pointerId);
+                });
+                arena.addEventListener('pointermove', (e) => onDrag(e.clientX));
+                window.addEventListener('pointerup', () => { activeNode = null; });
+                window.addEventListener('pointercancel', () => { activeNode = null; });
+
+                [nodeYai, nodeYo].forEach((n) => {
+                    n.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+                            e.preventDefault();
+                            uniteNodes();
+                        }
+                    });
+                });
+            })();
+
+            /* ─── ACTO 7: Tres certezas deslizables ─── */
+            (function setupAct7Truths() {
+                const track = document.getElementById('truths-track');
+                const btns = Array.from(document.querySelectorAll('.truth-pill-btn'));
+                const nextBtn = document.getElementById('act7-next-btn');
+                const nextLabel = document.getElementById('act7-next-label');
+                if (!track) return;
+
+                const seen = new Set([0]);
+
+                function markSeen(idx) {
+                    seen.add(idx);
+                    btns.forEach((b, i) => b.classList.toggle('is-current', i === idx));
+                    if (seen.size >= 3 && nextBtn) {
+                        nextBtn.disabled = false;
+                        if (nextLabel) nextLabel.textContent = 'Ver mis acuerdos contigo';
+                    } else if (nextLabel) {
+                        const rem = 3 - seen.size;
+                        nextLabel.textContent = rem === 1 ? 'Falta 1 parte por leer' : 'Faltan ' + rem + ' partes por leer';
+                    }
+                }
+
+                btns.forEach((btn) => {
+                    btn.addEventListener('click', () => {
+                        const idx = Number(btn.getAttribute('data-truth-idx'));
+                        const w = track.clientWidth || 1;
+                        track.scrollTo({ left: idx * w, behavior: prefersReducedMotion ? 'auto' : 'smooth' });
+                        markSeen(idx);
+                        pulseHaptic(8);
+                    });
+                });
+
+                track.addEventListener('scroll', () => {
+                    const w = Math.max(1, track.clientWidth);
+                    const idx = Math.max(0, Math.min(2, Math.round(track.scrollLeft / w)));
+                    markSeen(idx);
+                }, { passive: true });
+            })();
+
+            /* ─── ACTO 8: Encender los 4 acuerdos reales ─── */
+            (function setupAct8Promises() {
+                const litPromises = new Set();
+                const total = 4;
+                const nextBtn = document.getElementById('act8-next-btn');
+                const nextLabel = document.getElementById('act8-next-label');
+
+                document.querySelectorAll('.promise-row').forEach((row) => {
+                    row.addEventListener('click', () => {
+                        const idx = Number(row.getAttribute('data-promise'));
+                        if (!litPromises.has(idx)) {
+                            litPromises.add(idx);
+                            row.classList.add('is-lit');
+                            row.setAttribute('aria-expanded', 'true');
+                            const rect = row.getBoundingClientRect();
+                            spawnMotes(rect.left + 18, rect.top + 22, 14, true);
+                            pulseHaptic(10);
+
+                            const rem = total - litPromises.size;
+                            if (rem > 0) {
+                                if (nextLabel) nextLabel.textContent = rem === 1 ? 'Falta 1 acuerdo por encender' : 'Faltan ' + rem + ' acuerdos por encender';
+                            } else if (nextBtn) {
+                                nextBtn.disabled = false;
+                                if (nextLabel) nextLabel.textContent = 'Poner el reloj en cero';
+                            }
+                        }
+                    });
+                });
+            })();
+
+            /* ─── ACTO 9: Rebobinar el marcador a 00 : 00 : 00 ─── */
+            (function setupAct9Rewind() {
+                const track = document.getElementById('rewind-track');
+                const fill = document.getElementById('rewind-fill');
+                const knob = document.getElementById('rewind-knob');
+                const digitsEl = document.getElementById('rewind-digits');
+                const captionEl = document.getElementById('rewind-caption');
+                const nextBtn = document.getElementById('act9-next-btn');
+                if (!track || !knob || !digitsEl) return;
+
+                let dragging = false;
+                let zeroed = false;
+
+                function pad2(n) {
+                    return String(Math.max(0, Math.floor(n))).padStart(2, '0');
+                }
+
+                function setRewindRatio(raw) {
+                    let r = Math.max(0, Math.min(1, raw));
+                    if (r <= 0.06) r = 0;
+                    const pct = Math.round(r * 100);
+
+                    if (fill) fill.style.width = pct + '%';
+                    knob.style.left = pct + '%';
+                    track.setAttribute('aria-valuenow', String(pct));
+
+                    const d = Math.round(28 * r);
+                    const h = Math.round(14 * r);
+                    const s = Math.round(59 * r);
+                    digitsEl.textContent = pad2(d) + ' : ' + pad2(h) + ' : ' + pad2(s);
+
+                    if (r === 0 && !zeroed) {
+                        zeroed = true;
+                        digitsEl.classList.add('is-zero');
+                        if (captionEl) captionEl.textContent = 'Día Cero · Página limpia para los dos';
+                        if (nextBtn) nextBtn.disabled = false;
+                        pulseHaptic([14, 26, 18]);
+                        const dr = digitsEl.getBoundingClientRect();
+                        spawnMotes(dr.left + dr.width / 2, dr.top + dr.height / 2, 34, true);
+                    }
+                }
+
+                function updateFromPointer(clientX) {
+                    const rect = track.getBoundingClientRect();
+                    setRewindRatio((clientX - rect.left) / Math.max(1, rect.width));
+                }
+
+                track.addEventListener('pointerdown', (e) => {
+                    dragging = true;
+                    track.setPointerCapture(e.pointerId);
+                    updateFromPointer(e.clientX);
+                });
+                track.addEventListener('pointermove', (e) => {
+                    if (!dragging) return;
+                    updateFromPointer(e.clientX);
+                });
+                track.addEventListener('pointerup', () => { dragging = false; });
+                track.addEventListener('pointercancel', () => { dragging = false; });
+                track.addEventListener('keydown', (e) => {
+                    const cur = Number(track.getAttribute('aria-valuenow')) || 100;
+                    if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') {
+                        e.preventDefault();
+                        setRewindRatio((cur - 25) / 100);
+                    } else if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        setRewindRatio(0);
+                    }
+                });
+            })();
+
+            /* ─── ACTO 10 + EPÍLOGO: Sello mantenido 2s + Reloj de nuevo comienzo ─── */
             const sealBtn = document.getElementById('seal-btn');
             const sealCircle = document.getElementById('seal-progress-circle');
             const sealHint = document.getElementById('seal-hint');
-            const CIRCUMFERENCE = 289.03;
-            const HOLD_DURATION_MS = 1850;
+            const SEAL_CIRC = 295.31;
+            const HOLD_DURATION_MS = 1900;
 
             let holdingSeal = false;
             let holdProgress = 0;
-            let sealCompleted = false;
             let lastHoldFrame = performance.now();
             let acceptedTimestampMs = 0;
 
             function setSealVisual(p) {
                 const clamped = Math.max(0, Math.min(1, p));
                 if (sealCircle) {
-                    sealCircle.style.strokeDashoffset = (CIRCUMFERENCE * (1 - clamped)).toFixed(2);
+                    sealCircle.style.strokeDashoffset = (SEAL_CIRC * (1 - clamped)).toFixed(2);
                 }
-                auraTargetBoost = clamped * 0.52;
+                if (currentAct === 10) auraTargetBoost = clamped * 0.54;
             }
 
             function completeSeal() {
@@ -1786,32 +2962,31 @@
 
                 if (sealBtn) {
                     const r = sealBtn.getBoundingClientRect();
-                    spawnMotes(r.left + r.width / 2, r.top + r.height / 2, 62, true);
+                    spawnMotes(r.left + r.width / 2, r.top + r.height / 2, 65, true);
                 }
-                playWarmChord([523.25, 659.25, 783.99, 1046.5], 1.6);
-                if (navigator.vibrate) {
-                    try { navigator.vibrate([22, 40, 35]); } catch (_) {}
-                }
+                pulseHaptic([24, 40, 36]);
 
                 sendDiaCeroPayload({
                     status: 'accepted',
                     accepted: true,
+                    currentAct: 10,
+                    totalActs: TOTAL_ACTS,
                     acceptedAt: new Date(acceptedTimestampMs).toISOString()
                 });
 
                 startFreshClock();
-                setTimeout(() => goToAct(5), 360);
+                setTimeout(() => goToAct(11), 340);
             }
 
             (function tickSeal(now) {
                 const dt = Math.min(64, Math.max(0, now - lastHoldFrame));
                 lastHoldFrame = now;
 
-                if (!sealCompleted) {
+                if (!sealCompleted && currentAct === 10) {
                     if (holdingSeal) {
                         holdProgress = Math.min(1, holdProgress + dt / HOLD_DURATION_MS);
                         setSealVisual(holdProgress);
-                        if (Math.random() < 0.32 && sealBtn) {
+                        if (Math.random() < 0.3 && sealBtn) {
                             const r = sealBtn.getBoundingClientRect();
                             spawnMotes(r.left + r.width / 2, r.top + r.height / 2, 2, true);
                         }
@@ -1830,7 +3005,6 @@
                 holdingSeal = true;
                 sealBtn?.classList.add('is-holding');
                 if (sealHint) sealHint.textContent = 'Sigue manteniendo… empezando desde cero';
-                playHarmonicTone(440, 0.55, 0.03);
             }
 
             function endHold() {
@@ -1838,7 +3012,7 @@
                 holdingSeal = false;
                 sealBtn?.classList.remove('is-holding');
                 if (sealHint && holdProgress < 1) {
-                    sealHint.textContent = 'Mantén presionado el sello para decir que sí';
+                    sealHint.textContent = 'Mantén presionado el sello dos segundos para decir que sí';
                 }
             }
 
@@ -1882,35 +3056,33 @@
                     await sendDiaCeroPayload({
                         status: 'message_before_answer',
                         accepted: false,
+                        currentAct: 10,
+                        totalActs: TOTAL_ACTS,
                         message: text
                     });
-                    playWarmChord([440, 523.25, 659.25], 0.9);
+                    pulseHaptic(14);
                     if (sendTalkFirstLabel) sendTalkFirstLabel.textContent = 'Mensaje enviado · Te leo ahora mismo';
                 });
             }
 
-            /* ─── 9. ACTO V: Reloj ascendente desde Día Cero + Entrada a 28E ─── */
+            /* Reloj ascendente en el Epílogo */
             const fcDays = document.getElementById('fc-days');
             const fcHours = document.getElementById('fc-hours');
             const fcMins = document.getElementById('fc-mins');
             const fcSecs = document.getElementById('fc-secs');
             let freshClockTimer = 0;
 
-            function pad2(n) {
+            function padClock(n) {
                 return String(Math.max(0, Math.floor(n))).padStart(2, '0');
             }
 
             function updateFreshClock() {
                 const base = acceptedTimestampMs || Date.now();
                 const elapsedSec = Math.max(0, Math.floor((Date.now() - base) / 1000));
-                const d = Math.floor(elapsedSec / 86400);
-                const h = Math.floor((elapsedSec % 86400) / 3600);
-                const m = Math.floor((elapsedSec % 3600) / 60);
-                const s = elapsedSec % 60;
-                if (fcDays) fcDays.textContent = pad2(d);
-                if (fcHours) fcHours.textContent = pad2(h);
-                if (fcMins) fcMins.textContent = pad2(m);
-                if (fcSecs) fcSecs.textContent = pad2(s);
+                if (fcDays) fcDays.textContent = padClock(Math.floor(elapsedSec / 86400));
+                if (fcHours) fcHours.textContent = padClock(Math.floor((elapsedSec % 86400) / 3600));
+                if (fcMins) fcMins.textContent = padClock(Math.floor((elapsedSec % 3600) / 60));
+                if (fcSecs) fcSecs.textContent = padClock(elapsedSec % 60);
             }
 
             function startFreshClock() {
@@ -1927,11 +3099,10 @@
                     }
                 } catch (_) {}
 
-                fadeElementAudio(0, 620);
                 shellEl?.classList.add('is-exiting');
                 setTimeout(() => {
                     window.location.replace(isPreview ? 'index.html?dev=1' : 'index.html');
-                }, 650);
+                }, 620);
             }
 
             const finishEnterBtn = document.getElementById('finish-enter-btn');
@@ -1948,6 +3119,8 @@
                         await sendDiaCeroPayload({
                             status: 'accepted',
                             accepted: true,
+                            currentAct: 10,
+                            totalActs: TOTAL_ACTS,
                             acceptedAt: new Date(acceptedTimestampMs || Date.now()).toISOString(),
                             message: note
                         });
@@ -1957,9 +3130,7 @@
             }
 
             if (skipNoteEnterBtn) {
-                skipNoteEnterBtn.addEventListener('click', () => {
-                    navigateToMainWeb();
-                });
+                skipNoteEnterBtn.addEventListener('click', navigateToMainWeb);
             }
         })();
     </script>
