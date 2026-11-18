@@ -3,7 +3,7 @@
 // Version: 1.0.0
 // ══════════════════════════════════════════════════════════════════════════════
 
-const CACHE_NAME = '28e-pwa-v139';
+const CACHE_NAME = '28e-pwa-v140';
 
 // Recursos esenciales pre-cacheados para arranque instantáneo y offline básico
 const PRECACHE_ASSETS = [
@@ -117,6 +117,18 @@ self.addEventListener('fetch', (event) => {
   if (isStatic) {
     event.respondWith(
       caches.match(request).then((cachedResponse) => {
+        // Si el recurso ya está en caché y tiene versión explícita (?v=) o es fuente/imagen/icono,
+        // devolver instantáneamente desde caché sin disparar 40+ peticiones de fondo en cada F5
+        const isImmutableLike = url.searchParams.has('v') ||
+          /\.(woff2?|ttf|otf|png|jpe?g|webp|gif|ico|svg)$/i.test(url.pathname) ||
+          url.hostname.includes('fonts.gstatic.com') ||
+          url.hostname.includes('cdn.jsdelivr.net') ||
+          url.hostname.includes('cdnjs.cloudflare.com');
+
+        if (cachedResponse && isImmutableLike) {
+          return cachedResponse;
+        }
+
         const fetchPromise = fetch(request).then((networkResponse) => {
           if (networkResponse && networkResponse.status === 200) {
             const copy = networkResponse.clone();
@@ -124,7 +136,7 @@ self.addEventListener('fetch', (event) => {
           }
           return networkResponse;
         }).catch(() => {
-          return Response.error(); // A fetch handler must always resolve to a Response.
+          return cachedResponse || Response.error();
         });
 
         return cachedResponse || fetchPromise;

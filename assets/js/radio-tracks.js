@@ -31,7 +31,7 @@
                 ];
                 let currentSpotTrack = 0;
                 let spotAudio = new Audio();
-                spotAudio.preload = 'auto';
+                spotAudio.preload = 'none';
                 let fbRadioAudio = new Audio();
                 let currentRadioState = null;
                 let radioUnsubscribe = null;
@@ -671,12 +671,20 @@
                     });
                 }
 
-                function spotlightLoadTrack(i) {
+                function spotlightLoadTrack(i, attachAudio = isSpotPlaying) {
                     toastShownForCurrentSong = false;
                     currentSpotTrack = i;
                     const track = spotlightTracks[i];
-                    spotAudio.src = typeof normalizeAudioSrc === "function" ? normalizeAudioSrc(track.src) : track.src;
-                    spotAudio.preload = "auto";
+                    if (attachAudio) {
+                        const nextSrc = typeof normalizeAudioSrc === "function" ? normalizeAudioSrc(track.src) : track.src;
+                        spotAudio.preload = "auto";
+                        const resolvedNext = new URL(nextSrc, document.baseURI).href;
+                        if (spotAudio.src !== resolvedNext) {
+                            spotAudio.src = nextSrc;
+                        }
+                    } else {
+                        spotAudio.preload = "none";
+                    }
                     document.getElementById('spotlight-title').textContent = track.title;
                     document.getElementById('spotlight-artist').textContent = track.artist;
 
@@ -729,7 +737,7 @@
                     isSpotPlaying = true;
                     spotlightUpdateUI();
 
-                    if (currentSpotTrack !== i) {
+                    if (currentSpotTrack !== i || !spotAudio.src) {
                         // Register the play handler BEFORE changing the source
                         // so we don't miss the canplay event on cached/local files
                         let played = false;
@@ -747,7 +755,7 @@
                         spotAudio.addEventListener('canplay', doPlay, { once: true });
 
                         // Now change the source (this triggers loading)
-                        spotlightLoadTrack(i);
+                        spotlightLoadTrack(i, true);
 
                         // Safety: if canplay doesn't fire within 3 seconds, force play
                         setTimeout(() => { doPlay(); }, 3000);
@@ -789,7 +797,7 @@
                         return;
                     }
 
-                    if (!spotAudio.src) spotlightLoadTrack(0);
+                    if (!spotAudio.src) spotlightLoadTrack(currentSpotTrack, true);
                     if (isSpotPlaying) {
                         spotAudio.pause();
                         isSpotPlaying = false;

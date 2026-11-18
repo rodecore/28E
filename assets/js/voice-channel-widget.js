@@ -676,9 +676,6 @@
       this._injectCSS();
       this._buildUI();
 
-      // Precargar los archivos de audio para que suenen a la primera
-      setTimeout(() => this._initAudio(), 500);
-
       window.yaireVoiceChannel = this;
     }
 
@@ -727,41 +724,27 @@
         this.actx = null;
       }
 
-      // 1. Preload dedicated HTMLAudio elements for high-reliability mobile playback
-      for (const [k, u] of Object.entries(this.sfxUrls)) {
-        try {
-          const a = new Audio();
-          a.preload = 'auto';
-          a.src = u;
-          a.setAttribute('playsinline', '');
-          a.setAttribute('webkit-playsinline', '');
-          this._audioPool[k] = a;
-        } catch(e){}
-      }
+      // Carga bajo demanda por clave (cero descargas WAV masivas al abrir la web principal)
+      this._ensureSfxBuffer = (k) => {
+        if (!this.actx || this._checkMobile()) return Promise.resolve(null);
+        if (this.sfxBuf[k]) return Promise.resolve(this.sfxBuf[k]);
+        if (this.sfxPromises[k]) return this.sfxPromises[k];
+        const u = this.sfxUrls && this.sfxUrls[k];
+        if (!u) return Promise.resolve(null);
+        this.sfxPromises[k] = fetch(u)
+          .then(r => {
+            if (!r.ok) throw new Error('HTTP ' + r.status);
+            return r.arrayBuffer();
+          })
+          .then(ab => this.actx.decodeAudioData(ab))
+          .then(buf => {
+            this.sfxBuf[k] = buf;
+            return buf;
+          })
+          .catch(() => null);
+        return this.sfxPromises[k];
+      };
 
-      // 2. Preload Web Audio buffers for desktop
-      if (this.actx) {
-        const loadBuf = (k, u) => {
-          this.sfxPromises[k] = fetch(u)
-            .then(r => {
-              if (!r.ok) throw new Error('HTTP ' + r.status);
-              return r.arrayBuffer();
-            })
-            .then(ab => this.actx.decodeAudioData(ab))
-            .then(buf => {
-              this.sfxBuf[k] = buf;
-              return buf;
-            })
-            .catch(() => null);
-          return this.sfxPromises[k];
-        };
-
-        for (const [k, u] of Object.entries(this.sfxUrls)) {
-          loadBuf(k, u);
-        }
-      }
-
-      // 3. User interaction unlocker for iOS Safari and mobile Chrome
       const unlock = () => {
         if (this.actx) {
           if (this.actx.state === 'suspended' || this.actx.state === 'interrupted') {
@@ -777,14 +760,6 @@
               this._unlocked = true;
             } catch(e){}
           }
-        }
-        if (!this._poolUnlocked && this._audioPool) {
-          this._poolUnlocked = true;
-          try {
-            ['jbl_latency', 'jbl_success'].forEach(key => {
-              if (this._audioPool[key]) this._audioPool[key].load();
-            });
-          } catch(e){}
         }
       };
 
@@ -875,8 +850,8 @@
       } else {
         if (this.actx && this.sfxBuf && this.sfxBuf[k]) {
           playBuffer(this.sfxBuf[k]);
-        } else if (this.sfxPromises && this.sfxPromises[k]) {
-          this.sfxPromises[k].then(buf => {
+        } else if (this._ensureSfxBuffer) {
+          this._ensureSfxBuffer(k).then(buf => {
             if (controller.stopped) return;
             if (buf) playBuffer(buf);
             else playHtmlAudio();

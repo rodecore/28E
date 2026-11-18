@@ -738,7 +738,7 @@
         </footer>
     </div>
 
-    <audio id="ambient-audio" src="./sounds/ost/re-forro.mp3" preload="auto" autoplay playsinline></audio>
+    <audio id="ambient-audio" preload="none" playsinline></audio>
 
     <script>
         (function () {
@@ -1622,13 +1622,16 @@
             } catch (_) {}
         }
 
-        function prepareTrackMetadata(idx) {
+        function prepareTrackMetadata(idx, attachSource = false) {
             if (!ambientAudio) return;
             currentTrackIdx = ((idx % MAINT_PLAYLIST.length) + MAINT_PLAYLIST.length) % MAINT_PLAYLIST.length;
             const track = MAINT_PLAYLIST[currentTrackIdx];
-            const resolvedUrl = new URL(track.src, document.baseURI).href;
-            if (ambientAudio.src !== resolvedUrl) {
-                ambientAudio.src = track.src;
+            if (attachSource) {
+                const resolvedUrl = new URL(track.src, document.baseURI).href;
+                if (ambientAudio.src !== resolvedUrl) {
+                    ambientAudio.preload = 'metadata';
+                    ambientAudio.src = track.src;
+                }
             }
             if (ambientBtn) {
                 ambientBtn.title = `${track.title} — ${track.artist}`;
@@ -1707,7 +1710,7 @@
 
         function tryStartImmediatePlayback(fadeMs = 700) {
             if (!ambientAudio || userMuted || hasUnlocked) return;
-            prepareTrackMetadata(currentTrackIdx);
+            prepareTrackMetadata(currentTrackIdx, true);
             ambientAudio.muted = false;
 
             if (!ambientAudio.paused) {
@@ -1742,11 +1745,11 @@
                 return;
             }
             if (ambientBtn && ambientBtn.contains(e.target)) return;
-            if (!ambientAudio.paused && !ambientAudio.muted) {
+            if (ambientAudio.src && !ambientAudio.paused && !ambientAudio.muted) {
                 detachUnlockListeners();
                 return;
             }
-            // Llamada síncrona a .play() dentro del gesto para compatibilidad estricta con Safari / iOS / Chrome
+            prepareTrackMetadata(currentTrackIdx, true);
             ambientAudio.muted = false;
             ambientAudio.volume = currentTargetVolume();
             const p = ambientAudio.play();
@@ -1760,7 +1763,7 @@
 
         function advanceToTrack(nextIdx) {
             if (!ambientAudio || hasUnlocked) return;
-            prepareTrackMetadata(nextIdx);
+            prepareTrackMetadata(nextIdx, true);
             if (!userMuted) {
                 ambientAudio.muted = false;
                 ambientAudio.volume = 0.04;
@@ -1818,6 +1821,7 @@
 
             // Si el navegador aún tenía pausado el audio antes del primer gesto, este clic arranca la música directamente
             if (ambientAudio.paused && !userMuted) {
+                prepareTrackMetadata(currentTrackIdx, true);
                 ambientAudio.muted = false;
                 ambientAudio.volume = currentTargetVolume();
                 ambientAudio.play().then(() => {
@@ -1840,9 +1844,23 @@
             }
         });
 
-        prepareTrackMetadata(0);
+        // Preparar metadatos sin bloquear window.load (para que el spinner de recarga termine en <100ms)
+        prepareTrackMetadata(0, false);
         syncAudioButton(true);
-        tryStartImmediatePlayback(700);
+        attachUnlockListeners();
+
+        const bootBackgroundMusic = () => {
+            setTimeout(() => {
+                if (!userMuted && !hasUnlocked) {
+                    tryStartImmediatePlayback(700);
+                }
+            }, 30);
+        };
+        if (document.readyState === 'complete') {
+            bootBackgroundMusic();
+        } else {
+            window.addEventListener('load', bootBackgroundMusic, { once: true });
+        }
         })();
     </script>
 </body>
