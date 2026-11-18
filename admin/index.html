@@ -924,18 +924,18 @@
                                             </div>
                                         </div>
                                         <input type="hidden" id="maint-screen" value="cinematic">
-                                        <!-- Cards horizontales -->
+                                        <!-- Pantalla única activa -->
                                         <div class="flex flex-col gap-2">
                                             <!-- Card: OLED Monolith -->
-                                            <div id="maint-screen-card-cinematic" onclick="setMaintScreen('cinematic')"
-                                                class="relative flex items-center gap-4 px-4 py-3.5 rounded-xl border-2 cursor-pointer transition-all duration-200 maint-screen-card border-amber-500/60 bg-amber-500/[0.06] hover:bg-amber-500/10"
+                                            <div id="maint-screen-card-cinematic"
+                                                class="relative flex items-center gap-4 px-4 py-3.5 rounded-xl border-2 transition-all duration-200 border-amber-500/60 bg-amber-500/[0.06]"
                                                 data-screen="cinematic">
                                                 <div class="maint-icon w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 bg-amber-500/20 text-amber-400">
                                                     <i class="ph-fill ph-sparkle text-lg"></i>
                                                 </div>
                                                 <div class="flex-1 min-w-0">
                                                     <div class="text-sm font-bold text-white leading-tight">OLED Monolith</div>
-                                                    <div class="text-[11px] text-zinc-500 mt-0.5">Estilo Apple, Sebenta, halo óptico y audio ambiental</div>
+                                                    <div class="text-[11px] text-zinc-400 mt-0.5">Estilo Apple, Sebenta, halo óptico y audio ambiental</div>
                                                 </div>
                                                 <div class="flex items-center gap-2 flex-shrink-0">
                                                     <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 uppercase tracking-wide">Activo</span>
@@ -943,32 +943,6 @@
                                                         <i class="ph-bold ph-check text-black text-[10px]"></i>
                                                     </div>
                                                 </div>
-                                            </div>
-                                            <!-- Card: Especial 6 Meses -->
-                                            <div id="maint-screen-card-special" onclick="setMaintScreen('special')"
-                                                class="relative flex items-center gap-4 px-4 py-3.5 rounded-xl border-2 cursor-pointer transition-all duration-200 maint-screen-card border-white/5 bg-white/[0.02] hover:bg-white/[0.04] hover:border-white/10"
-                                                data-screen="special">
-                                                <div class="maint-icon w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 bg-white/5 text-zinc-500">
-                                                    <i class="ph-fill ph-confetti text-lg"></i>
-                                                </div>
-                                                <div class="flex-1 min-w-0">
-                                                    <div class="text-sm font-bold text-zinc-300 leading-tight">Especial 6 Meses</div>
-                                                    <div class="text-[11px] text-zinc-600 mt-0.5">Estadísticas y Wrapped</div>
-                                                </div>
-                                                <div class="maint-check w-5 h-5 rounded-full flex items-center justify-center border border-white/10 bg-transparent flex-shrink-0"></div>
-                                            </div>
-                                            <!-- Card: Tráiler Yaire -->
-                                            <div id="maint-screen-card-trailer" onclick="setMaintScreen('trailer')"
-                                                class="relative flex items-center gap-4 px-4 py-3.5 rounded-xl border-2 cursor-pointer transition-all duration-200 maint-screen-card border-white/5 bg-white/[0.02] hover:bg-white/[0.04] hover:border-white/10"
-                                                data-screen="trailer">
-                                                <div class="maint-icon w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 bg-white/5 text-zinc-500">
-                                                    <i class="ph-fill ph-plant text-lg"></i>
-                                                </div>
-                                                <div class="flex-1 min-w-0">
-                                                    <div class="text-sm font-bold text-zinc-300 leading-tight">Tráiler Yaire</div>
-                                                    <div class="text-[11px] text-zinc-600 mt-0.5">Jardín 3D + música</div>
-                                                </div>
-                                                <div class="maint-check w-5 h-5 rounded-full flex items-center justify-center border border-white/10 bg-transparent flex-shrink-0"></div>
                                             </div>
                                         </div>
                                     </div>
@@ -3358,8 +3332,7 @@
 
             document.getElementById('maint-toggle').checked = cfg.mantenimiento || false;
             document.getElementById('maint-date').value = cfg.maintDate || '';
-            if (cfg.maintScreen) setMaintScreen(cfg.maintScreen);
-            else setMaintScreen('cinematic');
+            setMaintScreen('cinematic');
             setMaintDuration(cfg.maintType || 'indefinite');
             toggleMaintOptions(false);
 
@@ -4495,30 +4468,9 @@
             }
         }
 
-        function setMaintScreen(type) {
-            document.getElementById('maint-screen').value = type;
-            document.querySelectorAll('.maint-screen-card').forEach(el => {
-                const check = el.querySelector('.maint-check');
-                const icon = el.querySelector('.maint-icon');
-                if (el.dataset.screen === type) {
-                    el.classList.add('border-amber-500', 'bg-amber-500/5');
-                    el.classList.remove('border-white/5', 'bg-white/[0.02]');
-                    check.classList.add('bg-amber-500');
-                    check.classList.remove('bg-transparent');
-                    icon.classList.add('bg-amber-500/15', 'text-amber-400');
-                    icon.classList.remove('bg-white/5', 'text-zinc-600');
-                    check.innerHTML = '<i class="ph-bold ph-check text-black text-[10px]"></i>';
-                } else {
-                    el.classList.remove('border-amber-500', 'bg-amber-500/5');
-                    el.classList.add('border-white/5', 'bg-white/[0.02]');
-                    check.classList.remove('bg-amber-500');
-                    check.classList.add('bg-transparent');
-                    icon.classList.remove('bg-amber-500/15', 'text-amber-400');
-                    icon.classList.add('bg-white/5', 'text-zinc-600');
-                    check.innerHTML = '';
-                }
-            });
-            checkDirtyState();
+        function setMaintScreen() {
+            const input = document.getElementById('maint-screen');
+            if (input) input.value = 'cinematic';
         }
 
         function setMaintDuration(type) {
