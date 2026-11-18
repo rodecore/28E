@@ -120,8 +120,8 @@
                             }
                         }
 
-                        // Autocompletar traducciones faltantes (ej: si el panel viejo falló)
-                        if (enTxt === cfg.heroBadge) {
+                        // Autocompletar traducciones faltantes solo si el usuario navega en otro idioma distinto al español
+                        if (enTxt === cfg.heroBadge && typeof currentLang !== 'undefined' && currentLang !== 'es') {
                             const translateApi = async (text, lang) => {
                                 try {
                                     const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=es&tl=${lang}&dt=t&q=${encodeURIComponent(text)}`;
@@ -170,7 +170,7 @@
 
                     // Autocompletar traducciones faltantes al vuelo si el panel no las generó
                     const tipsEs = cfg.spotlightTips.es;
-                    if (tipsEs && tipsEs.length > 0) {
+                    if (tipsEs && tipsEs.length > 0 && typeof currentLang !== 'undefined' && currentLang !== 'es') {
                         const translateApi = async (text, lang) => {
                             try {
                                 const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=es&tl=${lang}&dt=t&q=${encodeURIComponent(text)}`;

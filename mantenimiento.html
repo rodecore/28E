@@ -1855,6 +1855,11 @@
                     tryStartImmediatePlayback(700);
                 }
             }, 30);
+            if ('serviceWorker' in navigator && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+                navigator.serviceWorker.register('./sw.js?v=141', { updateViaCache: 'none' })
+                    .then((reg) => reg.update().catch(() => {}))
+                    .catch(() => {});
+            }
         };
         if (document.readyState === 'complete') {
             bootBackgroundMusic();

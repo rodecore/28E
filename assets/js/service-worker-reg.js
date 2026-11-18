@@ -14,8 +14,9 @@
     } else if ('serviceWorker' in navigator) {
         // 1. Registro del Service Worker en producción
         window.addEventListener('load', function () {
-            navigator.serviceWorker.register('./sw.js?v=47')
+            navigator.serviceWorker.register('./sw.js?v=141', { updateViaCache: 'none' })
                 .then(function (reg) {
+                    reg.update().catch(function () {});
                     reg.addEventListener('updatefound', function () {
                         var newWorker = reg.installing;
                         if (newWorker) {

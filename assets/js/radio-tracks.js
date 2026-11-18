@@ -239,6 +239,15 @@
                 let isSpotPlaying = false;
                 let isSpotlightExpanded = false;
                 let spotArtworkCache = {};
+                try {
+                    spotArtworkCache = JSON.parse(sessionStorage.getItem('yaire_spot_art_v1') || '{}') || {};
+                } catch (_) { spotArtworkCache = {}; }
+
+                function saveArtworkCache(key, val) {
+                    spotArtworkCache[key] = val;
+                    try { sessionStorage.setItem('yaire_spot_art_v1', JSON.stringify(spotArtworkCache)); } catch (_) {}
+                    return val;
+                }
 
                 async function fetchSpotlightArtwork(track) {
                     const key = track.title + '|' + track.artist;
@@ -253,11 +262,25 @@
                     };
 
                     const searchDeezer = (query, artistFilter) => {
+                        if (document.readyState !== 'complete') return Promise.resolve(null);
                         return new Promise((resolve) => {
+                            let settled = false;
                             const cbName = 'dzcb_' + Date.now() + Math.floor(Math.random() * 10000);
-                            window[cbName] = (data) => {
+                            const cleanup = () => {
                                 delete window[cbName];
-                                document.head.removeChild(script);
+                                if (script.parentNode) script.parentNode.removeChild(script);
+                            };
+                            const timer = setTimeout(() => {
+                                if (settled) return;
+                                settled = true;
+                                cleanup();
+                                resolve(null);
+                            }, 2200);
+                            window[cbName] = (data) => {
+                                if (settled) return;
+                                settled = true;
+                                clearTimeout(timer);
+                                cleanup();
                                 if (data && data.data && data.data.length > 0) {
                                     if (artistFilter) {
                                         const lowerArtist = artistFilter.toLowerCase();
@@ -269,10 +292,13 @@
                                 resolve(null);
                             };
                             const script = document.createElement('script');
+                            script.async = true;
                             script.src = `https://api.deezer.com/search?q=${query}&output=jsonp&callback=${cbName}`;
                             script.onerror = () => {
-                                delete window[cbName];
-                                document.head.removeChild(script);
+                                if (settled) return;
+                                settled = true;
+                                clearTimeout(timer);
+                                cleanup();
                                 resolve(null);
                             };
                             document.head.appendChild(script);
@@ -280,8 +306,11 @@
                     };
 
                     const searchiTunes = async (query, artistFilter) => {
+                        const ctrl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+                        const tId = ctrl ? setTimeout(() => ctrl.abort(), 2500) : 0;
                         try {
-                            const res = await fetch('https://itunes.apple.com/search?term=' + query + '&entity=song&limit=10');
+                            const res = await fetch('https://itunes.apple.com/search?term=' + query + '&entity=song&limit=10', ctrl ? { signal: ctrl.signal } : undefined);
+                            if (tId) clearTimeout(tId);
                             const data = await res.json();
                             if (data.results && data.results.length > 0) {
                                 if (artistFilter) {
@@ -291,42 +320,32 @@
                                 }
                                 return data.results[0].artworkUrl100.replace('100x100bb', '400x400bb');
                             }
-                        } catch (e) { }
+                        } catch (e) {
+                            if (tId) clearTimeout(tId);
+                        }
                         return null;
                     };
 
-                    // Try 1: Clean Title + Clean Artist (Deezer -> iTunes)
+                    // Priorizar fetch CORS rápido a iTunes (nunca bloquea window.load), y Deezer solo como respaldo post-load
                     const titleClean = clean(track.title);
                     const artistClean = clean(track.artist);
                     let q = encodeURIComponent(titleClean + ' ' + artistClean);
 
-                    let url = await searchDeezer(q, artistClean);
-                    if (url) { spotArtworkCache[key] = url; return url; }
+                    let url = await searchiTunes(q, artistClean);
+                    if (url) return saveArtworkCache(key, url);
 
-                    url = await searchiTunes(q, artistClean);
-                    if (url) { spotArtworkCache[key] = url; return url; }
-
-                    // Try 2: Original Title + Original Artist
-                    q = encodeURIComponent(track.title + ' ' + track.artist);
-                    url = await searchDeezer(q, track.artist);
-                    if (url) { spotArtworkCache[key] = url; return url; }
-
-                    url = await searchiTunes(q, track.artist);
-                    if (url) { spotArtworkCache[key] = url; return url; }
-
-                    // Try 3: Just Title
-                    q = encodeURIComponent(titleClean);
                     url = await searchDeezer(q, artistClean);
-                    if (url) { spotArtworkCache[key] = url; return url; }
+                    if (url) return saveArtworkCache(key, url);
 
+                    q = encodeURIComponent(track.title + ' ' + track.artist);
+                    url = await searchiTunes(q, track.artist);
+                    if (url) return saveArtworkCache(key, url);
+
+                    q = encodeURIComponent(titleClean);
                     url = await searchiTunes(q, artistClean);
-                    if (url) {
-                        spotArtworkCache[key] = url;
-                        return url;
-                    }
+                    if (url) return saveArtworkCache(key, url);
 
-                    spotArtworkCache[key] = null;
-                    return null;
+                    return saveArtworkCache(key, null);
                 }
                 window.spotArtworkCache = spotArtworkCache;
                 window.fetchSpotlightArtwork = fetchSpotlightArtwork;
@@ -694,13 +713,19 @@
                     if (expTitle) expTitle.textContent = track.title;
                     if (expArtist) expArtist.textContent = track.artist;
 
-                    // Fetch and update artwork immediately
-                    fetchSpotlightArtwork(track).then(artUrl => {
-                        updateAllArtwork(artUrl);
-                        if (isSpotlightExpanded) {
-                            renderSpotlightPlaylist();
-                        }
-                    });
+                    const runArtworkLoad = () => {
+                        fetchSpotlightArtwork(track).then(artUrl => {
+                            updateAllArtwork(artUrl);
+                            if (isSpotlightExpanded) {
+                                renderSpotlightPlaylist();
+                            }
+                        });
+                    };
+                    if ((track.title + '|' + track.artist) in spotArtworkCache || document.readyState === 'complete') {
+                        runArtworkLoad();
+                    } else {
+                        window.addEventListener('load', runArtworkLoad, { once: true });
+                    }
 
                     // Actualizar título de ventana y Media Session del Sistema Operativo
                     if (isSpotPlaying) {

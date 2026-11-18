@@ -3,7 +3,7 @@
 // Version: 1.0.0
 // ══════════════════════════════════════════════════════════════════════════════
 
-const CACHE_NAME = '28e-pwa-v140';
+const CACHE_NAME = '28e-pwa-v141';
 
 // Recursos esenciales pre-cacheados para arranque instantáneo y offline básico
 const PRECACHE_ASSETS = [
@@ -33,16 +33,18 @@ self.addEventListener('install', (event) => {
 // ── 2. ACTIVATE ───────────────────────────────────────────────────────────────
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((name) => {
-          if (name.startsWith('28e-') && name !== CACHE_NAME) {
-            console.log('[SW] Eliminando caché antigua:', name);
-            return caches.delete(name);
-          }
-        })
-      );
-    }).then(() => self.clients.claim())
+    Promise.all([
+      self.registration.navigationPreload ? self.registration.navigationPreload.enable().catch(() => {}) : Promise.resolve(),
+      caches.keys().then((cacheNames) => {
+        return Promise.all(
+          cacheNames.map((name) => {
+            if (name.startsWith('28e-') && name !== CACHE_NAME) {
+              return caches.delete(name);
+            }
+          })
+        );
+      })
+    ]).then(() => self.clients.claim())
   );
 });
 
@@ -88,19 +90,28 @@ self.addEventListener('fetch', (event) => {
   // Garantiza que el usuario reciba siempre la versión más reciente online, pero cargue si está offline
   if (request.mode === 'navigate') {
     event.respondWith(
-      fetch(request)
-        .then((networkResponse) => {
+      (async () => {
+        try {
+          const preloadResp = await event.preloadResponse;
+          if (preloadResp) {
+            if (preloadResp.status === 200) {
+              const copy = preloadResp.clone();
+              caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+            }
+            return preloadResp;
+          }
+          const networkResponse = await fetch(request);
           if (networkResponse && networkResponse.status === 200) {
             const copy = networkResponse.clone();
             caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
           }
           return networkResponse;
-        })
-        .catch(async () => {
+        } catch (_) {
           const cached = await caches.match(request);
           if (cached) return cached;
           return caches.match('./index.html');
-        })
+        }
+      })()
     );
     return;
   }
