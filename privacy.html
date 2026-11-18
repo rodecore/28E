@@ -389,93 +389,12 @@
             user-select: none;
         }
 
-        /* ─── 3 Pilares de Confianza (Bento Glass idéntico a la página principal) ─── */
-        .pillars-wrap {
-            max-width: 72rem;
-            margin: 0 auto 3.5rem;
-            padding: 0 1.25rem;
-        }
-
-        @media (min-width: 640px) {
-            .pillars-wrap {
-                padding: 0 2rem;
-                margin-bottom: 4.25rem;
-            }
-        }
-
-        .pillars-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 1rem;
-        }
-
-        @media (min-width: 820px) {
-            .pillars-grid {
-                grid-template-columns: repeat(3, minmax(0, 1fr));
-                gap: 1.25rem;
-            }
-        }
-
-        .pillar-card {
-            position: relative;
-            border-radius: 20px;
-            padding: 1.4rem 1.5rem;
-            background:
-                radial-gradient(circle at 18% 0%, rgba(231, 117, 166, 0.09) 0%, transparent 62%),
-                var(--bg-glass);
-            border: 1px solid rgba(255, 255, 255, 0.09);
-            box-shadow: 0 16px 36px -16px rgba(0, 0, 0, 0.72), inset 0 1px 0 rgba(255, 255, 255, 0.09);
-            display: flex;
-            flex-direction: column;
-            gap: 0.65rem;
-            transition: border-color 220ms ease, transform 220ms var(--ease-out);
-        }
-
-        @media (hover: hover) and (pointer: fine) {
-            .pillar-card:hover {
-                border-color: var(--border-rose);
-                transform: translateY(-2px);
-            }
-        }
-
-        .pillar-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 10px;
-            background: rgba(231, 117, 166, 0.11);
-            border: 1px solid rgba(231, 117, 166, 0.24);
-            color: var(--rose-light);
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .pillar-icon svg {
-            width: 18px;
-            height: 18px;
-        }
-
-        .pillar-title {
-            font-family: var(--font-editorial);
-            font-weight: 500;
-            font-size: 1.28rem;
-            line-height: 1.2;
-            letter-spacing: -0.015em;
-            color: var(--ink-white);
-            margin-top: 0.15rem;
-        }
-
-        .pillar-desc {
-            font-size: 0.86rem;
-            line-height: 1.62;
-            color: var(--ink-secondary);
-        }
-
         /* ─── Cuerpo Editorial a Dos Columnas (Índice Sticky + Lectura) ─── */
         .document-shell {
             max-width: 72rem;
             margin: 0 auto;
-            padding: 0 1.25rem 4rem;
+            padding: 2.5rem 1.25rem 5rem;
+            border-top: 1px solid var(--border-subtle);
             display: grid;
             grid-template-columns: 1fr;
             gap: 2.25rem;
@@ -484,7 +403,7 @@
 
         @media (min-width: 640px) {
             .document-shell {
-                padding: 0 2rem 5rem;
+                padding: 3rem 2rem 6rem;
             }
         }
 
@@ -728,163 +647,6 @@
             color: var(--rose-soft);
         }
 
-        /* ─── Footer Oficial de Twenty Eight Experience (Idéntico a index.html) ─── */
-        .site-footer {
-            position: relative;
-            margin-top: 1rem;
-            padding: 3.75rem 1.5rem 3.5rem;
-            border-top: 1px solid var(--border-subtle);
-            text-align: center;
-            overflow: hidden;
-        }
-
-        .footer-glow {
-            position: absolute;
-            bottom: -4rem;
-            left: 50%;
-            transform: translateX(-50%);
-            width: min(34rem, 90vw);
-            height: 10rem;
-            background: radial-gradient(ellipse at center, rgba(196, 55, 122, 0.16) 0%, transparent 72%);
-            filter: blur(36px);
-            pointer-events: none;
-        }
-
-        .footer-inner {
-            position: relative;
-            z-index: 1;
-            max-width: 48rem;
-            margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .footer-emblem {
-            background: none;
-            border: 0;
-            cursor: pointer;
-            font-family: 'Inter', system-ui, sans-serif;
-            font-weight: 800;
-            font-size: clamp(1.5rem, 3.6vw, 2.25rem);
-            letter-spacing: -0.03em;
-            background-image: linear-gradient(180deg, #FFE5EE 0%, #FFB7D4 28%, #E775A6 62%, #C4377A 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            color: transparent;
-            transition: transform 220ms var(--ease-out);
-        }
-
-        @media (hover: hover) and (pointer: fine) {
-            .footer-emblem:hover {
-                transform: scale(1.03);
-            }
-        }
-
-        .footer-emblem:active {
-            transform: scale(0.97);
-        }
-
-        .footer-poetic-row {
-            margin: 0.9rem auto 0.55rem;
-            width: 100%;
-            max-width: 32rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.75rem;
-        }
-
-        .footer-poetic-line {
-            height: 1px;
-            flex: 1;
-            background: linear-gradient(90deg, transparent 0%, rgba(231, 117, 166, 0.3) 100%);
-        }
-
-        .footer-poetic-line.is-right {
-            background: linear-gradient(90deg, rgba(231, 117, 166, 0.3) 0%, transparent 100%);
-        }
-
-        .footer-poetic-quote {
-            font-family: var(--font-editorial);
-            font-style: italic;
-            font-size: 0.85rem;
-            color: rgba(255, 225, 238, 0.9);
-            text-shadow: 0 0 18px rgba(231, 117, 166, 0.3);
-        }
-
-        .footer-copy {
-            margin-top: 0.35rem;
-            font-size: 12.5px;
-            line-height: 1.6;
-            color: #A1A1AA;
-            max-width: 44rem;
-        }
-
-        .footer-date {
-            margin-top: 0.75rem;
-            font-family: var(--font-ui);
-            font-size: 11px;
-            font-weight: 500;
-            letter-spacing: 0.16em;
-            color: rgba(255, 183, 212, 0.72);
-            display: inline-flex;
-            align-items: center;
-            gap: 0.45rem;
-            user-select: none;
-        }
-
-        .footer-date .inf {
-            color: #FF94C2;
-            font-weight: 600;
-            font-size: 0.85rem;
-            text-shadow: 0 0 10px rgba(231, 117, 166, 0.55);
-        }
-
-        .footer-pills {
-            margin-top: 1.15rem;
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: center;
-            gap: 0.65rem;
-        }
-
-        .footer-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.42rem;
-            padding: 0.42rem 0.9rem;
-            border-radius: 9999px;
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.09);
-            font-family: var(--font-ui);
-            font-size: 11.5px;
-            font-weight: 600;
-            color: var(--ink-secondary);
-            text-decoration: none;
-            transition: background-color 180ms ease, border-color 180ms ease, color 180ms ease, transform 160ms var(--ease-out);
-        }
-
-        .footer-pill svg {
-            width: 12px;
-            height: 12px;
-            color: rgba(255, 183, 212, 0.78);
-        }
-
-        @media (hover: hover) and (pointer: fine) {
-            .footer-pill:hover {
-                background: rgba(231, 117, 166, 0.11);
-                border-color: rgba(231, 117, 166, 0.28);
-                color: var(--ink-white);
-            }
-        }
-
-        .footer-pill:active {
-            transform: scale(0.97);
-        }
-
         @media (max-width: 640px) {
             .floating-pill-nav {
                 height: 3.5rem;
@@ -899,10 +661,6 @@
                 font-size: 0.71rem;
                 gap: 0.42rem;
                 padding: 0.45rem 0.9rem;
-            }
-
-            .footer-poetic-line {
-                display: none;
             }
         }
 
@@ -966,57 +724,6 @@
                 <span>Actualizado: <strong>Nov 2026</strong></span>
                 <span class="meta-sep" aria-hidden="true">&bull;</span>
                 <span>9 apartados</span>
-            </div>
-        </div>
-    </section>
-
-    <!-- Resumen Ejecutivo en 3 Tarjetas Bento Glass -->
-    <section class="pillars-wrap" aria-label="Principios de privacidad">
-        <div class="pillars-grid">
-            <div class="pillar-card">
-                <div class="pillar-icon" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
-                        stroke-linejoin="round">
-                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-                        <path d="m9 12 2 2 4-4"></path>
-                    </svg>
-                </div>
-                <h2 class="pillar-title">Sin venta ni publicidad</h2>
-                <p class="pillar-desc">
-                    Jamás vendemos, alquilamos ni cedemos tu información a terceros, anunciantes ni redes de rastreo
-                    comercial.
-                </p>
-            </div>
-
-            <div class="pillar-card">
-                <div class="pillar-icon" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
-                        stroke-linejoin="round">
-                        <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
-                        <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
-                        <line x1="12" y1="19" x2="12" y2="22"></line>
-                    </svg>
-                </div>
-                <h2 class="pillar-title">Voz efímera en Afterglow</h2>
-                <p class="pillar-desc">
-                    El micrófono solo se activa cuando entras voluntariamente a la sala; el audio viaja cifrado por
-                    WebRTC y nunca se graba.
-                </p>
-            </div>
-
-            <div class="pillar-card">
-                <div class="pillar-icon" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
-                        stroke-linejoin="round">
-                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                    </svg>
-                </div>
-                <h2 class="pillar-title">Control en tus manos</h2>
-                <p class="pillar-desc">
-                    Puedes editar o borrar tus dedicatorias, limpiar tus preferencias locales o revocar el acceso de
-                    Google en cualquier momento.
-                </p>
             </div>
         </div>
     </section>
@@ -1305,53 +1012,12 @@
         </main>
     </div>
 
-    <!-- Footer Oficial idéntico a la página principal de 28E -->
-    <footer class="site-footer">
-        <div class="footer-glow" aria-hidden="true"></div>
-        <div class="footer-inner">
-            <button type="button" class="footer-emblem" id="scroll-top-emblem"
-                aria-label="Volver arriba en Twenty Eight Experience">
-                Twenty Eight Experience
-            </button>
-
-            <div class="footer-poetic-row">
-                <div class="footer-poetic-line" aria-hidden="true"></div>
-                <p class="footer-poetic-quote">&laquo; Donde la distancia se disuelve y cada segundo florece contigo
-                    &raquo;</p>
-                <div class="footer-poetic-line is-right" aria-hidden="true"></div>
-            </div>
-
-            <p class="footer-copy">
-                Copyright &copy; 2026 Twenty Eight Experience. Todos los derechos reservados y dedicados exclusivamente
-                a Yaire Alvarado.
-            </p>
-
-            <p class="footer-date">
-                <span>28.01.2026</span>
-                <span>&mdash;</span>
-                <span class="inf" title="Amor Infinito">&infin;</span>
-            </p>
-
-            <div class="footer-pills">
-                <a href="/" class="footer-pill">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                        stroke-linejoin="round" aria-hidden="true">
-                        <path d="M19 12H5"></path>
-                        <path d="m12 19-7-7 7-7"></path>
-                    </svg>
-                    <span>Volver a la página principal</span>
-                </a>
-            </div>
-        </div>
-    </footer>
-
     <script>
         (function () {
             const progressEl = document.getElementById('reading-progress');
             const tocLinks = Array.from(document.querySelectorAll('.toc-link'));
             const chapters = Array.from(document.querySelectorAll('.policy-chapter'));
             const activeNavLabel = document.getElementById('nav-active-label');
-            const topEmblem = document.getElementById('scroll-top-emblem');
 
             const linkById = new Map();
             let lockedTargetId = '';
@@ -1422,12 +1088,6 @@
             window.addEventListener('scroll', syncScrollState, { passive: true });
             window.addEventListener('resize', syncScrollState, { passive: true });
             syncScrollState();
-
-            if (topEmblem) {
-                topEmblem.addEventListener('click', () => {
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                });
-            }
         })();
     </script>
 </body>
