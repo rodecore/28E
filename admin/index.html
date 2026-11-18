@@ -4799,6 +4799,10 @@
                     localStorage.removeItem('yaire_dia_cero_done');
                     localStorage.removeItem('yaire_dia_cero_accepted_at');
                     localStorage.removeItem('yaire_dia_cero_local');
+                    const isProd = window.location.hostname.endsWith('yaire.site');
+                    const domPart = isProd ? '; domain=.yaire.site' : '';
+                    const secPart = window.location.protocol === 'https:' ? '; Secure' : '';
+                    document.cookie = 'yaire_dc_reset=' + Date.now() + '; path=/' + domPart + '; max-age=2592000; SameSite=Lax' + secPart;
                 } catch (_) {}
                 renderDiaCeroStatus(null, false);
                 if (typeof showToast === 'function') showToast('Estado de Día Cero reiniciado', 'amber');

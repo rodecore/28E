@@ -240,10 +240,10 @@
                 applyActiveAvatarToDOM();
                 syncAuthUserToLocalStorage();
 
-                // Si Yaire inicia sesión (o restaura sesión desde IndexedDB) a partir de la apertura del 21 nov, abrir Día Cero exclusivamente para su correo
+                // Si Yaire (a partir del 21 nov) o la cuenta de prueba inicia/restaura sesión, verificar si ya completó Día Cero
                 try {
                     const emNorm = String(user.email || '').trim().toLowerCase();
-                    if (emNorm && localStorage.getItem('yaire_dia_cero_done') !== '1' && !window.__YAIRE_DEV_BYPASS__) {
+                    if (emNorm) {
                         let h1 = 0x811c9dc5;
                         let h2 = 0x01000193;
                         for (let i = 0; i < emNorm.length; i++) {
@@ -252,15 +252,36 @@
                             h2 = Math.imul(h2 ^ ((b + 17) & 0xff), 0x85ebca6b) >>> 0;
                         }
                         const digest = h1.toString(16).padStart(8, '0') + h2.toString(16).padStart(8, '0');
-                        const openingReached = Date.now() >= Date.parse('2026-11-21T00:00:00-04:00');
-                        if (digest === '409e602eba69e041' && openingReached) {
-                            get(ref(db, 'config/diaCeroEnabled')).then((dcSnap) => {
-                                if (!dcSnap.exists() || dcSnap.val() !== false) {
-                                    window.location.replace('empezar.html?auto=1');
-                                }
-                            }).catch(() => {
-                                window.location.replace('empezar.html?auto=1');
-                            });
+                        const isYaire = digest === '409e602eba69e041';
+                        const isTest = digest === '13fa7a3b79305bcc';
+                        const openingReached = isTest || Date.now() >= Date.parse('2026-11-21T00:00:00-04:00');
+                        const qpNow = new URLSearchParams(window.location.search);
+
+                        if ((isYaire || isTest) && openingReached && qpNow.get('admin') !== '1') {
+                            const resetCookieMatch = document.cookie.match(/(?:^|;\s*)yaire_dc_reset=([^;]+)/);
+                            const resetTs = resetCookieMatch ? (Number(decodeURIComponent(resetCookieMatch[1])) || 0) : 0;
+                            const cookieDoneMatch = document.cookie.match(new RegExp('(?:^|;\\s*)yaire_dc_done_' + digest + '=([^;]+)'));
+                            const rawLocalDone = localStorage.getItem('yaire_dia_cero_done_' + digest) || (cookieDoneMatch ? decodeURIComponent(cookieDoneMatch[1]) : '') || '';
+                            const doneNum = Number(rawLocalDone);
+                            const alreadyDoneLocal = doneNum > 1000000000000 ? (!resetTs || doneNum >= resetTs) : (rawLocalDone === '1' && !resetTs);
+
+                            if (!alreadyDoneLocal) {
+                                Promise.all([
+                                    get(ref(db, 'config/diaCeroEnabled')).catch(() => null),
+                                    get(ref(db, 'dia_cero/completed/' + digest)).catch(() => null)
+                                ]).then(([dcSnap, doneSnap]) => {
+                                    const enabled = !dcSnap || !dcSnap.exists() || dcSnap.val() !== false;
+                                    const doneRemote = doneSnap && doneSnap.exists() && doneSnap.val() && doneSnap.val().completed === true;
+                                    if (doneRemote) {
+                                        const remoteTs = String(doneSnap.val().completedAt || Date.now());
+                                        try { localStorage.setItem('yaire_dia_cero_done_' + digest, remoteTs); } catch (_) {}
+                                        return;
+                                    }
+                                    if (enabled) {
+                                        window.location.replace(isTest && Date.now() < Date.parse('2026-11-21T00:00:00-04:00') ? 'mantenimiento.html' : 'empezar.html?auto=1');
+                                    }
+                                });
+                            }
                         }
                     }
                 } catch (e) {}

@@ -19,41 +19,90 @@
                 var isPreview = pv === 'dc_28e_k9x7' || (isLocal && (pv === '1' || pv === 'true'));
                 if (isLocal || isPreview) return;
 
-                /* Antes del 21 de noviembre a las 00:00 (UTC-4), mantener bloqueado tras el contador */
-                var serverOffset = Number(localStorage.getItem('yaire_server_offset')) || 0;
-                if (Date.now() + serverOffset < Date.parse('2026-11-21T00:00:00-04:00')) {
-                    window.location.replace('mantenimiento.html');
-                    return;
+                function getCookieVal(cname) {
+                    var m = document.cookie.match(new RegExp('(?:^|;\\s*)' + cname + '=([^;]+)'));
+                    return m ? decodeURIComponent(m[1]) : '';
                 }
 
-                function isYaireEmail(raw) {
+                function hashAccountEmail(raw) {
                     var s = String(raw || '').trim().toLowerCase();
-                    if (!s) return false;
+                    if (!s) return '';
                     var h1 = 0x811c9dc5, h2 = 0x01000193;
                     for (var i = 0; i < s.length; i++) {
                         var b = s.charCodeAt(i) & 0xff;
                         h1 = Math.imul(h1 ^ b, 0x01000193) >>> 0;
                         h2 = Math.imul(h2 ^ ((b + 17) & 0xff), 0x85ebca6b) >>> 0;
                     }
-                    return (('00000000' + h1.toString(16)).slice(-8) + ('00000000' + h2.toString(16)).slice(-8)) === '409e602eba69e041';
+                    return ('00000000' + h1.toString(16)).slice(-8) + ('00000000' + h2.toString(16)).slice(-8);
+                }
+
+                function isDiaCeroDoneFor(digest) {
+                    if (!digest) return false;
+                    try {
+                        var resetTs = Number(getCookieVal('yaire_dc_reset')) || 0;
+                        var rawVal = localStorage.getItem('yaire_dia_cero_done_' + digest) || getCookieVal('yaire_dc_done_' + digest) || '';
+                        if (!rawVal) return false;
+                        var doneTs = Number(rawVal);
+                        if (doneTs > 1000000000000) {
+                            if (resetTs && resetTs > doneTs) {
+                                try { localStorage.removeItem('yaire_dia_cero_done_' + digest); } catch (_) {}
+                                return false;
+                            }
+                            return true;
+                        }
+                        return rawVal === '1' && !resetTs;
+                    } catch (_) {
+                        return false;
+                    }
+                }
+
+                function validateAuthorizedDigest(digest) {
+                    var isYaire = digest === '409e602eba69e041';
+                    var isTest = digest === '13fa7a3b79305bcc';
+                    if (!isYaire && !isTest) {
+                        window.location.replace('index.html');
+                        return false;
+                    }
+                    /* Para Yaire, mantener cerrado tras el contador hasta el 21 de noviembre a las 00:00 (UTC-4) */
+                    var serverOffset = Number(localStorage.getItem('yaire_server_offset')) || 0;
+                    if (isYaire && (Date.now() + serverOffset < Date.parse('2026-11-21T00:00:00-04:00'))) {
+                        window.location.replace('mantenimiento.html');
+                        return false;
+                    }
+                    /* Si ya completó Empezar anteriormente, no volver a mostrarlo nunca */
+                    if (isDiaCeroDoneFor(digest)) {
+                        window.location.replace('index.html');
+                        return false;
+                    }
+                    window.__YAIRE_DC_ACTIVE_DIGEST__ = digest;
+                    /* Verificación remota adicional por si lo completó en otro dispositivo */
+                    fetch('https://yaire-591ca-default-rtdb.firebaseio.com/dia_cero/completed/' + digest + '.json', { cache: 'no-store' })
+                        .then(function (r) { return r.ok ? r.json() : null; })
+                        .then(function (rec) {
+                            if (rec && rec.completed === true) {
+                                var rTs = Number(rec.completedAt) || Date.now();
+                                var resetTs = Number(getCookieVal('yaire_dc_reset')) || 0;
+                                if (!resetTs || rTs >= resetTs) {
+                                    try { localStorage.setItem('yaire_dia_cero_done_' + digest, String(rTs)); } catch (_) {}
+                                    window.location.replace('index.html');
+                                }
+                            }
+                        })
+                        .catch(function () {});
+                    return true;
                 }
 
                 var storedEmail = '';
                 try {
-                    var rawAuth = localStorage.getItem('yaire_auth_user');
-                    if (!rawAuth) {
-                        var cm = document.cookie.match(/(?:^|;\s*)yaire_auth_user=([^;]+)/);
-                        if (cm) rawAuth = decodeURIComponent(cm[1]);
-                    }
+                    var rawAuth = localStorage.getItem('yaire_auth_user') || getCookieVal('yaire_auth_user');
                     if (rawAuth) {
                         var parsed = JSON.parse(rawAuth);
                         storedEmail = String((parsed && parsed.email) || '').trim();
                     }
                 } catch (_) {}
 
-                if (isYaireEmail(storedEmail)) return;
                 if (storedEmail) {
-                    window.location.replace('index.html');
+                    validateAuthorizedDigest(hashAccountEmail(storedEmail));
                     return;
                 }
 
@@ -82,11 +131,12 @@
                         var allReq = tx.objectStore('firebaseLocalStorage').getAll();
                         allReq.onsuccess = function () {
                             var rows = allReq.result || [];
-                            var matched = false;
+                            var matchedDigest = '';
                             for (var j = 0; j < rows.length; j++) {
                                 var v = rows[j] && rows[j].value;
-                                if (v && isYaireEmail(v.email)) {
-                                    matched = true;
+                                var d = v ? hashAccountEmail(v.email) : '';
+                                if (d === '409e602eba69e041' || d === '13fa7a3b79305bcc') {
+                                    matchedDigest = d;
                                     try {
                                         localStorage.setItem('yaire_auth_user', JSON.stringify({
                                             uid: v.uid || '',
@@ -101,9 +151,9 @@
                                 }
                             }
                             try { idb.close(); } catch (_) {}
-                            if (matched) {
+                            if (matchedDigest && validateAuthorizedDigest(matchedDigest)) {
                                 document.documentElement.style.visibility = '';
-                            } else {
+                            } else if (!matchedDigest) {
                                 window.location.replace('index.html');
                             }
                         };
@@ -5066,6 +5116,63 @@
                 if (currentAct === 10) auraTargetBoost = clamped * 0.56;
             }
 
+            function resolveActiveEmailDigest() {
+                if (window.__YAIRE_DC_ACTIVE_DIGEST__) return window.__YAIRE_DC_ACTIVE_DIGEST__;
+                try {
+                    let raw = localStorage.getItem('yaire_auth_user');
+                    if (!raw) {
+                        const cm = document.cookie.match(/(?:^|;\s*)yaire_auth_user=([^;]+)/);
+                        if (cm) raw = decodeURIComponent(cm[1]);
+                    }
+                    if (!raw) return '';
+                    const parsed = JSON.parse(raw);
+                    const s = String((parsed && parsed.email) || '').trim().toLowerCase();
+                    if (!s) return '';
+                    let h1 = 0x811c9dc5;
+                    let h2 = 0x01000193;
+                    for (let i = 0; i < s.length; i++) {
+                        const b = s.charCodeAt(i) & 0xff;
+                        h1 = Math.imul(h1 ^ b, 0x01000193) >>> 0;
+                        h2 = Math.imul(h2 ^ ((b + 17) & 0xff), 0x85ebca6b) >>> 0;
+                    }
+                    return h1.toString(16).padStart(8, '0') + h2.toString(16).padStart(8, '0');
+                } catch (_) {
+                    return '';
+                }
+            }
+
+            function persistDiaCeroCompletion(tsMs) {
+                if (isPreview) return;
+                const stamp = String(tsMs || Date.now());
+                const digest = resolveActiveEmailDigest();
+                try {
+                    localStorage.setItem('yaire_dia_cero_done', '1');
+                    localStorage.setItem('yaire_dia_cero_accepted_at', stamp);
+                    if (digest) {
+                        localStorage.setItem('yaire_dia_cero_done_' + digest, stamp);
+                        const isProd = window.location.hostname.endsWith('yaire.site');
+                        const domPart = isProd ? '; domain=.yaire.site' : '';
+                        const secPart = window.location.protocol === 'https:' ? '; Secure' : '';
+                        document.cookie = 'yaire_dc_done_' + digest + '=' + stamp + '; path=/' + domPart + '; max-age=31536000; SameSite=Lax' + secPart;
+                    }
+                } catch (_) {}
+
+                if (digest) {
+                    try {
+                        fetch('https://yaire-591ca-default-rtdb.firebaseio.com/dia_cero/completed/' + digest + '.json', {
+                            method: 'PUT',
+                            keepalive: true,
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                completed: true,
+                                completedAt: Number(stamp),
+                                iso: new Date(Number(stamp)).toISOString()
+                            })
+                        }).catch(() => {});
+                    } catch (_) {}
+                }
+            }
+
             function completeSeal() {
                 if (sealCompleted) return;
                 sealCompleted = true;
@@ -5075,12 +5182,7 @@
                 setSealVisual(1, performance.now());
 
                 acceptedTimestampMs = Date.now();
-                try {
-                    if (!isPreview) {
-                        localStorage.setItem('yaire_dia_cero_done', '1');
-                        localStorage.setItem('yaire_dia_cero_accepted_at', String(acceptedTimestampMs));
-                    }
-                } catch (_) {}
+                persistDiaCeroCompletion(acceptedTimestampMs);
 
                 DiaCeroSFX.play('sounds/secret.wav', { volume: 0.27, rate: 1.0, cooldownKey: 'seal_done', cooldownMs: 500 });
                 DiaCeroSFX.play('sounds/celebration.wav', { volume: 0.14, rate: 1.0, delaySec: 0.15, cooldownKey: 'seal_chime', cooldownMs: 500 });
@@ -5281,9 +5383,9 @@
 
             function navigateToMainWeb() {
                 DiaCeroSFX.play('sounds/entrarcarta.mp3', { volume: 0.22, rate: 1.0, cooldownKey: 'enter_main', cooldownMs: 400 });
+                persistDiaCeroCompletion(acceptedTimestampMs || Date.now());
                 try {
                     if (!isPreview) {
-                        localStorage.setItem('yaire_dia_cero_done', '1');
                         localStorage.setItem('yaire_restore', '1');
                     }
                 } catch (_) {}

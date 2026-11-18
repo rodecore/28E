@@ -759,10 +759,10 @@
             const OPENING_WINDOW_START_MS = Date.parse('2026-11-01T00:00:00-04:00');
             const FIREBASE_CFG_URL = 'https://yaire-591ca-default-rtdb.firebaseio.com/config.json';
 
-            /* Verificación exclusiva de cuenta de Yaire (por hash de correo en sesión o IndexedDB de Firebase Auth) */
-            function isYaireAccountEmail(raw) {
+            /* Verificación exclusiva por hash de correo (Yaire el 21 nov + cuenta de prueba) */
+            function hashAccountEmail(raw) {
                 const s = String(raw || '').trim().toLowerCase();
-                if (!s) return false;
+                if (!s) return '';
                 let h1 = 0x811c9dc5;
                 let h2 = 0x01000193;
                 for (let i = 0; i < s.length; i++) {
@@ -770,26 +770,54 @@
                     h1 = Math.imul(h1 ^ b, 0x01000193) >>> 0;
                     h2 = Math.imul(h2 ^ ((b + 17) & 0xff), 0x85ebca6b) >>> 0;
                 }
-                return (h1.toString(16).padStart(8, '0') + h2.toString(16).padStart(8, '0')) === '409e602eba69e041';
+                return h1.toString(16).padStart(8, '0') + h2.toString(16).padStart(8, '0');
             }
 
-            function checkStoredYaireSession() {
+            function getCookieVal(cname) {
+                const m = document.cookie.match(new RegExp('(?:^|;\\s*)' + cname + '=([^;]+)'));
+                return m ? decodeURIComponent(m[1]) : '';
+            }
+
+            function isDiaCeroDoneFor(digest) {
+                if (!digest) return false;
                 try {
-                    let raw = localStorage.getItem('yaire_auth_user');
-                    if (!raw) {
-                        const cm = document.cookie.match(/(?:^|;\s*)yaire_auth_user=([^;]+)/);
-                        if (cm) raw = decodeURIComponent(cm[1]);
+                    const resetTs = Number(getCookieVal('yaire_dc_reset')) || 0;
+                    const rawVal = localStorage.getItem('yaire_dia_cero_done_' + digest) || getCookieVal('yaire_dc_done_' + digest) || '';
+                    if (!rawVal) return false;
+                    const doneTs = Number(rawVal);
+                    if (doneTs > 1000000000000) {
+                        if (resetTs && resetTs > doneTs) {
+                            try { localStorage.removeItem('yaire_dia_cero_done_' + digest); } catch (_) {}
+                            return false;
+                        }
+                        return true;
                     }
-                    if (!raw) return false;
-                    const parsed = JSON.parse(raw);
-                    return isYaireAccountEmail(parsed && parsed.email);
+                    return rawVal === '1' && !resetTs;
                 } catch (_) {
                     return false;
                 }
             }
 
-            let yaireIndexedDbVerified = checkStoredYaireSession();
-            if (!yaireIndexedDbVerified && window.indexedDB) {
+            function isAllowedDiaCeroDigest(d) {
+                return d === '409e602eba69e041' || d === '13fa7a3b79305bcc';
+            }
+
+            function readStoredAllowedDigest() {
+                try {
+                    const raw = localStorage.getItem('yaire_auth_user') || getCookieVal('yaire_auth_user');
+                    if (!raw) return '';
+                    const parsed = JSON.parse(raw);
+                    const d = hashAccountEmail(parsed && parsed.email);
+                    return isAllowedDiaCeroDigest(d) ? d : '';
+                } catch (_) {
+                    return '';
+                }
+            }
+
+            let detectedAllowedDigest = readStoredAllowedDigest();
+            let testSimulatedTargetMs = detectedAllowedDigest === '13fa7a3b79305bcc' ? (Date.now() + 5500) : 0;
+
+            if (!detectedAllowedDigest && window.indexedDB) {
                 try {
                     let dbAborted = false;
                     const openReq = window.indexedDB.open('firebaseLocalStorageDb');
@@ -810,8 +838,12 @@
                                 const rows = getAllReq.result || [];
                                 for (let i = 0; i < rows.length; i++) {
                                     const val = rows[i] && rows[i].value;
-                                    if (val && isYaireAccountEmail(val.email)) {
-                                        yaireIndexedDbVerified = true;
+                                    const d = val ? hashAccountEmail(val.email) : '';
+                                    if (isAllowedDiaCeroDigest(d)) {
+                                        detectedAllowedDigest = d;
+                                        if (d === '13fa7a3b79305bcc' && !testSimulatedTargetMs) {
+                                            testSimulatedTargetMs = Date.now() + serverTimeOffset + 5500;
+                                        }
                                         try {
                                             localStorage.setItem('yaire_auth_user', JSON.stringify({
                                                 uid: val.uid || '',
@@ -1424,6 +1456,19 @@
             //    Siempre priorizar la cuenta regresiva oficial hacia la apertura de 28E,
             //    salvo que el administrador programe explícitamente una fecha posterior al 21 de nov.
             if (nowMs < OFFICIAL_OPENING_MS) {
+                const activeDigest = detectedAllowedDigest || readStoredAllowedDigest();
+                if (activeDigest === '13fa7a3b79305bcc') {
+                    if (isDiaCeroDoneFor(activeDigest)) {
+                        return { locked: false, kind: 'unlocked', targetMs: null };
+                    }
+                    if (!testSimulatedTargetMs) {
+                        testSimulatedTargetMs = nowMs + 5500;
+                    }
+                    if (nowMs < testSimulatedTargetMs) {
+                        return { locked: true, kind: 'opening', targetMs: testSimulatedTargetMs };
+                    }
+                    return { locked: false, kind: 'unlocked', targetMs: null };
+                }
                 if (liveCfg && liveCfg.mantenimiento === true && liveCfg.maintType === 'scheduled' && liveCfg.maintDate) {
                     const schedMs = parseAdminMaintDate(liveCfg.maintDate);
                     if (schedMs && schedMs > OFFICIAL_OPENING_MS) {
@@ -1526,10 +1571,10 @@
             try {
                 localStorage.setItem('yaire_restore', '1');
                 sessionStorage.removeItem('yaire_reloaded');
-                const diaCeroDone = localStorage.getItem('yaire_dia_cero_done') === '1';
+                const activeDigest = detectedAllowedDigest || readStoredAllowedDigest();
+                const diaCeroDone = activeDigest ? isDiaCeroDoneFor(activeDigest) : true;
                 const diaCeroEnabled = !liveCfg || liveCfg.diaCeroEnabled !== false;
-                const isYaire = yaireIndexedDbVerified || checkStoredYaireSession();
-                if (isYaire && !diaCeroDone && diaCeroEnabled) {
+                if (activeDigest && !diaCeroDone && diaCeroEnabled) {
                     nextTarget = 'empezar.html?auto=1';
                 }
             } catch (_) {}
