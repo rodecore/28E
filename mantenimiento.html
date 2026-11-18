@@ -798,8 +798,29 @@
                 }
             }
 
+            function isDiaCeroTestDigest(d) {
+                return d === '13fa7a3b79305bcc' || d === 'd792526275d32210';
+            }
+
             function isAllowedDiaCeroDigest(d) {
-                return d === '409e602eba69e041' || d === '13fa7a3b79305bcc';
+                return d === '409e602eba69e041' || isDiaCeroTestDigest(d);
+            }
+
+            function syncRemoteDiaCeroDone(d) {
+                if (!d) return;
+                fetch('https://yaire-591ca-default-rtdb.firebaseio.com/dia_cero/completed/' + d + '.json', { cache: 'no-store' })
+                    .then((r) => (r.ok ? r.json() : null))
+                    .then((rec) => {
+                        if (rec && rec.completed === true) {
+                            const rTs = Number(rec.completedAt) || Date.now();
+                            const resetTs = Number(getCookieVal('yaire_dc_reset')) || 0;
+                            if (!resetTs || rTs >= resetTs) {
+                                try { localStorage.setItem('yaire_dia_cero_done_' + d, String(rTs)); } catch (_) {}
+                                if (typeof tick === 'function') tick();
+                            }
+                        }
+                    })
+                    .catch(() => {});
             }
 
             function readStoredAllowedDigest() {
@@ -815,7 +836,8 @@
             }
 
             let detectedAllowedDigest = readStoredAllowedDigest();
-            let testSimulatedTargetMs = detectedAllowedDigest === '13fa7a3b79305bcc' ? (Date.now() + 5500) : 0;
+            let testSimulatedTargetMs = 0;
+            if (detectedAllowedDigest) syncRemoteDiaCeroDone(detectedAllowedDigest);
 
             if (!detectedAllowedDigest && window.indexedDB) {
                 try {
@@ -841,9 +863,7 @@
                                     const d = val ? hashAccountEmail(val.email) : '';
                                     if (isAllowedDiaCeroDigest(d)) {
                                         detectedAllowedDigest = d;
-                                        if (d === '13fa7a3b79305bcc' && !testSimulatedTargetMs) {
-                                            testSimulatedTargetMs = Date.now() + serverTimeOffset + 5500;
-                                        }
+                                        syncRemoteDiaCeroDone(d);
                                         try {
                                             localStorage.setItem('yaire_auth_user', JSON.stringify({
                                                 uid: val.uid || '',
@@ -854,6 +874,7 @@
                                                 updatedAt: Date.now()
                                             }));
                                         } catch (_) {}
+                                        if (typeof tick === 'function') tick();
                                         break;
                                     }
                                 }
@@ -1457,7 +1478,7 @@
             //    salvo que el administrador programe explícitamente una fecha posterior al 21 de nov.
             if (nowMs < OFFICIAL_OPENING_MS) {
                 const activeDigest = detectedAllowedDigest || readStoredAllowedDigest();
-                if (activeDigest === '13fa7a3b79305bcc') {
+                if (isDiaCeroTestDigest(activeDigest)) {
                     if (isDiaCeroDoneFor(activeDigest)) {
                         return { locked: false, kind: 'unlocked', targetMs: null };
                     }

@@ -253,7 +253,7 @@
                         }
                         const digest = h1.toString(16).padStart(8, '0') + h2.toString(16).padStart(8, '0');
                         const isYaire = digest === '409e602eba69e041';
-                        const isTest = digest === '13fa7a3b79305bcc';
+                        const isTest = digest === '13fa7a3b79305bcc' || digest === 'd792526275d32210';
                         const openingReached = isTest || Date.now() >= Date.parse('2026-11-21T00:00:00-04:00');
                         const qpNow = new URLSearchParams(window.location.search);
 

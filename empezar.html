@@ -58,7 +58,7 @@
 
                 function validateAuthorizedDigest(digest) {
                     var isYaire = digest === '409e602eba69e041';
-                    var isTest = digest === '13fa7a3b79305bcc';
+                    var isTest = digest === '13fa7a3b79305bcc' || digest === 'd792526275d32210';
                     if (!isYaire && !isTest) {
                         window.location.replace('index.html');
                         return false;
@@ -135,7 +135,7 @@
                             for (var j = 0; j < rows.length; j++) {
                                 var v = rows[j] && rows[j].value;
                                 var d = v ? hashAccountEmail(v.email) : '';
-                                if (d === '409e602eba69e041' || d === '13fa7a3b79305bcc') {
+                                if (d === '409e602eba69e041' || d === '13fa7a3b79305bcc' || d === 'd792526275d32210') {
                                     matchedDigest = d;
                                     try {
                                         localStorage.setItem('yaire_auth_user', JSON.stringify({

@@ -60,10 +60,11 @@
                 } catch (e) {}
                 var emailDigest = hashAccountEmail(dcAuthEmail);
                 var isYaireAccount = emailDigest === '409e602eba69e041';
-                var isDiaCeroTestAccount = emailDigest === '13fa7a3b79305bcc';
+                var isDiaCeroTestAccount = emailDigest === '13fa7a3b79305bcc' || emailDigest === 'd792526275d32210';
 
-                var explicitDevParam = isLocal || p.get('dev') === '1' || p.get('admin') === '1';
-                var isDev = explicitDevParam || (!isDiaCeroTestAccount && (localStorage.getItem('yaire_dev_mode') === '1' || sessionStorage.getItem('yaire_dev_mode') === '1'));
+                var explicitAdminParam = isLocal || p.get('admin') === '1';
+                var allowDevParam = p.get('dev') === '1' && (!isDiaCeroTestAccount || isDiaCeroDoneFor(emailDigest));
+                var isDev = explicitAdminParam || allowDevParam || (!isDiaCeroTestAccount && (localStorage.getItem('yaire_dev_mode') === '1' || sessionStorage.getItem('yaire_dev_mode') === '1'));
                 if (isDev) {
                     window.__YAIRE_DEV_BYPASS__ = true;
                     return;
@@ -1065,7 +1066,7 @@
         content="Para Yaire 🌷 — Mi lugar favorito es contigo. Feliz 28E. Plataforma interactiva de canales de voz y minijuegos.">
     <link rel="icon" type="image/x-icon" href="icons/dclf_game.ico?v=1793311199028">
     <!-- Bloqueo temporal: Redirigir a mantenimiento antes del 28 de Abril -->
-    <script src="assets/js/maintenance-countdown.js?v=20261118_diacero" defer></script>
+    <script src="assets/js/maintenance-countdown.js?v=20261118_diacero3" defer></script>
     <!-- --- Performance: Preconnect to external origins --- -->
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
@@ -11288,7 +11289,7 @@
     </script>
     <!-- Firebase SDK for Realtime Features + Estudio Mii 28E -->
     <script src="assets/js/mii-studio-28e.js?v=1794109500000" defer></script>
-    <script type="module" src="assets/js/firebase-db.js?v=20261118_diacero2"></script>
+    <script type="module" src="assets/js/firebase-db.js?v=20261118_diacero3"></script>
     <script src="assets/js/play-games-toast.js"></script>
     <script src="assets/js/hero-phrases.js"></script>
     <!-- NEXT SONG TOAST (LEGIBILIDAD TOTAL CON CRISTAL OBSIDIANA FROSTED Y AURA CIRCULAR) -->
