@@ -1843,19 +1843,20 @@ var logDebug = window.logDebug;
             // Precarga todos los buffers en oleadas
 
             _startPreload: function () {
-
-                // Oleada 1: sonidos críticos de inmediato
-
-                this._critical.forEach(s => this._loadBuffer(s));
-
-                // Oleada 2: secundarios 800ms después
-
-                setTimeout(() => {
-
-                    this._secondary.forEach(s => this._loadBuffer(s));
-
-                }, 800);
-
+                const runIdle = window.requestIdleCallback || ((fn) => setTimeout(fn, 250));
+                const beginPreload = () => {
+                    const core = ['navegacion.wav', 'seleccionsi.wav', 'typing.wav', 'flyin.wav', 'flyout.wav'];
+                    core.forEach((s, idx) => setTimeout(() => this._loadBuffer(s), idx * 90));
+                    setTimeout(() => {
+                        const rest = this._critical.filter(s => !core.includes(s));
+                        rest.forEach((s, idx) => runIdle(() => setTimeout(() => this._loadBuffer(s), idx * 140)));
+                    }, 1800);
+                };
+                if (document.readyState === 'complete') {
+                    runIdle(beginPreload);
+                } else {
+                    window.addEventListener('load', () => runIdle(beginPreload), { once: true });
+                }
             },
 
 
