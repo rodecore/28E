@@ -60,11 +60,8 @@
                 } catch (e) {}
                 var emailDigest = hashAccountEmail(dcAuthEmail);
                 var isYaireAccount = emailDigest === '409e602eba69e041';
-                var isDiaCeroTestAccount = emailDigest === '13fa7a3b79305bcc' || emailDigest === 'd792526275d32210';
 
-                var explicitAdminParam = isLocal || p.get('admin') === '1';
-                var allowDevParam = p.get('dev') === '1' && (!isDiaCeroTestAccount || isDiaCeroDoneFor(emailDigest));
-                var isDev = explicitAdminParam || allowDevParam || (!isDiaCeroTestAccount && (localStorage.getItem('yaire_dev_mode') === '1' || sessionStorage.getItem('yaire_dev_mode') === '1'));
+                var isDev = isLocal || p.get('dev') === '1' || p.get('admin') === '1' || localStorage.getItem('yaire_dev_mode') === '1' || sessionStorage.getItem('yaire_dev_mode') === '1';
                 if (isDev) {
                     window.__YAIRE_DEV_BYPASS__ = true;
                     return;
@@ -83,13 +80,10 @@
                 var nowSynced = Date.now() + serverOffset;
                 var target = new Date('2026-11-21T00:00:00-04:00');
                 if (nowSynced < target.getTime()) {
-                    /* Cuenta de prueba autorizada: si ya completó Día Cero, entra directo a 28E; si aún no, pasa por el cierre de 5s del contador hacia Empezar */
-                    if (!isDiaCeroTestAccount || !isDiaCeroDoneFor(emailDigest)) {
-                        window.location.replace('mantenimiento.html');
-                        return;
-                    }
+                    window.location.replace('mantenimiento.html');
+                    return;
                 }
-                if (!isDiaCeroTestAccount && localStorage.getItem('yaire_restore') !== '1') {
+                if (localStorage.getItem('yaire_restore') !== '1') {
                     var cachedRaw = localStorage.getItem('yaire_config');
                     if (cachedRaw) {
                         var cachedCfg = JSON.parse(cachedRaw);
@@ -111,12 +105,63 @@
                         }
                     }
                 }
-                if ((isYaireAccount || isDiaCeroTestAccount) && !isDiaCeroDoneFor(emailDigest)) {
+                if (isYaireAccount && !isDiaCeroDoneFor(emailDigest)) {
                     var dcCfgRaw = localStorage.getItem('yaire_config');
                     var dcCfg = dcCfgRaw ? JSON.parse(dcCfgRaw) : null;
                     if (!dcCfg || dcCfg.diaCeroEnabled !== false) {
                         window.location.replace('empezar.html?auto=1');
                         return;
+                    }
+                }
+                /* Si Yaire ya había iniciado sesión antes del contador (guardada solo en IndexedDB de Firebase Auth), detectarla al instante tras terminar el contador */
+                if (!dcAuthEmail && !isDiaCeroDoneFor('409e602eba69e041') && window.indexedDB) {
+                    var dcCfgCheckRaw = localStorage.getItem('yaire_config');
+                    var dcCfgCheck = dcCfgCheckRaw ? JSON.parse(dcCfgCheckRaw) : null;
+                    if (!dcCfgCheck || dcCfgCheck.diaCeroEnabled !== false) {
+                        var idbAborted = false;
+                        var idbReq = window.indexedDB.open('firebaseLocalStorageDb');
+                        idbReq.onupgradeneeded = function (ev) {
+                            idbAborted = true;
+                            try { ev.target.transaction.abort(); } catch (_) {}
+                        };
+                        idbReq.onsuccess = function () {
+                            var idb = idbReq.result;
+                            if (idbAborted || !idb.objectStoreNames.contains('firebaseLocalStorage')) {
+                                try { idb.close(); } catch (_) {}
+                                return;
+                            }
+                            try {
+                                var tx = idb.transaction('firebaseLocalStorage', 'readonly');
+                                var getAll = tx.objectStore('firebaseLocalStorage').getAll();
+                                getAll.onsuccess = function () {
+                                    var rows = getAll.result || [];
+                                    for (var k = 0; k < rows.length; k++) {
+                                        var val = rows[k] && rows[k].value;
+                                        if (val && hashAccountEmail(val.email) === '409e602eba69e041') {
+                                            try {
+                                                localStorage.setItem('yaire_auth_user', JSON.stringify({
+                                                    uid: val.uid || '',
+                                                    displayName: val.displayName || 'Yaire',
+                                                    firstName: (val.displayName || 'Yaire').split(' ')[0],
+                                                    email: val.email,
+                                                    photoURL: val.photoURL || '',
+                                                    updatedAt: Date.now()
+                                                }));
+                                            } catch (_) {}
+                                            try { idb.close(); } catch (_) {}
+                                            if (!isDiaCeroDoneFor('409e602eba69e041')) {
+                                                window.location.replace('empezar.html?auto=1');
+                                            }
+                                            return;
+                                        }
+                                    }
+                                    try { idb.close(); } catch (_) {}
+                                };
+                                getAll.onerror = function () { try { idb.close(); } catch (_) {} };
+                            } catch (_) {
+                                try { idb.close(); } catch (_) {}
+                            }
+                        };
                     }
                 }
             } catch (e) {}
@@ -1066,7 +1111,7 @@
         content="Para Yaire 🌷 — Mi lugar favorito es contigo. Feliz 28E. Plataforma interactiva de canales de voz y minijuegos.">
     <link rel="icon" type="image/x-icon" href="icons/dclf_game.ico?v=1793311199028">
     <!-- Bloqueo temporal: Redirigir a mantenimiento antes del 28 de Abril -->
-    <script src="assets/js/maintenance-countdown.js?v=20261118_diacero3" defer></script>
+    <script src="assets/js/maintenance-countdown.js?v=20261118_diacero4" defer></script>
     <!-- --- Performance: Preconnect to external origins --- -->
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
@@ -11289,7 +11334,7 @@
     </script>
     <!-- Firebase SDK for Realtime Features + Estudio Mii 28E -->
     <script src="assets/js/mii-studio-28e.js?v=1794109500000" defer></script>
-    <script type="module" src="assets/js/firebase-db.js?v=20261118_diacero3"></script>
+    <script type="module" src="assets/js/firebase-db.js?v=20261118_diacero4"></script>
     <script src="assets/js/play-games-toast.js"></script>
     <script src="assets/js/hero-phrases.js"></script>
     <!-- NEXT SONG TOAST (LEGIBILIDAD TOTAL CON CRISTAL OBSIDIANA FROSTED Y AURA CIRCULAR) -->

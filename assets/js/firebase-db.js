@@ -240,7 +240,7 @@
                 applyActiveAvatarToDOM();
                 syncAuthUserToLocalStorage();
 
-                // Si Yaire (a partir del 21 nov) o la cuenta de prueba inicia/restaura sesión, verificar si ya completó Día Cero
+                // Si Yaire inicia o restaura sesión a partir del 21 de noviembre (tras terminar el contador), llevarla directo a Empezar si aún no lo completó
                 try {
                     const emNorm = String(user.email || '').trim().toLowerCase();
                     if (emNorm) {
@@ -253,11 +253,11 @@
                         }
                         const digest = h1.toString(16).padStart(8, '0') + h2.toString(16).padStart(8, '0');
                         const isYaire = digest === '409e602eba69e041';
-                        const isTest = digest === '13fa7a3b79305bcc' || digest === 'd792526275d32210';
-                        const openingReached = isTest || Date.now() >= Date.parse('2026-11-21T00:00:00-04:00');
+                        const srvOffset = Number(localStorage.getItem('yaire_server_offset')) || 0;
+                        const openingReached = (Date.now() + srvOffset) >= Date.parse('2026-11-21T00:00:00-04:00');
                         const qpNow = new URLSearchParams(window.location.search);
 
-                        if ((isYaire || isTest) && openingReached && qpNow.get('admin') !== '1') {
+                        if (isYaire && openingReached && qpNow.get('admin') !== '1') {
                             const resetCookieMatch = document.cookie.match(/(?:^|;\s*)yaire_dc_reset=([^;]+)/);
                             const resetTs = resetCookieMatch ? (Number(decodeURIComponent(resetCookieMatch[1])) || 0) : 0;
                             const cookieDoneMatch = document.cookie.match(new RegExp('(?:^|;\\s*)yaire_dc_done_' + digest + '=([^;]+)'));
@@ -278,7 +278,7 @@
                                         return;
                                     }
                                     if (enabled) {
-                                        window.location.replace(isTest && Date.now() < Date.parse('2026-11-21T00:00:00-04:00') ? 'mantenimiento.html' : 'empezar.html?auto=1');
+                                        window.location.replace('empezar.html?auto=1');
                                     }
                                 });
                             }

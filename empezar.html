@@ -57,15 +57,13 @@
                 }
 
                 function validateAuthorizedDigest(digest) {
-                    var isYaire = digest === '409e602eba69e041';
-                    var isTest = digest === '13fa7a3b79305bcc' || digest === 'd792526275d32210';
-                    if (!isYaire && !isTest) {
+                    if (digest !== '409e602eba69e041') {
                         window.location.replace('index.html');
                         return false;
                     }
                     /* Para Yaire, mantener cerrado tras el contador hasta el 21 de noviembre a las 00:00 (UTC-4) */
                     var serverOffset = Number(localStorage.getItem('yaire_server_offset')) || 0;
-                    if (isYaire && (Date.now() + serverOffset < Date.parse('2026-11-21T00:00:00-04:00'))) {
+                    if (Date.now() + serverOffset < Date.parse('2026-11-21T00:00:00-04:00')) {
                         window.location.replace('mantenimiento.html');
                         return false;
                     }
@@ -135,7 +133,7 @@
                             for (var j = 0; j < rows.length; j++) {
                                 var v = rows[j] && rows[j].value;
                                 var d = v ? hashAccountEmail(v.email) : '';
-                                if (d === '409e602eba69e041' || d === '13fa7a3b79305bcc' || d === 'd792526275d32210') {
+                                if (d === '409e602eba69e041') {
                                     matchedDigest = d;
                                     try {
                                         localStorage.setItem('yaire_auth_user', JSON.stringify({

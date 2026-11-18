@@ -1,31 +1,7 @@
 (async function () {
     // En desarrollo local (localhost / 127.0.0.1) o modo dev, omitir mantenimiento para poder probar libremente
     const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:';
-    function isDiaCeroTestAccountSession() {
-        try {
-            let raw = localStorage.getItem('yaire_auth_user');
-            if (!raw) {
-                const cm = document.cookie.match(/(?:^|;\s*)yaire_auth_user=([^;]+)/);
-                if (cm) raw = decodeURIComponent(cm[1]);
-            }
-            if (!raw) return false;
-            const parsed = JSON.parse(raw);
-            const s = String((parsed && parsed.email) || '').trim().toLowerCase();
-            if (!s) return false;
-            let h1 = 0x811c9dc5, h2 = 0x01000193;
-            for (let i = 0; i < s.length; i++) {
-                const b = s.charCodeAt(i) & 0xff;
-                h1 = Math.imul(h1 ^ b, 0x01000193) >>> 0;
-                h2 = Math.imul(h2 ^ ((b + 17) & 0xff), 0x85ebca6b) >>> 0;
-            }
-            const d = h1.toString(16).padStart(8, '0') + h2.toString(16).padStart(8, '0');
-            return d === '13fa7a3b79305bcc' || d === 'd792526275d32210';
-        } catch (_) {
-            return false;
-        }
-    }
-
-    const isDev = isLocal || window.__YAIRE_DEV_BYPASS__ || localStorage.getItem('yaire_dev_mode') === '1' || sessionStorage.getItem('yaire_dev_mode') === '1' || isDiaCeroTestAccountSession();
+    const isDev = isLocal || window.__YAIRE_DEV_BYPASS__ || localStorage.getItem('yaire_dev_mode') === '1' || sessionStorage.getItem('yaire_dev_mode') === '1';
     const urlParams = new URLSearchParams(window.location.search);
     if (isDev || urlParams.get('dev') === '1' || urlParams.get('admin') === '1') {
         return;

@@ -798,12 +798,8 @@
                 }
             }
 
-            function isDiaCeroTestDigest(d) {
-                return d === '13fa7a3b79305bcc' || d === 'd792526275d32210';
-            }
-
             function isAllowedDiaCeroDigest(d) {
-                return d === '409e602eba69e041' || isDiaCeroTestDigest(d);
+                return d === '409e602eba69e041';
             }
 
             function syncRemoteDiaCeroDone(d) {
@@ -816,7 +812,6 @@
                             const resetTs = Number(getCookieVal('yaire_dc_reset')) || 0;
                             if (!resetTs || rTs >= resetTs) {
                                 try { localStorage.setItem('yaire_dia_cero_done_' + d, String(rTs)); } catch (_) {}
-                                if (typeof tick === 'function') tick();
                             }
                         }
                     })
@@ -836,7 +831,6 @@
             }
 
             let detectedAllowedDigest = readStoredAllowedDigest();
-            let testSimulatedTargetMs = 0;
             if (detectedAllowedDigest) syncRemoteDiaCeroDone(detectedAllowedDigest);
 
             if (!detectedAllowedDigest && window.indexedDB) {
@@ -1477,19 +1471,6 @@
             //    Siempre priorizar la cuenta regresiva oficial hacia la apertura de 28E,
             //    salvo que el administrador programe explícitamente una fecha posterior al 21 de nov.
             if (nowMs < OFFICIAL_OPENING_MS) {
-                const activeDigest = detectedAllowedDigest || readStoredAllowedDigest();
-                if (isDiaCeroTestDigest(activeDigest)) {
-                    if (isDiaCeroDoneFor(activeDigest)) {
-                        return { locked: false, kind: 'unlocked', targetMs: null };
-                    }
-                    if (!testSimulatedTargetMs) {
-                        testSimulatedTargetMs = nowMs + 5500;
-                    }
-                    if (nowMs < testSimulatedTargetMs) {
-                        return { locked: true, kind: 'opening', targetMs: testSimulatedTargetMs };
-                    }
-                    return { locked: false, kind: 'unlocked', targetMs: null };
-                }
                 if (liveCfg && liveCfg.mantenimiento === true && liveCfg.maintType === 'scheduled' && liveCfg.maintDate) {
                     const schedMs = parseAdminMaintDate(liveCfg.maintDate);
                     if (schedMs && schedMs > OFFICIAL_OPENING_MS) {
