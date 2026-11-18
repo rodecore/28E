@@ -961,14 +961,14 @@
                                     </div>
                                     <div class="min-w-0">
                                         <div class="flex flex-wrap items-center gap-2">
-                                            <h3 class="font-black text-lg sm:text-xl text-white tracking-tight">Día Cero · Empezar con Yai</h3>
+                                            <h3 class="font-black text-lg sm:text-xl text-white tracking-tight">Día Cero · Empezar con Yaire</h3>
                                             <span id="diacero-status-badge"
                                                 class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/25">
                                                 Esperando respuesta
                                             </span>
                                         </div>
                                         <p class="text-xs text-zinc-400 mt-1 leading-relaxed">
-                                            Recorrido interactivo de 10 actos en silencio adaptado a PC y celular: cristal empañado, soltar los roces, pausa respirada, balanza, distancia, acuerdos y sello final.
+                                            Recorrido interactivo de 10 actos en silencio adaptado a PC y celular, escrito a medida con su historia real (Hevvo, girasoles y tulipanes, confianza en su palabra y acuerdos con hechos).
                                         </p>
                                     </div>
                                 </div>
@@ -992,7 +992,7 @@
                                     <span id="diacero-device-text" class="font-mono text-[11px] text-zinc-600"></span>
                                 </div>
                                 <div id="diacero-message-box" class="hidden pt-3 border-t border-white/5">
-                                    <div class="text-[11px] font-bold text-amber-400/90 mb-1.5">Mensaje de Yai:</div>
+                                    <div class="text-[11px] font-bold text-amber-400/90 mb-1.5">Mensaje de Yaire:</div>
                                     <p id="diacero-message-text" class="text-sm text-zinc-100 leading-relaxed whitespace-pre-wrap"></p>
                                 </div>
                             </div>
@@ -4627,7 +4627,7 @@
             }
 
             if (data.status === 'accepted' || data.accepted === true) {
-                badge.textContent = '¡Yai dijo que sí!';
+                badge.textContent = '¡Yaire dijo que sí!';
                 badge.className = 'text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/35';
                 meta.textContent = whenStr ? `Aceptó empezar de cero el ${whenStr}` : 'Aceptó empezar de cero.';
                 if (card) card.className = 'yaire-card p-5 sm:p-8 bg-zinc-950 border border-emerald-500/30 transition-all duration-500';
@@ -4656,10 +4656,10 @@
 
             if (notifyOnChange && (changed || firstArrival) && data.status !== 'reading') {
                 if (typeof addLog === 'function') {
-                    addLog('Día Cero', data.accepted ? '¡Yai aceptó empezar desde cero!' : 'Yai envió un mensaje en Día Cero.', 'emerald-500');
+                    addLog('Día Cero', data.accepted ? '¡Yaire aceptó empezar desde cero!' : 'Yaire envió un mensaje en Día Cero.', 'emerald-500');
                 }
                 if (typeof showToast === 'function') {
-                    showToast(data.accepted ? '¡Yai dijo que sí en Día Cero!' : 'Nuevo mensaje de Yai en Día Cero', 'emerald');
+                    showToast(data.accepted ? '¡Yaire dijo que sí en Día Cero!' : 'Nuevo mensaje de Yaire en Día Cero', 'emerald');
                 }
             }
         }
@@ -4687,7 +4687,7 @@
         }
 
         async function resetDiaCeroResponse() {
-            if (!window.confirm('¿Seguro que quieres borrar el estado/respuesta actual de Día Cero y dejarlo limpio para Yai?')) return;
+            if (!window.confirm('¿Seguro que quieres borrar el estado/respuesta actual de Día Cero y dejarlo limpio para Yaire?')) return;
             try {
                 await firebaseFetch('https://yaire-591ca-default-rtdb.firebaseio.com/dia_cero.json', { method: 'DELETE' });
                 renderDiaCeroStatus(null, false);

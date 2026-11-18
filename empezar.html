@@ -275,19 +275,28 @@
         .stage-viewport {
             position: relative;
             width: 100%;
+            height: 100%;
+            min-height: 0;
             max-width: 38rem;
             margin: 0 auto;
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             justify-content: center;
             overflow-y: auto;
             overflow-x: hidden;
             overscroll-behavior: contain;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
             padding: 0.35rem 0;
+        }
+
+        .stage-viewport::-webkit-scrollbar {
+            display: none;
         }
 
         .act-panel {
             width: 100%;
+            margin: auto 0;
             display: none;
             flex-direction: column;
             align-items: center;
@@ -763,7 +772,7 @@
             text-align: center;
         }
 
-        /* ─── ACTO 6: Unir Yai + Yo ─── */
+        /* ─── ACTO 6: Unir Yaire + Yo ─── */
         .bridge-arena {
             position: relative;
             width: 100%;
@@ -788,10 +797,10 @@
         .bridge-node {
             position: absolute;
             top: 50%;
-            width: 58px;
-            height: 58px;
-            margin-top: -29px;
-            margin-left: -29px;
+            width: 64px;
+            height: 64px;
+            margin-top: -32px;
+            margin-left: -32px;
             border-radius: 50%;
             border: 1.5px solid rgba(247, 244, 238, 0.25);
             background: #11100f;
@@ -799,8 +808,9 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.82rem;
+            font-size: 0.8rem;
             font-weight: 600;
+            letter-spacing: -0.01em;
             cursor: grab;
             touch-action: none;
             user-select: none;
@@ -925,11 +935,11 @@
 
         .truth-quote {
             font-family: var(--font-display);
-            font-size: clamp(1.25rem, 2.3vw, 1.62rem);
-            line-height: 1.34;
+            font-size: clamp(1.22rem, 2.25vw, 1.58rem);
+            line-height: 1.35;
             letter-spacing: -0.015em;
             color: var(--ink-primary);
-            max-width: 28ch;
+            max-width: 30ch;
             text-wrap: balance;
         }
 
@@ -1095,10 +1105,18 @@
             color: var(--ink-primary);
         }
 
-        .promise-row.is-lit .promise-detail-wrap {
+        .promise-row.is-open .promise-detail-wrap {
             grid-template-rows: 1fr;
             opacity: 1;
             margin-top: 0.32rem;
+        }
+
+        @media (min-width: 1024px) and (min-height: 580px) {
+            .promise-row.is-lit .promise-detail-wrap {
+                grid-template-rows: 1fr;
+                opacity: 1;
+                margin-top: 0.32rem;
+            }
         }
 
         /* ─── ACTO 9: Rebobinar a 00:00:00 ─── */
@@ -1718,18 +1736,18 @@
             <!-- ACTO 1: EL UMBRAL EN SILENCIO -->
             <section id="act-1" class="act-panel is-mounted is-visible" aria-labelledby="act1-title">
                 <div class="act-narrative">
-                    <h1 id="act1-title" class="headline">Hola, <em>Yai.</em></h1>
+                    <h1 id="act1-title" class="headline">Hola, <em>princesa.</em></h1>
                     <p class="prose-lead">
-                        Dejé esta página en completo silencio a propósito. No quiero distraerte ni convencerte con adornos: solo quiero hablarte sin escudos y desde la calma.
+                        Dejé todo en silencio a propósito, Yaire. Sé que una página no arregla nada por sí sola: hoy no vengo a impresionarte con código, sino a hablarte mirándome por dentro.
                     </p>
                 </div>
 
                 <div class="act-interactive">
-                    <div id="threshold-rail" class="slide-rail" role="slider" tabindex="0" aria-label="Desliza hacia la derecha para entrar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                    <div id="threshold-rail" class="slide-rail" role="slider" tabindex="0" aria-label="Desliza hacia la derecha para leerme" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
                         <div id="threshold-fill" class="slide-rail-fill" aria-hidden="true"></div>
                         <span id="threshold-label" class="slide-rail-label"
-                            data-touch="Desliza con calma para entrar"
-                            data-fine="Arrastra hacia la derecha para entrar">Desliza con calma para entrar</span>
+                            data-touch="Desliza con calma para leerme"
+                            data-fine="Arrastra hacia la derecha para leerme">Desliza con calma para leerme</span>
                         <div id="threshold-thumb" class="slide-thumb" aria-hidden="true">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M5 12h14"></path>
@@ -1740,21 +1758,21 @@
                 </div>
             </section>
 
-            <!-- ACTO 2: DESEMPAÑAR LA VERDAD -->
+            <!-- ACTO 2: DESEMPAÑAR LA VERDAD DEL UNIVERSO Y LA CONFIANZA -->
             <section id="act-2" class="act-panel" aria-labelledby="act2-title" hidden>
                 <div class="act-narrative">
-                    <h2 id="act2-title" class="headline">Últimamente nos tapó <em>demasiado el ruido.</em></h2>
+                    <h2 id="act2-title" class="headline">Tenías razón en lo que <em>me preguntaste.</em></h2>
                     <p class="prose-lead"
-                        data-touch="Pasa tu dedo por el cristal empañado para ver lo que siempre se quedó intacto debajo de tantas subidas y bajadas."
-                        data-fine="Pasa el cursor por el cristal empañado para ver lo que siempre se quedó intacto debajo de tantas subidas y bajadas.">
-                        Pasa tu dedo por el cristal empañado para ver lo que siempre se quedó intacto debajo de tantas subidas y bajadas.
+                        data-touch="Pasa tu dedo por el cristal empañado para leer lo que me quedé pensando después de escucharte."
+                        data-fine="Pasa el cursor por el cristal empañado para leer lo que me quedé pensando después de escucharte.">
+                        Pasa tu dedo por el cristal empañado para leer lo que me quedé pensando después de escucharte.
                     </p>
                 </div>
 
                 <div class="act-interactive">
                     <div id="frost-frame" class="frost-frame">
                         <p class="frost-hidden-truth">
-                            Debajo del cansancio y de cada discusión sin sentido, <em>nunca dejé de sentir que eres tú</em> la persona con la que quiero estar en paz.
+                            De nada sirve construirte un universo entero si no aprendo a <em>creer en tu palabra</em> y a cuidar tu paz dentro de él.
                         </p>
                         <canvas id="frost-canvas" tabindex="0" role="button" aria-label="Despejar el cristal empañado"></canvas>
                     </div>
@@ -1778,22 +1796,22 @@
             <!-- ACTO 3: SOLTAR LOS SEIS ROCES REALES -->
             <section id="act-3" class="act-panel" aria-labelledby="act3-title" hidden>
                 <div class="act-narrative">
-                    <h2 id="act3-title" class="headline">No quiero fingir que <em>aquí no pasó nada.</em></h2>
+                    <h2 id="act3-title" class="headline">No quiero tapar lo que <em>nos hizo daño.</em></h2>
                     <p class="prose-lead"
-                        data-touch="Toca o barre con tu dedo cada una de las cosas que nos desgastaron para soltarlas antes de seguir."
-                        data-fine="Haz clic o pasa el cursor sobre cada una de las cosas que nos desgastaron para soltarlas antes de seguir.">
-                        Toca o barre con tu dedo cada una de las cosas que nos desgastaron para soltarlas antes de seguir.
+                        data-touch="Toca o barre con tu dedo cada una de las actitudes que nos cansaron para dejarlas atrás de verdad."
+                        data-fine="Haz clic o pasa el cursor sobre cada una de las actitudes que nos cansaron para dejarlas atrás de verdad.">
+                        Toca o barre con tu dedo cada una de las actitudes que nos cansaron para dejarlas atrás de verdad.
                     </p>
                 </div>
 
                 <div class="act-interactive">
-                    <div id="noise-arena" class="noise-arena" aria-label="Soltar cada frase que nos hizo daño">
-                        <button type="button" class="noise-chip" data-noise="0">El orgullo</button>
-                        <button type="button" class="noise-chip" data-noise="1">Contestar en caliente</button>
-                        <button type="button" class="noise-chip" data-noise="2">Callar lo que sentimos</button>
-                        <button type="button" class="noise-chip" data-noise="3">Querer tener la razón</button>
-                        <button type="button" class="noise-chip" data-noise="4">Enfriarnos en silencio</button>
-                        <button type="button" class="noise-chip" data-noise="5">Dejar que la distancia gane</button>
+                    <div id="noise-arena" class="noise-arena" aria-label="Soltar cada actitud que nos desgastó">
+                        <button type="button" class="noise-chip" data-noise="0">Suponer sin preguntar</button>
+                        <button type="button" class="noise-chip" data-noise="1">Pedirte pruebas de todo</button>
+                        <button type="button" class="noise-chip" data-noise="2">Contestar desde el orgullo</button>
+                        <button type="button" class="noise-chip" data-noise="3">Decir «no somos nada»</button>
+                        <button type="button" class="noise-chip" data-noise="4">Comparar con el pasado</button>
+                        <button type="button" class="noise-chip" data-noise="5">Terminar en caliente</button>
                     </div>
 
                     <p id="noise-caption" class="micro-status"
@@ -1802,18 +1820,18 @@
                 </div>
             </section>
 
-            <!-- ACTO 4: LA PAUSA ANTES DEL IMPULSO -->
+            <!-- ACTO 4: SER BONITOS TAMBIÉN EN LAS DIFERENCIAS -->
             <section id="act-4" class="act-panel" aria-labelledby="act4-title" hidden>
                 <div class="act-narrative">
-                    <h2 id="act4-title" class="headline">Aprendí cuánto lastima <em>hablar en caliente.</em></h2>
+                    <h2 id="act4-title" class="headline">Ser bonitos también <em>en las diferencias.</em></h2>
                     <p class="prose-lead">
-                        Muchas discusiones crecieron porque respondí desde el impulso cuando tocaba respirar primero. Haz esta pausa de tres segundos conmigo.
+                        Sé cuánto das entre tu trabajo, la universidad y tu casa. Cuando algo nos incomode, quiero respirar antes de alterarme y ser tu descanso, no otro peso. Haz esta pausa conmigo.
                     </p>
                 </div>
 
                 <div class="act-interactive">
                     <div class="breath-stage">
-                        <button id="breath-btn" type="button" class="breath-orb-btn" aria-label="Mantén presionado tres segundos para hacer una pausa en calma">
+                        <button id="breath-btn" type="button" class="breath-orb-btn" aria-label="Mantén presionado tres segundos para bajar la guardia">
                             <span id="breath-halo" class="breath-halo" aria-hidden="true"></span>
                             <svg class="breath-ring-svg" viewBox="0 0 122 122" fill="none" aria-hidden="true">
                                 <circle cx="61" cy="61" r="56" stroke="rgba(247,244,238,0.12)" stroke-width="1.5"></circle>
@@ -1822,18 +1840,18 @@
                             <span class="breath-core-dot" aria-hidden="true"></span>
                         </button>
                         <p id="breath-status" class="micro-status"
-                            data-touch="Mantén tu dedo en el centro para enfriar el impulso"
-                            data-fine="Mantén clic en el centro (o barra espaciadora) durante 3 s">Mantén tu dedo en el centro para enfriar el impulso</p>
+                            data-touch="Mantén tu dedo tres segundos para bajar la guardia"
+                            data-fine="Mantén clic en el centro (o barra espaciadora) durante 3 s">Mantén tu dedo tres segundos para bajar la guardia</p>
                     </div>
                 </div>
             </section>
 
-            <!-- ACTO 5: BAJAR EL ORGULLO A CERO -->
+            <!-- ACTO 5: ORGULLO Y DUDAS -> CONFIAR EN TI -->
             <section id="act-5" class="act-panel" aria-labelledby="act5-title" hidden>
                 <div class="act-narrative">
-                    <h2 id="act5-title" class="headline">Tener la razón no sirve de nada <em>si te pierdo a ti.</em></h2>
+                    <h2 id="act5-title" class="headline">Tener la razón no vale nada <em>si pierdo tu paz.</em></h2>
                     <p class="prose-lead">
-                        A veces cuidé más mi orgullo que nuestra tranquilidad. Lleva esta barra hasta el final para poner las cosas en su lugar.
+                        Muchas veces dejé que la desconfianza o el orgullo hablaran más fuerte que lo que siento por ti. Lleva la barra hasta el final para poner todo en su sitio.
                     </p>
                 </div>
 
@@ -1841,23 +1859,23 @@
                     <div class="balance-box">
                         <div class="balance-meters">
                             <div class="balance-side">
-                                <span class="balance-name">Mi orgullo</span>
+                                <span class="balance-name">Orgullo y dudas</span>
                                 <span id="pride-pct" class="balance-pct">100%</span>
                             </div>
                             <div class="balance-side is-right">
-                                <span class="balance-name">Nosotros dos</span>
+                                <span class="balance-name">Confiar en ti</span>
                                 <span id="us-pct" class="balance-pct">0%</span>
                             </div>
                         </div>
 
-                        <div id="balance-track" class="scrubber-track" role="slider" tabindex="0" aria-label="Bajar el orgullo a cero y subir nosotros dos al cien por ciento" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                        <div id="balance-track" class="scrubber-track" role="slider" tabindex="0" aria-label="Bajar orgullo y dudas a cero y subir confiar en ti al cien por ciento" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
                             <div class="scrubber-line">
                                 <div id="balance-fill" class="scrubber-fill"></div>
                             </div>
                             <div id="balance-knob" class="scrubber-knob" aria-hidden="true"></div>
                         </div>
 
-                        <p id="balance-quote" class="balance-quote">Defender mi orgullo solo nos ponía en bandos opuestos.</p>
+                        <p id="balance-quote" class="balance-quote">Interrogarte o ponerme a la defensiva solo nos ponía en bandos opuestos.</p>
                     </div>
 
                     <div class="act-actions">
@@ -1872,14 +1890,14 @@
                 </div>
             </section>
 
-            <!-- ACTO 6: ACORTAR LA DISTANCIA -->
+            <!-- ACTO 6: DE DOMINICANA A VENEZUELA, DEL MISMO LADO -->
             <section id="act-6" class="act-panel" aria-labelledby="act6-title" hidden>
                 <div class="act-narrative">
-                    <h2 id="act6-title" class="headline">La distancia solo gana cuando <em>nos soltamos por dentro.</em></h2>
+                    <h2 id="act6-title" class="headline">De Dominicana a Venezuela, <em>del mismo lado.</em></h2>
                     <p class="prose-lead"
-                        data-touch="Arrastra cualquiera de los dos círculos con tu dedo hasta volver a juntarnos en el centro."
-                        data-fine="Arrastra cualquiera de los dos círculos con el cursor hasta volver a juntarnos en el centro.">
-                        Arrastra cualquiera de los dos círculos con tu dedo hasta volver a juntarnos en el centro.
+                        data-touch="Aunque hoy nos separen kilómetros y días pesados, la única distancia que duele es enfriarnos. Arrastra cualquiera de los dos círculos hasta unirnos."
+                        data-fine="Aunque hoy nos separen kilómetros y días pesados, la única distancia que duele es enfriarnos. Arrastra cualquiera de los dos círculos hasta unirnos.">
+                        Aunque hoy nos separen kilómetros y días pesados, la única distancia que duele es enfriarnos. Arrastra cualquiera de los dos círculos hasta unirnos.
                     </p>
                 </div>
 
@@ -1888,7 +1906,7 @@
                         <svg class="bridge-svg" id="bridge-svg" preserveAspectRatio="none" aria-hidden="true">
                             <path id="bridge-path" fill="none" stroke="rgba(232,189,131,0.45)" stroke-width="1.6" stroke-dasharray="4 5"></path>
                         </svg>
-                        <button id="node-yai" type="button" class="bridge-node node-yai" aria-label="Acercar a Yai hacia el centro">Yai</button>
+                        <button id="node-yai" type="button" class="bridge-node node-yai" aria-label="Acercar a Yaire hacia el centro">Yaire</button>
                         <button id="node-yo" type="button" class="bridge-node node-yo" aria-label="Acercar a Yo hacia el centro">Yo</button>
                     </div>
 
@@ -1906,14 +1924,14 @@
                 </div>
             </section>
 
-            <!-- ACTO 7: TRES VERDADES QUE SOBREVIVIERON A TODO -->
+            <!-- ACTO 7: TRES COSAS QUE NUNCA MÁS QUIERO QUE DUDES -->
             <section id="act-7" class="act-panel" aria-labelledby="act7-title" hidden>
                 <div class="act-narrative">
-                    <h2 id="act7-title" class="headline">Ni en nuestras peores rachas <em>dudé de esto.</em></h2>
+                    <h2 id="act7-title" class="headline">Tres cosas que quiero que <em>nunca más dudes.</em></h2>
                     <p class="prose-lead"
-                        data-touch="Desliza hacia los lados o toca cada parte para leer las tres certezas que ninguna pelea pudo borrar."
-                        data-fine="Usa las flechas o selecciona cada parte para leer las tres certezas que ninguna pelea pudo borrar.">
-                        Desliza hacia los lados o toca cada parte para leer las tres certezas que ninguna pelea pudo borrar.
+                        data-touch="Desliza hacia los lados o toca cada parte para leer tres verdades que hoy quiero dejarte claras."
+                        data-fine="Usa las flechas o selecciona cada parte para leer tres verdades que hoy quiero dejarte claras.">
+                        Desliza hacia los lados o toca cada parte para leer tres verdades que hoy quiero dejarte claras.
                     </p>
                 </div>
 
@@ -1926,20 +1944,20 @@
                                 </svg>
                             </button>
 
-                            <div id="truths-track" class="truths-track" aria-label="Tres certezas sobre nosotros">
+                            <div id="truths-track" class="truths-track" aria-label="Tres certezas para Yaire">
                                 <article class="truth-slide">
                                     <p class="truth-quote">
-                                        Cómo me cambia el día entero cuando estamos bien, nos reímos sin tensión y <em>te siento tranquila conmigo.</em>
+                                        Ese Charles bien cónchale que te dio aquel girasol en Hevvo un 28 de enero nunca se fue: <em>sigue loco por ti, princesa.</em>
                                     </p>
                                 </article>
                                 <article class="truth-slide">
                                     <p class="truth-quote">
-                                        Que incluso cuando discutíamos fuerte, mi mente jamás buscó otro lugar: <em>siempre buscó cómo arreglarlo contigo.</em>
+                                        Jamás has sido una carga y nadie ocupa tu lugar: todo lo que creo nace porque <em>tú me importas más que mi orgullo.</em>
                                     </p>
                                 </article>
                                 <article class="truth-slide">
                                     <p class="truth-quote">
-                                        Que prefiero aprender a cuidarte mejor mil veces antes que <em>acostumbrarme a una vida sin ti.</em>
+                                        Admiro cómo luchas cada día por tu mamá y tus sueños; hoy quiero cuidar <em>nuestro mundo de girasoles y tulipanes</em> con hechos.
                                     </p>
                                 </article>
                             </div>
@@ -1970,14 +1988,14 @@
                 </div>
             </section>
 
-            <!-- ACTO 8: CUATRO ACUERDOS REALES -->
+            <!-- ACTO 8: CUATRO ACUERDOS REALES CON HECHOS -->
             <section id="act-8" class="act-panel" aria-labelledby="act8-title" hidden>
                 <div class="act-narrative">
-                    <h2 id="act8-title" class="headline">Si empezamos de cero, <em>no va a ser igual.</em></h2>
+                    <h2 id="act8-title" class="headline">No te pido fe ciega: <em>estos son mis acuerdos.</em></h2>
                     <p class="prose-lead"
-                        data-touch="Toca cada línea para encender los cuatro compromisos que asumo contigo desde hoy."
-                        data-fine="Haz clic en cada línea para encender los cuatro compromisos que asumo contigo desde hoy.">
-                        Toca cada línea para encender los cuatro compromisos que asumo contigo desde hoy.
+                        data-touch="Sé que la confianza se sostiene con hechos. Toca cada línea para encender lo que asumo contigo desde hoy."
+                        data-fine="Sé que la confianza se sostiene con hechos. Haz clic en cada línea para encender lo que asumo contigo desde hoy.">
+                        Sé que la confianza se sostiene con hechos. Toca cada línea para encender lo que asumo contigo desde hoy.
                     </p>
                 </div>
 
@@ -1990,10 +2008,10 @@
                                 </svg>
                             </span>
                             <span>
-                                <span class="promise-title">Respirar antes de contestar en caliente</span>
+                                <span class="promise-title">Confiar en tu palabra sin interrogatorios</span>
                                 <span class="promise-detail-wrap">
                                     <span class="promise-detail-inner">
-                                        <span class="promise-detail">Cuando algo duela o incomode, bajar la guardia primero. Nunca volver a hablarte desde el impulso ni usar palabras para herirnos.</span>
+                                        <span class="promise-detail">No suponer cosas raras por una hora, un fallo técnico o terceros. Preguntarte en calma y creerte, porque eres mi equipo y no mi enemiga.</span>
                                     </span>
                                 </span>
                             </span>
@@ -2006,10 +2024,10 @@
                                 </svg>
                             </span>
                             <span>
-                                <span class="promise-title">Poner nuestra paz por encima del orgullo</span>
+                                <span class="promise-title">Cuidar cómo te hablo hasta en el enojo</span>
                                 <span class="promise-detail-wrap">
                                     <span class="promise-detail-inner">
-                                        <span class="promise-detail">Dejar de competir por quién tiene la razón. En cualquier desacuerdo no eres mi rival, Yai: somos tú y yo del mismo lado.</span>
+                                        <span class="promise-detail">Cero comparaciones con el pasado, cero frases hirientes cuando me sienta dolido y nunca más soltarte un «no somos nada» por orgullo.</span>
                                     </span>
                                 </span>
                             </span>
@@ -2022,10 +2040,10 @@
                                 </svg>
                             </span>
                             <span>
-                                <span class="promise-title">Hablar claro sin castigarnos con silencios</span>
+                                <span class="promise-title">Respetar tu cansancio, tu salud y tus tiempos</span>
                                 <span class="promise-detail-wrap">
                                     <span class="promise-detail-inner">
-                                        <span class="promise-detail">Decir lo que sentimos a tiempo y con honestidad tranquila, sin guardarnos cosas ni enfriarnos durante días.</span>
+                                        <span class="promise-detail">Entender tus días entre oficina, clases y familia sin medir visitas ni reclamar desvelos: todo lo que hago para ti es amor, jamás una deuda.</span>
                                     </span>
                                 </span>
                             </span>
@@ -2038,10 +2056,10 @@
                                 </svg>
                             </span>
                             <span>
-                                <span class="promise-title">Hacerme presente a pesar de la distancia</span>
+                                <span class="promise-title">Volver a los detalles que nacen del alma</span>
                                 <span class="promise-detail-wrap">
                                     <span class="promise-detail-inner">
-                                        <span class="promise-detail">Cuidar los detalles cotidianos para que te sientas acompañada, escuchada y cerca de mí todos los días, estemos donde estemos.</span>
+                                        <span class="promise-detail">No quedarme solo detrás de una pantalla editando código: darte tus buenos días, tus textos sinceros y la paz de sentirte elegida siempre.</span>
                                     </span>
                                 </span>
                             </span>
@@ -2063,16 +2081,16 @@
             <!-- ACTO 9: PONER EL RELOJ EN CERO -->
             <section id="act-9" class="act-panel" aria-labelledby="act9-title" hidden>
                 <div class="act-narrative">
-                    <h2 id="act9-title" class="headline">Borremos la cuenta <em>de todo lo malo.</em></h2>
+                    <h2 id="act9-title" class="headline">Dejemos atrás la cuenta <em>de cada pelea.</em></h2>
                     <p class="prose-lead">
-                        Lleva el control hacia la izquierda hasta dejar todo el historial de discusiones en cero absoluto.
+                        Nos quedamos con todo lo bonito que construimos desde enero y soltamos el peso de estos meses difíciles. Lleva la barra hasta cero.
                     </p>
                 </div>
 
                 <div class="act-interactive">
                     <div class="rewind-box">
                         <div id="rewind-digits" class="rewind-digits">28 : 14 : 59</div>
-                        <p id="rewind-caption" class="rewind-caption">Altas y bajas acumuladas · Lleva la barra a cero</p>
+                        <p id="rewind-caption" class="rewind-caption">Discusiones, bloqueos y malos ratos · Lleva la barra a cero</p>
 
                         <div id="rewind-track" class="scrubber-track" role="slider" tabindex="0" aria-label="Rebobinar el contador hasta cero" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100">
                             <div class="scrubber-line">
@@ -2094,18 +2112,18 @@
                 </div>
             </section>
 
-            <!-- ACTO 10: LA PREGUNTA + SELLO DE LUZ -->
+            <!-- ACTO 10: LA PREGUNTA CON MADUREZ + SELLO DE LUZ -->
             <section id="act-10" class="act-panel" aria-labelledby="act10-title" hidden>
                 <div class="act-narrative">
-                    <h2 id="act10-title" class="headline">Yai, ¿empezamos desde cero? <em>¿Quieres ser mi novia?</em></h2>
+                    <h2 id="act10-title" class="headline">Yaire, ¿empezamos de cero? <em>¿Quieres ser mi novia?</em></h2>
                     <p class="prose-lead">
-                        Sin arrastrar las peleas de ayer. Con todo lo que aprendimos y con el corazón en calma para hacerlo bien contigo.
+                        Te lo pido con madurez, confiando en ti y con mi corazón en paz: para cuidarte bonito en las buenas y también cuando tengamos diferencias.
                     </p>
                 </div>
 
                 <div class="act-interactive">
                     <div class="seal-stage">
-                        <button id="seal-btn" type="button" class="seal-button" aria-label="Mantén presionado dos segundos para decir que sí">
+                        <button id="seal-btn" type="button" class="seal-button" aria-label="Mantén presionado dos segundos para decirme que sí">
                             <svg class="seal-ring-svg" viewBox="0 0 106 106" fill="none" aria-hidden="true">
                                 <circle class="seal-ring-track" cx="53" cy="53" r="49" stroke-width="1.6"></circle>
                                 <circle id="seal-progress-circle" class="seal-ring-progress" cx="53" cy="53" r="49" stroke-width="2.3" stroke-linecap="round" stroke-dasharray="307.88" stroke-dashoffset="307.88"></circle>
@@ -2115,16 +2133,16 @@
                             </svg>
                         </button>
                         <p id="seal-hint" class="seal-hint"
-                            data-touch="Mantén presionado el sello dos segundos para decir que sí"
-                            data-fine="Mantén clic sobre el sello dos segundos (o Espacio) para decir que sí">Mantén presionado el sello dos segundos para decir que sí</p>
+                            data-touch="Mantén presionado el sello dos segundos para decirme que sí"
+                            data-fine="Mantén clic sobre el sello dos segundos (o Espacio) para decirme que sí">Mantén presionado el sello dos segundos para decirme que sí</p>
                     </div>
 
                     <div class="act-actions" style="margin-top: 0.9rem;">
-                        <button id="open-talk-first-btn" type="button" class="btn-quiet">Quiero escribirte algo antes</button>
+                        <button id="open-talk-first-btn" type="button" class="btn-quiet">Quiero decirte algo antes de responder</button>
                     </div>
 
                     <div id="talk-first-drawer" class="first-note-drawer">
-                        <textarea id="talk-first-input" class="reply-textarea" maxlength="600" enterkeyhint="send" placeholder="Escríbeme con calma lo que sientes, Yai…"></textarea>
+                        <textarea id="talk-first-input" class="reply-textarea" maxlength="600" enterkeyhint="send" placeholder="Escríbeme con total confianza lo que sientes, princesa…"></textarea>
                         <div class="act-actions" style="margin-top: 0.2rem; justify-content: flex-end;">
                             <button id="send-talk-first-btn" type="button" class="btn-primary">
                                 <span id="send-talk-first-label">Enviarle mi mensaje</span>
@@ -2137,9 +2155,9 @@
             <!-- EPÍLOGO (ACTO 11): SELLADO · NUESTRO DÍA CERO -->
             <section id="act-11" class="act-panel" aria-labelledby="act11-title" hidden>
                 <div class="act-narrative">
-                    <h2 id="act11-title" class="headline">Gracias por darme <em>este nuevo comienzo, Yai.</em></h2>
+                    <h2 id="act11-title" class="headline">Gracias por elegirnos <em>otra vez, princesa.</em></h2>
                     <p class="prose-lead">
-                        Desde este segundo nuestra cuenta empieza limpia. Prometo cuidar tu tranquilidad y lo nuestro todos los días.
+                        Desde este segundo empieza nuestra cuenta limpia. Aquí está tu chico de los girasoles para cuidarte con hechos todos los días.
                     </p>
                 </div>
 
@@ -2155,8 +2173,8 @@
                     </div>
 
                     <div class="reply-composer">
-                        <label for="accepted-note-input" class="reply-label">Si quieres dejarme unas palabras para guardar este momento, te leo ahora mismo:</label>
-                        <textarea id="accepted-note-input" class="reply-textarea" maxlength="600" enterkeyhint="send" placeholder="Escribe lo que quieras decirme, Yai…"></textarea>
+                        <label for="accepted-note-input" class="reply-label">Si quieres dejarme unas palabras para guardar nuestro nuevo comienzo, te leo ahora mismo:</label>
+                        <textarea id="accepted-note-input" class="reply-textarea" maxlength="600" enterkeyhint="send" placeholder="Escribe lo que te salga del corazón, Yaire…"></textarea>
                     </div>
 
                     <div class="act-actions">
@@ -2222,8 +2240,10 @@
             }
 
             /* ─── Adaptación automática de textos según método de entrada (PC vs Celular) ─── */
+            let rawPointerFine = finePointerMql.matches;
             function applyInputMethodCopy(fine) {
-                isFinePointer = !!fine;
+                rawPointerFine = !!fine;
+                isFinePointer = rawPointerFine && window.innerWidth >= 768;
                 document.querySelectorAll('[data-touch][data-fine]').forEach((el) => {
                     if (el.dataset.lockedCopy === '1') return;
                     el.textContent = isFinePointer ? el.getAttribute('data-fine') : el.getAttribute('data-touch');
@@ -2235,9 +2255,10 @@
             if (typeof finePointerMql.addEventListener === 'function') {
                 finePointerMql.addEventListener('change', (e) => applyInputMethodCopy(e.matches));
             }
+            window.addEventListener('resize', () => applyInputMethodCopy(rawPointerFine), { passive: true });
             window.addEventListener('pointerdown', (e) => {
                 const nowFine = e.pointerType === 'mouse';
-                if (nowFine !== isFinePointer) applyInputMethodCopy(nowFine);
+                if (nowFine !== rawPointerFine) applyInputMethodCopy(nowFine);
             }, { passive: true });
 
             if (urlParams.get('auto') === '1' && !isPreview) {
@@ -2795,7 +2816,7 @@
                     canvas.classList.add('is-cleared');
                     if (statusEl) {
                         statusEl.dataset.lockedCopy = '1';
-                        statusEl.textContent = 'Cristal despejado';
+                        statusEl.textContent = 'Eso es lo primero que hoy cambia en mí.';
                         statusEl.classList.add('is-lit');
                     }
                     if (nextBtn) nextBtn.disabled = false;
@@ -2918,7 +2939,7 @@
                         if (left > 0) {
                             noiseCaption.textContent = left === 1 ? 'Queda 1 por soltar' : 'Quedan ' + left + ' por soltar';
                         } else {
-                            noiseCaption.textContent = 'Todo ese peso se queda aquí.';
+                            noiseCaption.textContent = 'Nada de eso vuelve a entrar con nosotros.';
                             noiseCaption.classList.add('is-lit');
                         }
                     }
@@ -2985,7 +3006,7 @@
                     pulseHaptic([14, 30, 18]);
                     if (statusEl) {
                         statusEl.dataset.lockedCopy = '1';
-                        statusEl.textContent = 'Así quiero escucharte siempre: en calma.';
+                        statusEl.textContent = 'Así quiero tratarte incluso cuando pensemos distinto.';
                         statusEl.classList.add('is-lit');
                     }
                     const r = btn.getBoundingClientRect();
@@ -3002,8 +3023,8 @@
                             renderBreath(progress);
                             if (statusEl) {
                                 statusEl.textContent = progress < 0.5
-                                    ? 'Respira hondo… sin prisa'
-                                    : 'Bajando la guardia…';
+                                    ? 'Respirando primero… sin suponer'
+                                    : 'Escuchándote sin ponernos en contra…';
                             }
                             if (progress >= 1) finishBreath();
                         } else if (progress > 0) {
@@ -3027,7 +3048,7 @@
                     if (statusEl && progress < 1) {
                         statusEl.textContent = isFinePointer
                             ? 'Mantén clic en el centro (o barra espaciadora) durante 3 s'
-                            : 'Mantén tu dedo en el centro para enfriar el impulso';
+                            : 'Mantén tu dedo tres segundos para bajar la guardia';
                     }
                 }
 
@@ -3073,11 +3094,11 @@
 
                     if (quoteEl) {
                         if (pct < 38) {
-                            quoteEl.textContent = 'Defender mi orgullo solo nos ponía en bandos opuestos.';
+                            quoteEl.textContent = 'Interrogarte o ponerme a la defensiva solo nos ponía en bandos opuestos.';
                         } else if (pct < 92) {
-                            quoteEl.textContent = 'Soltar la terquedad abre espacio para escucharte de verdad.';
+                            quoteEl.textContent = 'Bajar los escudos deja espacio para creerte y cuidarnos como equipo.';
                         } else {
-                            quoteEl.textContent = 'Cero orgullo entre tú y yo. Primero nuestra paz.';
+                            quoteEl.textContent = 'Cero interrogatorios, princesa. Mi paz empieza confiando en tu palabra.';
                         }
                     }
 
@@ -3121,7 +3142,7 @@
                 });
             })();
 
-            /* ─── ACTO 6: Unir Yai + Yo cortando la distancia ─── */
+            /* ─── ACTO 6: Unir Yaire + Yo cortando la distancia ─── */
             (function setupAct6Bridge() {
                 const arena = document.getElementById('bridge-arena');
                 const pathEl = document.getElementById('bridge-path');
@@ -3172,12 +3193,12 @@
                     if (united) return;
                     united = true;
                     activeNode = null;
-                    yaiRatio = 0.44;
-                    yoRatio = 0.56;
+                    yaiRatio = 0.43;
+                    yoRatio = 0.57;
                     arena.classList.add('is-united');
                     renderBridge();
                     if (statusEl) {
-                        statusEl.textContent = 'Aunque haya kilómetros, nunca más quiero hacerte sentir lejos de mí.';
+                        statusEl.textContent = 'Hasta el día en que pueda abrazarte en persona, aquí estoy contigo.';
                         statusEl.classList.add('is-lit');
                     }
                     if (nextBtn) nextBtn.disabled = false;
@@ -3190,7 +3211,7 @@
                     if (!activeNode || united) return;
                     const rect = arena.getBoundingClientRect();
                     const w = Math.max(1, rect.width);
-                    const padRatio = Math.min(0.22, 32 / w);
+                    const padRatio = Math.min(0.22, 36 / w);
                     const r = Math.max(padRatio, Math.min(1 - padRatio, (clientX - rect.left) / w));
                     if (activeNode === 'yai') {
                         yaiRatio = Math.min(yoRatio - 0.06, r);
@@ -3309,14 +3330,17 @@
                 const total = 4;
                 const nextBtn = document.getElementById('act8-next-btn');
                 const nextLabel = document.getElementById('act8-next-label');
+                const rows = Array.from(document.querySelectorAll('.promise-row'));
 
-                document.querySelectorAll('.promise-row').forEach((row) => {
+                rows.forEach((row) => {
                     row.addEventListener('click', () => {
                         const idx = Number(row.getAttribute('data-promise'));
-                        if (!litPromises.has(idx)) {
+                        const isDesktopSplit = window.innerWidth >= 1024 && window.innerHeight >= 580;
+                        const wasFirstTime = !litPromises.has(idx);
+
+                        if (wasFirstTime) {
                             litPromises.add(idx);
                             row.classList.add('is-lit');
-                            row.setAttribute('aria-expanded', 'true');
                             const rect = row.getBoundingClientRect();
                             spawnMotes(rect.left + 18, rect.top + 22, 14, true);
                             pulseHaptic(10);
@@ -3328,6 +3352,20 @@
                                 nextBtn.disabled = false;
                                 if (nextLabel) nextLabel.textContent = 'Poner el reloj en cero';
                             }
+                        } else {
+                            pulseHaptic(6);
+                        }
+
+                        if (isDesktopSplit) {
+                            row.classList.add('is-open');
+                            row.setAttribute('aria-expanded', 'true');
+                        } else {
+                            const willOpen = wasFirstTime || !row.classList.contains('is-open');
+                            rows.forEach((other) => {
+                                const openHere = other === row && willOpen;
+                                other.classList.toggle('is-open', openHere);
+                                other.setAttribute('aria-expanded', openHere ? 'true' : 'false');
+                            });
                         }
                     });
                 });
@@ -3367,7 +3405,7 @@
                     if (r === 0 && !zeroed) {
                         zeroed = true;
                         digitsEl.classList.add('is-zero');
-                        if (captionEl) captionEl.textContent = 'Día Cero · Página limpia para los dos';
+                        if (captionEl) captionEl.textContent = 'Día Cero · Cuenta limpia para Yaire y para mí';
                         if (nextBtn) nextBtn.disabled = false;
                         pulseHaptic([14, 26, 18]);
                         const dr = digitsEl.getBoundingClientRect();
@@ -3482,7 +3520,7 @@
                 if (e && e.cancelable) e.preventDefault();
                 holdingSeal = true;
                 sealBtn?.classList.add('is-holding');
-                if (sealHint) sealHint.textContent = 'Sigue manteniendo… empezando desde cero';
+                if (sealHint) sealHint.textContent = 'Sigue manteniendo… empezando nuestro Día Cero';
             }
 
             function endHold() {
@@ -3491,8 +3529,8 @@
                 sealBtn?.classList.remove('is-holding');
                 if (sealHint && holdProgress < 1) {
                     sealHint.textContent = isFinePointer
-                        ? 'Mantén clic sobre el sello dos segundos (o Espacio) para decir que sí'
-                        : 'Mantén presionado el sello dos segundos para decir que sí';
+                        ? 'Mantén clic sobre el sello dos segundos (o Espacio) para decirme que sí'
+                        : 'Mantén presionado el sello dos segundos para decirme que sí';
                 }
             }
 
@@ -3514,7 +3552,7 @@
                 if (e.key === ' ') endHold();
             });
 
-            /* Cajón opcional "Quiero escribirte algo antes" */
+            /* Cajón opcional "Quiero decirte algo antes de responder" */
             const openTalkFirstBtn = document.getElementById('open-talk-first-btn');
             const talkFirstDrawer = document.getElementById('talk-first-drawer');
             const talkFirstInput = document.getElementById('talk-first-input');
@@ -3524,7 +3562,7 @@
             if (openTalkFirstBtn && talkFirstDrawer) {
                 openTalkFirstBtn.addEventListener('click', () => {
                     const open = talkFirstDrawer.classList.toggle('is-open');
-                    openTalkFirstBtn.textContent = open ? 'Ocultar mensaje' : 'Quiero escribirte algo antes';
+                    openTalkFirstBtn.textContent = open ? 'Ocultar mensaje' : 'Quiero decirte algo antes de responder';
                     if (open && talkFirstInput) setTimeout(() => talkFirstInput.focus(), 80);
                 });
             }
