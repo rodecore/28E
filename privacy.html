@@ -123,21 +123,6 @@
             outline-offset: 3px;
         }
 
-        /* Barra superior sutil de progreso de lectura */
-        .reading-progress {
-            position: fixed;
-            top: 0;
-            left: 0;
-            height: 2px;
-            width: 100%;
-            transform-origin: 0 50%;
-            transform: scaleX(0);
-            background: linear-gradient(90deg, var(--rose-deep) 0%, var(--rose-mid) 55%, var(--rose-light) 100%);
-            z-index: 1600;
-            pointer-events: none;
-            will-change: transform;
-        }
-
         /* ─── Píldora flotante superior contráctil (Sistema #epidemic-nav de 28E) ─── */
         .top-header {
             position: fixed;
@@ -287,13 +272,8 @@
             color: var(--ink-white);
             text-decoration: none;
             user-select: none;
-            transition: color 180ms ease, transform 160ms var(--ease-out);
-        }
-
-        @media (hover: hover) and (pointer: fine) {
-            .brand-wordmark:hover {
-                color: #FDA4AF;
-            }
+            cursor: pointer;
+            transition: transform 160ms var(--ease-out);
         }
 
         .brand-wordmark:active {
@@ -402,13 +382,15 @@
 
         .hero-aura {
             position: absolute;
-            top: 4.5rem;
+            top: 4.25rem;
             left: 50%;
             transform: translateX(-50%);
-            width: min(36rem, 92vw);
-            height: 13rem;
-            background: radial-gradient(ellipse 65% 55% at 50% 50%, rgba(231, 117, 166, 0.28) 0%, rgba(196, 55, 122, 0.16) 42%, transparent 80%);
+            width: 620px;
+            max-width: 95vw;
+            height: 260px;
+            background: radial-gradient(ellipse 65% 55% at 50% 35%, rgba(231, 117, 166, 0.7) 0%, rgba(196, 55, 122, 0.55) 35%, rgba(123, 20, 75, 0.3) 60%, transparent 85%);
             filter: blur(42px);
+            opacity: 0.9;
             pointer-events: none;
             z-index: 0;
         }
@@ -419,6 +401,35 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+        }
+
+        .hero-date-glow-wrap {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.35rem;
+            user-select: none;
+            z-index: 1;
+        }
+
+        .hero-date-glow {
+            position: absolute;
+            inset: -16px -80px;
+            border-radius: 9999px;
+            background: radial-gradient(ellipse at center, rgba(255, 183, 212, 0.6) 0%, rgba(231, 117, 166, 0.45) 40%, rgba(196, 55, 122, 0.2) 70%, transparent 85%);
+            filter: blur(14px);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .hero-date-label {
+            font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 0.025em;
+            color: var(--ink-white);
+            text-shadow: 0 2px 10px rgba(196, 55, 122, 0.9);
         }
 
         .hero-title {
@@ -454,34 +465,6 @@
             line-height: 1.68;
             color: var(--ink-secondary);
             text-wrap: pretty;
-        }
-
-        .hero-meta-strip {
-            margin-top: 1.65rem;
-            display: inline-flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem 0.9rem;
-            padding: 0.5rem 1.15rem;
-            border-radius: 9999px;
-            background: rgba(255, 255, 255, 0.035);
-            border: 1px solid var(--border-subtle);
-            font-family: var(--font-ui);
-            font-size: 0.75rem;
-            font-weight: 500;
-            color: var(--ink-muted);
-            font-variant-numeric: tabular-nums;
-        }
-
-        .hero-meta-strip strong {
-            color: var(--rose-light);
-            font-weight: 600;
-        }
-
-        .meta-sep {
-            color: rgba(255, 255, 255, 0.18);
-            user-select: none;
         }
 
         /* ─── Cuerpo Editorial a Dos Columnas (Índice Sticky + Lectura) ─── */
@@ -762,12 +745,6 @@
             .brand-wordmark {
                 font-size: 1.32rem;
             }
-
-            .hero-meta-strip {
-                font-size: 0.71rem;
-                gap: 0.42rem;
-                padding: 0.45rem 0.9rem;
-            }
         }
 
         @media (prefers-reduced-motion: reduce) {
@@ -786,13 +763,12 @@
 </head>
 
 <body>
-    <div class="reading-progress" id="reading-progress" aria-hidden="true"></div>
-
     <!-- Barra flotante estilo 28E Principal -->
     <header class="top-header" id="top-header">
         <nav class="floating-pill-nav" id="privacy-nav" aria-label="Navegación de Política de Privacidad">
             <div class="brand-cluster" id="brand-cluster">
-                <a href="/" class="brand-wordmark" id="nav-brand-logo" aria-label="Ir al inicio de 28E">28E</a>
+                <a href="javascript:void(0)" class="brand-wordmark" id="nav-brand-logo"
+                    aria-label="Volver al inicio de Privacidad">28E</a>
                 <span class="brand-divider" aria-hidden="true"></span>
                 <span class="brand-context">Privacidad</span>
             </div>
@@ -817,6 +793,10 @@
     <section class="hero-section">
         <div class="hero-aura" aria-hidden="true"></div>
         <div class="hero-inner">
+            <div class="hero-date-glow-wrap">
+                <div class="hero-date-glow" aria-hidden="true"></div>
+                <span class="hero-date-label">Noviembre 2026</span>
+            </div>
             <h1 class="hero-title">
                 Política de <span class="text-highlight"><em>privacidad.</em></span>
             </h1>
@@ -824,13 +804,6 @@
                 28E es un espacio íntimo e interactivo creado con cariño. Aquí explicamos con total claridad qué datos
                 se utilizan en cada experiencia, cómo se protegen y qué control tienes siempre sobre ellos.
             </p>
-            <div class="hero-meta-strip">
-                <span>Documento vigente</span>
-                <span class="meta-sep" aria-hidden="true">&bull;</span>
-                <span>Actualizado: <strong>Nov 2026</strong></span>
-                <span class="meta-sep" aria-hidden="true">&bull;</span>
-                <span>9 apartados</span>
-            </div>
         </div>
     </section>
 
@@ -1120,16 +1093,29 @@
 
     <script>
         (function () {
-            const progressEl = document.getElementById('reading-progress');
             const topHeader = document.getElementById('top-header');
             const nav = document.getElementById('privacy-nav');
             const brandCluster = document.getElementById('brand-cluster');
+            const brandLogo = document.getElementById('nav-brand-logo');
             const tocLinks = Array.from(document.querySelectorAll('.toc-link'));
             const chapters = Array.from(document.querySelectorAll('.policy-chapter'));
             const activeNavLabel = document.getElementById('nav-active-label');
 
             let navCollapsed = false;
             let hoverLeaveTimer = 0;
+
+            if (brandLogo) {
+                brandLogo.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    brandLogo.blur?.();
+                    nav?.classList.remove('nav-expanded');
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    if (window.location.hash) {
+                        history.replaceState(null, '', window.location.pathname + window.location.search);
+                    }
+                });
+            }
 
             function syncNavDimensions() {
                 if (!nav || !topHeader || !brandCluster) return;
@@ -1167,6 +1153,7 @@
 
                 nav.addEventListener('click', (e) => {
                     if (!nav.classList.contains('nav-collapsed')) return;
+                    if (e.target.closest('#nav-brand-logo')) return;
                     if (nav.classList.contains('nav-expanded') && e.target.closest('a')) {
                         return;
                     }
@@ -1200,11 +1187,6 @@
             function syncScrollState() {
                 const docEl = document.documentElement;
                 const scrollY = window.pageYOffset || docEl.scrollTop || 0;
-                const maxScroll = Math.max(1, docEl.scrollHeight - docEl.clientHeight);
-                const ratio = Math.min(1, Math.max(0, scrollY / maxScroll));
-                if (progressEl) {
-                    progressEl.style.transform = 'scaleX(' + ratio.toFixed(4) + ')';
-                }
 
                 if (nav) {
                     if (!navCollapsed && scrollY > 100) {
