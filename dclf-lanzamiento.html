@@ -32,6 +32,9 @@
     </script>
     <link rel="icon" type="image/x-icon" href="./icons/dclf_game.ico">
     <link rel="stylesheet" href="./fonts/fonts.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@800;900&display=swap" rel="stylesheet">
     <style>
         @font-face {
             font-family: 'Sebenta';
@@ -151,19 +154,22 @@
         .brand-mark {
             display: inline-flex;
             align-items: center;
-            height: 44px;
+            min-height: 44px;
             pointer-events: none;
             user-select: none;
             -webkit-user-select: none;
         }
 
-        .brand-mark img {
-            height: 36px;
-            width: auto;
-            display: block;
-            margin-left: -5px;
-            user-select: none;
-            -webkit-user-drag: none;
+        .brand-wordmark {
+            font-family: 'Inter', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+            font-weight: 800;
+            font-size: clamp(1.52rem, 2.2vw, 1.88rem);
+            line-height: 1;
+            letter-spacing: -0.05em;
+            color: #ffffff;
+            -webkit-font-smoothing: antialiased;
+            text-rendering: geometricPrecision;
+            text-shadow: 0 2px 16px rgba(0, 0, 0, 0.45);
         }
 
         .top-actions {
@@ -409,9 +415,8 @@
                     max(1.2rem, env(safe-area-inset-left));
             }
 
-            .brand-mark img {
-                height: 31px;
-                margin-left: -4px;
+            .brand-wordmark {
+                font-size: 1.52rem;
             }
 
             .back-link {
@@ -495,8 +500,8 @@
 
     <div class="stage" id="stage-root">
         <header class="top-bar">
-            <div class="brand-mark">
-                <img src="./assets/logos/logo_28e_oficial.png" alt="28E" draggable="false">
+            <div class="brand-mark" aria-label="28E">
+                <span class="brand-wordmark">28E</span>
             </div>
 
             <div class="top-actions">
