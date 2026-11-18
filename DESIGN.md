@@ -263,3 +263,7 @@ GSAP 3.12.5 uses transform/opacity for panel entry/exit (260/200ms), view change
 - Don't make the minimized dock a single nested-button target or require opening it to mute or leave.
 
 Afterglow is the voice, chat and shared-music feature name. Keep it unchanged across languages; technical IDs and the principal room name stay stable.
+
+## Scoped Surface: OLED Monolith Countdown & Maintenance (`mantenimiento.html`)
+
+`mantenimiento.html` is a standalone full-viewport (`100dvh`) waiting and launch-countdown surface on pure `#000000` OLED black. It pairs rotating self-hosted `Sebenta` Medium/Italic headlines (without eyebrow/kicker) with `Plus Jakarta Sans` tabular horology (`Días · Horas · Minutos · Segundos`) over a 1px luminous horizon rule, static official `logo_28e_oficial.png` branding, a 44px translucent dark-glass `Sonido / Silencio` pill playing a level-matched 4-track sequential playlist (`re-forro.mp3`, `saw-halo.mp3`, `blood-in-your-eyes.mp3`, `dancing-in-the-dark.mp3`), and a spring-driven WebGL/Canvas optical eclipse aura in warm champagne-amber (`#e8bd83`) and tulip rose (`#e69ab8`) that respects `prefers-reduced-motion`, `prefers-reduced-transparency`, and `prefers-contrast`. It serves the November 21, 2026 (`00:00:00 UTC-4`) opening and syncs in real time with Firebase `config` (`scheduled` and `indefinite` Admin Panel maintenance).

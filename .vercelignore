@@ -13,3 +13,4 @@ stream-study/
 firebase/
 signaling-server/test/
 /*.wav
+/*.flac

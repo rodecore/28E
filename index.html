@@ -38,9 +38,34 @@
                     window.location.replace('tv.html' + window.location.search + window.location.hash);
                     return;
                 }
+                var serverOffset = Number(localStorage.getItem('yaire_server_offset')) || 0;
+                var nowSynced = Date.now() + serverOffset;
                 var target = new Date('2026-11-21T00:00:00-04:00');
-                if (new Date() < target) {
+                if (nowSynced < target.getTime()) {
                     window.location.replace('mantenimiento.html');
+                    return;
+                }
+                if (localStorage.getItem('yaire_restore') !== '1') {
+                    var cachedRaw = localStorage.getItem('yaire_config');
+                    if (cachedRaw) {
+                        var cachedCfg = JSON.parse(cachedRaw);
+                        if (cachedCfg && cachedCfg.mantenimiento === true) {
+                            var openingMs = target.getTime();
+                            var maintValid = false;
+                            if (cachedCfg.maintType === 'scheduled' && cachedCfg.maintDate) {
+                                var dStr = String(cachedCfg.maintDate).trim();
+                                var endMs = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(dStr) ? Date.parse(dStr + ':00-04:00') : Date.parse(dStr);
+                                if (endMs && nowSynced < endMs && endMs > openingMs) maintValid = true;
+                            } else {
+                                var updMs = cachedCfg.lastUpdated ? Date.parse(cachedCfg.lastUpdated) : 0;
+                                if (updMs >= openingMs) maintValid = true;
+                            }
+                            if (maintValid) {
+                                window.location.replace('mantenimiento.html');
+                                return;
+                            }
+                        }
+                    }
                 }
             } catch (e) {}
         })();
@@ -1688,7 +1713,7 @@
 
     <!-- Bloqueo temporal: Redirigir a mantenimiento antes del 28 de Abril -->
 
-    <script src="assets/js/maintenance-countdown.js?v=20261108_local"></script>
+    <script src="assets/js/maintenance-countdown.js?v=20261117_maint"></script>
 
     <!-- --- Performance: Preconnect to external origins --- -->
 

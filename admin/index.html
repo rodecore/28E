@@ -926,16 +926,16 @@
                                         <input type="hidden" id="maint-screen" value="cinematic">
                                         <!-- Cards horizontales -->
                                         <div class="flex flex-col gap-2">
-                                            <!-- Card: Cinemática -->
+                                            <!-- Card: OLED Monolith -->
                                             <div id="maint-screen-card-cinematic" onclick="setMaintScreen('cinematic')"
                                                 class="relative flex items-center gap-4 px-4 py-3.5 rounded-xl border-2 cursor-pointer transition-all duration-200 maint-screen-card border-amber-500/60 bg-amber-500/[0.06] hover:bg-amber-500/10"
                                                 data-screen="cinematic">
                                                 <div class="maint-icon w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 bg-amber-500/20 text-amber-400">
-                                                    <i class="ph-fill ph-film-strip text-lg"></i>
+                                                    <i class="ph-fill ph-sparkle text-lg"></i>
                                                 </div>
                                                 <div class="flex-1 min-w-0">
-                                                    <div class="text-sm font-bold text-white leading-tight">Cinemática</div>
-                                                    <div class="text-[11px] text-zinc-500 mt-0.5">Fondo de video, animaciones premium</div>
+                                                    <div class="text-sm font-bold text-white leading-tight">OLED Monolith</div>
+                                                    <div class="text-[11px] text-zinc-500 mt-0.5">Estilo Apple, Sebenta, halo óptico y audio ambiental</div>
                                                 </div>
                                                 <div class="flex items-center gap-2 flex-shrink-0">
                                                     <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 uppercase tracking-wide">Activo</span>
@@ -4461,7 +4461,9 @@
         function openMaintPreview() {
             const type = document.getElementById('maint-type').value;
             const date = document.getElementById('maint-date').value || '';
-            const url = `https://www.yaire.site/mantenimiento.html?preview=true&type=${type}&date=${encodeURIComponent(date)}`;
+            const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+            const base = isLocal ? '../mantenimiento.html' : 'https://yaire.site/mantenimiento.html';
+            const url = `${base}?preview=true&type=${encodeURIComponent(type)}&date=${encodeURIComponent(date)}`;
             window.open(url, '_blank');
         }
 

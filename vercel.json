@@ -11,6 +11,10 @@
         {
           "key": "Pragma",
           "value": "no-cache"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "autoplay=(self)"
         }
       ]
     },
@@ -24,6 +28,10 @@
         {
           "key": "Pragma",
           "value": "no-cache"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "autoplay=(self)"
         }
       ]
     },
@@ -37,6 +45,10 @@
         {
           "key": "Pragma",
           "value": "no-cache"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "autoplay=(self)"
         }
       ]
     }
