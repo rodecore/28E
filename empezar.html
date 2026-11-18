@@ -249,6 +249,47 @@
             flex-shrink: 0;
         }
 
+        .sfx-pill {
+            appearance: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 1px solid var(--hairline);
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--ink-secondary);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            touch-action: manipulation;
+            transition:
+                color 180ms var(--ease-apple),
+                border-color 180ms var(--ease-apple),
+                background-color 180ms var(--ease-apple),
+                transform 120ms var(--ease-apple);
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+            .sfx-pill:hover {
+                color: var(--ink-primary);
+                border-color: var(--hairline-strong);
+                background: var(--surface-control);
+            }
+        }
+
+        .sfx-pill:active {
+            transform: scale(0.94);
+        }
+
+        .sfx-pill.is-muted {
+            color: var(--ink-faint);
+        }
+
+        .sfx-pill svg {
+            width: 15px;
+            height: 15px;
+        }
+
         .act-counter-pill {
             min-height: 36px;
             padding: 0 0.85rem;
@@ -578,18 +619,27 @@
             font-style: italic;
         }
 
-        #frost-canvas {
+        #frost-canvas,
+        #frost-wet-canvas {
             position: absolute;
             inset: 0;
             width: 100%;
             height: 100%;
             display: block;
-            cursor: crosshair;
-            touch-action: none;
-            transition: opacity 620ms var(--ease-out-expo);
+            transition: opacity 680ms var(--ease-out-expo);
         }
 
-        #frost-canvas.is-cleared {
+        #frost-canvas {
+            cursor: crosshair;
+            touch-action: none;
+        }
+
+        #frost-wet-canvas {
+            pointer-events: none;
+        }
+
+        #frost-canvas.is-cleared,
+        #frost-wet-canvas.is-cleared {
             opacity: 0;
             pointer-events: none;
         }
@@ -1962,17 +2012,28 @@
                     </svg>
                     <span>Atrás</span>
                 </button>
+                <button id="sfx-toggle-btn" class="sfx-pill" type="button" aria-label="Silenciar efectos de sonido sutiles" title="Efectos sutiles activados">
+                    <svg id="sfx-icon-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M11 5L6 9H2v6h4l5 4V5z"></path>
+                        <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                    </svg>
+                    <svg id="sfx-icon-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:none;">
+                        <path d="M11 5L6 9H2v6h4l5 4V5z"></path>
+                        <path d="M22 9l-6 6"></path>
+                        <path d="M16 9l6 6"></path>
+                    </svg>
+                </button>
                 <div id="act-counter" class="act-counter-pill" aria-live="polite">1 / 10</div>
             </div>
         </header>
 
         <main id="stage-viewport" class="stage-viewport">
-            <!-- ACTO 1: EL UMBRAL EN SILENCIO -->
+            <!-- ACTO 1: EL UMBRAL -->
             <section id="act-1" class="act-panel is-mounted is-visible" aria-labelledby="act1-title">
                 <div class="act-narrative">
                     <h1 id="act1-title" class="headline">Hola, <em>princesa.</em></h1>
                     <p class="prose-lead">
-                        Dejé todo en silencio a propósito, Yaire. Sé que una página no arregla nada por sí sola: hoy no vengo a impresionarte con código, sino a hablarte mirándome por dentro.
+                        Dejé esta página sin música a propósito, Yaire. Sé que una web no arregla nada por sí sola: hoy no vengo a impresionarte con código, sino a hablarte mirándome por dentro.
                     </p>
                 </div>
 
@@ -1998,9 +2059,9 @@
                 <div class="act-narrative">
                     <h2 id="act2-title" class="headline">Tenías razón en lo que <em>me preguntaste.</em></h2>
                     <p class="prose-lead"
-                        data-touch="Pasa tu dedo por el cristal empañado para leer lo que me quedé pensando después de escucharte."
-                        data-fine="Pasa el cursor por el cristal empañado para leer lo que me quedé pensando después de escucharte.">
-                        Pasa tu dedo por el cristal empañado para leer lo que me quedé pensando después de escucharte.
+                        data-touch="Frota con tu dedo el cristal empañado hasta limpiar el vaho y leer lo que me quedé pensando después de escucharte."
+                        data-fine="Frota con el cursor el cristal empañado hasta limpiar el vaho y leer lo que me quedé pensando después de escucharte.">
+                        Frota con tu dedo el cristal empañado hasta limpiar el vaho y leer lo que me quedé pensando después de escucharte.
                     </p>
                 </div>
 
@@ -2010,11 +2071,12 @@
                             De nada sirve construirte un universo entero si no aprendo a <em>creer en tu palabra</em> y a cuidar tu paz dentro de él.
                         </p>
                         <canvas id="frost-canvas" tabindex="0" role="button" aria-label="Despejar el cristal empañado"></canvas>
+                        <canvas id="frost-wet-canvas" aria-hidden="true"></canvas>
                     </div>
 
                     <p id="frost-status" class="micro-status"
-                        data-touch="Frota el cristal con tu dedo para despejarlo"
-                        data-fine="Mueve el cursor sobre el cristal para despejarlo">Frota el cristal con tu dedo para despejarlo</p>
+                        data-touch="Frota varias veces con tu dedo para limpiar el vaho"
+                        data-fine="Pasa o frota varias veces el cursor sobre el vaho para despejarlo">Frota varias veces con tu dedo para limpiar el vaho</p>
 
                     <div class="act-actions">
                         <button id="act2-next-btn" type="button" class="btn-primary" data-goto="3" disabled>
@@ -2463,7 +2525,7 @@
                 <button type="button" class="step-seg" data-seg="9" aria-label="Acto 9" disabled><span class="step-seg-bar"></span></button>
                 <button type="button" class="step-seg" data-seg="10" aria-label="Acto 10" disabled><span class="step-seg-bar"></span></button>
             </nav>
-            <p id="footer-note" class="footer-note">Día Cero · En silencio</p>
+            <p id="footer-note" class="footer-note">Día Cero · Sin prisas</p>
         </footer>
     </div>
 
@@ -2486,6 +2548,193 @@
             const prevActBtn = document.getElementById('prev-act-btn');
             const actCounterEl = document.getElementById('act-counter');
             const footerNoteEl = document.getElementById('footer-note');
+            const sfxToggleBtn = document.getElementById('sfx-toggle-btn');
+            const sfxIconOn = document.getElementById('sfx-icon-on');
+            const sfxIconOff = document.getElementById('sfx-icon-off');
+
+            /* ─── 0. Motor de efectos de sonido sutiles (Web Audio API · 0 música de fondo) ─── */
+            const DiaCeroSFX = (function createDiaCeroSFX() {
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                let ctx = null;
+                let unlocked = false;
+                let muted = false;
+                const buffers = new Map();
+                const inflight = new Map();
+                const lastPlayed = new Map();
+
+                try {
+                    muted = localStorage.getItem('yaire_dia_cero_sfx_muted') === '1';
+                } catch (_) {}
+
+                const CORE_PATHS = [
+                    'sounds/navegacion.wav',
+                    'sounds/navegarcarta.mp3',
+                    'sounds/entrarcarta.mp3',
+                    'sounds/revelacion.wav',
+                    'sounds/toggle_on.wav',
+                    'sounds/toggle_off.wav',
+                    'sounds/abrirtusecreto.mp3',
+                    'sounds/sliderbajo.wav',
+                    'sounds/slideralto.wav',
+                    'sounds/dedicatoriacarta.mp3',
+                    'sounds/clickgirasol.wav',
+                    'sounds/correcto.wav',
+                    'sounds/secret.wav',
+                    'sounds/celebration.wav',
+                    'sounds/dclf/pagina.wav',
+                    'sounds/dclf/clock_tick.wav',
+                    'sounds/dclf/ui_click.wav',
+                    'sounds/dclf/phone_open.wav',
+                    'sounds/dclf/phone_close.wav',
+                    'sounds/dclf/phone_msg.wav',
+                    'sounds/dclf/wood_tap.wav'
+                ];
+
+                function ensureContext() {
+                    if (!AudioCtx) return null;
+                    if (!ctx) {
+                        try { ctx = new AudioCtx(); } catch (_) { ctx = null; }
+                    }
+                    return ctx;
+                }
+
+                function loadBuffer(path) {
+                    if (buffers.has(path)) return Promise.resolve(buffers.get(path));
+                    if (inflight.has(path)) return inflight.get(path);
+                    const audioCtx = ensureContext();
+                    if (!audioCtx) return Promise.resolve(null);
+
+                    const p = fetch(path)
+                        .then((r) => (r.ok ? r.arrayBuffer() : null))
+                        .then((ab) => (ab ? audioCtx.decodeAudioData(ab) : null))
+                        .then((decoded) => {
+                            if (decoded) buffers.set(path, decoded);
+                            inflight.delete(path);
+                            return decoded;
+                        })
+                        .catch(() => {
+                            inflight.delete(path);
+                            return null;
+                        });
+
+                    inflight.set(path, p);
+                    return p;
+                }
+
+                let preloaded = false;
+                function preloadAll() {
+                    if (preloaded || !AudioCtx) return;
+                    preloaded = true;
+                    CORE_PATHS.forEach((p) => { loadBuffer(p); });
+                }
+
+                function unlockAudio() {
+                    const audioCtx = ensureContext();
+                    if (!audioCtx) return;
+                    if (audioCtx.state === 'suspended') {
+                        audioCtx.resume().catch(() => {});
+                    }
+                    if (!unlocked) {
+                        unlocked = true;
+                        try {
+                            const silent = audioCtx.createBuffer(1, 1, 22050);
+                            const src = audioCtx.createBufferSource();
+                            src.buffer = silent;
+                            src.connect(audioCtx.destination);
+                            src.start(0);
+                        } catch (_) {}
+                        preloadAll();
+                    }
+                }
+
+                ['pointerdown', 'keydown', 'touchstart'].forEach((ev) => {
+                    window.addEventListener(ev, unlockAudio, { passive: true, capture: true });
+                });
+
+                if (typeof window.requestIdleCallback === 'function') {
+                    window.requestIdleCallback(() => preloadAll(), { timeout: 1500 });
+                } else {
+                    setTimeout(preloadAll, 700);
+                }
+
+                function play(path, opts) {
+                    if (muted || !AudioCtx) return;
+                    const o = opts || {};
+                    const key = o.cooldownKey || path;
+                    const minGap = o.cooldownMs != null ? o.cooldownMs : 45;
+                    const now = performance.now();
+                    if (now - (lastPlayed.get(key) || 0) < minGap) return;
+                    lastPlayed.set(key, now);
+
+                    const audioCtx = ensureContext();
+                    if (!audioCtx) return;
+                    if (audioCtx.state === 'suspended') {
+                        audioCtx.resume().catch(() => {});
+                    }
+
+                    const trigger = (buf) => {
+                        if (!buf || muted) return;
+                        try {
+                            const src = audioCtx.createBufferSource();
+                            src.buffer = buf;
+                            src.playbackRate.value = Math.max(0.5, Math.min(1.8, o.rate || 1.0));
+
+                            const gain = audioCtx.createGain();
+                            const vol = Math.max(0.01, Math.min(0.45, o.volume != null ? o.volume : 0.16));
+                            const startAt = audioCtx.currentTime + (o.delaySec || 0);
+                            gain.gain.setValueAtTime(vol, startAt);
+
+                            if (o.lowpassHz) {
+                                const filter = audioCtx.createBiquadFilter();
+                                filter.type = 'lowpass';
+                                filter.frequency.setValueAtTime(o.lowpassHz, startAt);
+                                src.connect(filter);
+                                filter.connect(gain);
+                            } else {
+                                src.connect(gain);
+                            }
+                            gain.connect(audioCtx.destination);
+                            src.start(startAt);
+                        } catch (_) {}
+                    };
+
+                    const cached = buffers.get(path);
+                    if (cached) {
+                        trigger(cached);
+                    } else {
+                        loadBuffer(path).then(trigger);
+                    }
+                }
+
+                function syncToggleUI() {
+                    if (!sfxToggleBtn) return;
+                    sfxToggleBtn.classList.toggle('is-muted', muted);
+                    if (sfxIconOn) sfxIconOn.style.display = muted ? 'none' : '';
+                    if (sfxIconOff) sfxIconOff.style.display = muted ? '' : 'none';
+                    sfxToggleBtn.setAttribute('aria-label', muted ? 'Activar efectos de sonido sutiles' : 'Silenciar efectos de sonido sutiles');
+                    sfxToggleBtn.setAttribute('title', muted ? 'Efectos sutiles silenciados' : 'Efectos sutiles activados');
+                }
+
+                function toggleMute() {
+                    unlockAudio();
+                    muted = !muted;
+                    try {
+                        localStorage.setItem('yaire_dia_cero_sfx_muted', muted ? '1' : '0');
+                    } catch (_) {}
+                    syncToggleUI();
+                    updateFooterNote();
+                    if (!muted) {
+                        play('sounds/toggle_on.wav', { volume: 0.13, rate: 1.02, cooldownKey: 'mute_toggle', cooldownMs: 60 });
+                    }
+                }
+
+                return {
+                    play: play,
+                    isMuted: () => muted,
+                    syncToggleUI: syncToggleUI,
+                    toggleMute: toggleMute
+                };
+            })();
 
             function updateFooterNote() {
                 if (!footerNoteEl) return;
@@ -2493,10 +2742,42 @@
                     footerNoteEl.textContent = 'Vista previa segura · No sobrescribe la respuesta real';
                     return;
                 }
+                const sfxTag = DiaCeroSFX.isMuted() ? 'Sonido silenciado' : 'Sin prisas';
                 footerNoteEl.textContent = isFinePointer
-                    ? 'Día Cero · En silencio · Teclas ← → disponibles'
-                    : 'Día Cero · En silencio';
+                    ? 'Día Cero · ' + sfxTag + ' · Teclas ← → disponibles'
+                    : 'Día Cero · ' + sfxTag;
             }
+
+            DiaCeroSFX.syncToggleUI();
+            if (sfxToggleBtn) {
+                sfxToggleBtn.addEventListener('click', () => {
+                    pulseHaptic(6);
+                    DiaCeroSFX.toggleMute();
+                });
+            }
+
+            /* Roce sonoro ultradelicado al pasar el cursor en PC sobre controles activos */
+            let lastHoverEl = null;
+            document.addEventListener('pointerover', (e) => {
+                if (!isFinePointer) return;
+                const el = e.target && e.target.closest
+                    ? e.target.closest('.btn-primary:not(:disabled), .back-pill, .sfx-pill, .noise-chip:not(.is-dissolved), .promise-row, .truth-pill-btn, .truth-arrow-btn:not(:disabled), .btn-quiet')
+                    : null;
+                if (!el || el === lastHoverEl) return;
+                lastHoverEl = el;
+                DiaCeroSFX.play('sounds/navegacion.wav', {
+                    volume: 0.06,
+                    rate: 1.05,
+                    lowpassHz: 2500,
+                    cooldownKey: 'ui_hover',
+                    cooldownMs: 125
+                });
+            }, { passive: true });
+            document.addEventListener('pointerout', (e) => {
+                if (lastHoverEl && e.target && !lastHoverEl.contains(e.relatedTarget)) {
+                    lastHoverEl = null;
+                }
+            }, { passive: true });
 
             /* ─── Adaptación automática de textos según método de entrada (PC vs Celular) ─── */
             let rawPointerFine = finePointerMql.matches;
@@ -2744,12 +3025,10 @@
                 requestAnimationFrame(renderAura);
             })();
 
-            /* ─── 3. Motor físico 2D: polvo estelar interactivo, ondas de choque, gotas y pétalos ─── */
+            /* ─── 3. Motor de ondas radiales sutiles (0 confeti / 0 partículas flotantes) ─── */
             const moteCanvas = document.getElementById('mote-canvas');
             const moteCtx = moteCanvas ? moteCanvas.getContext('2d') : null;
-            const motes = [];
             const shockRings = [];
-            const ambientDust = [];
 
             function resizeMotes() {
                 if (!moteCanvas) return;
@@ -2760,21 +3039,6 @@
             }
             window.addEventListener('resize', resizeMotes, { passive: true });
             resizeMotes();
-
-            if (!prefersReducedMotion) {
-                const dustCount = window.innerWidth >= 1024 ? 14 : 8;
-                for (let i = 0; i < dustCount; i++) {
-                    ambientDust.push({
-                        x: Math.random() * window.innerWidth,
-                        y: Math.random() * window.innerHeight,
-                        vx: (Math.random() - 0.5) * 0.18,
-                        vy: -0.08 - Math.random() * 0.16,
-                        r: 0.9 + Math.random() * 1.35,
-                        phase: Math.random() * Math.PI * 2,
-                        warm: i % 2 === 0
-                    });
-                }
-            }
 
             function spawnRing(x, y, maxRadius, warmTone) {
                 if (prefersReducedMotion || !moteCtx) return;
@@ -2788,122 +3052,29 @@
                 });
             }
 
-            function spawnMotes(x, y, count, warmPalette, opts) {
-                if (prefersReducedMotion || !moteCtx) return;
-                const options = opts || {};
-                const spreadX = options.spreadX != null ? options.spreadX : 40;
-                const spreadY = options.spreadY != null ? options.spreadY : 16;
-                const gravity = options.gravity != null ? options.gravity : -0.012;
-                const asPetals = !!options.petals;
-
-                for (let i = 0; i < count; i++) {
-                    const angle = Math.random() * Math.PI * 2;
-                    const speed = (options.speedBase || 0.5) + Math.random() * (options.speedRange || 2.3);
-                    motes.push({
-                        x: x + (Math.random() - 0.5) * spreadX,
-                        y: y + (Math.random() - 0.5) * spreadY,
-                        vx: Math.cos(angle) * speed * 0.72 + (options.biasVx || 0),
-                        vy: (options.droplet ? (0.3 + Math.random() * 1.1) : (-0.65 - Math.random() * 1.9)) + (options.biasVy || 0),
-                        gravity: gravity,
-                        drag: options.droplet ? 0.985 : 0.992,
-                        size: asPetals ? (2.2 + Math.random() * 2.6) : (1.15 + Math.random() * 2.1),
-                        rot: Math.random() * Math.PI * 2,
-                        vRot: (Math.random() - 0.5) * 0.12,
-                        petal: asPetals && i % 2 === 0,
-                        life: 1,
-                        decay: (options.decayBase || 0.014) + Math.random() * 0.014,
-                        color: warmPalette
-                            ? (Math.random() > 0.40 ? '232, 189, 131' : '230, 154, 184')
-                            : '247, 244, 238'
-                    });
-                }
-            }
-
-            (function renderMotes(now) {
+            (function renderShockRings() {
                 if (moteCtx && moteCanvas && !document.hidden) {
                     const W = window.innerWidth;
                     const H = window.innerHeight;
                     moteCtx.clearRect(0, 0, W, H);
 
-                    /* Polvo estelar ambiental con estela fluida ante el dedo/cursor */
-                    for (let i = 0; i < ambientDust.length; i++) {
-                        const d = ambientDust[i];
-                        const dx = d.x - ptrScreen.x;
-                        const dy = d.y - ptrScreen.y;
-                        const distSq = dx * dx + dy * dy;
-                        if (distSq < 14400 && distSq > 4) {
-                            const dist = Math.sqrt(distSq);
-                            const push = (1 - dist / 120) * 0.045;
-                            d.vx += (dx / dist) * push + ptrScreen.vx * 0.003;
-                            d.vy += (dy / dist) * push + ptrScreen.vy * 0.003;
-                        }
-                        d.vx *= 0.985;
-                        d.vy = d.vy * 0.985 - 0.0022;
-                        d.x += d.vx + Math.sin((now || 0) * 0.0007 + d.phase) * 0.12;
-                        d.y += d.vy;
-                        if (d.y < -10) { d.y = H + 10; d.x = Math.random() * W; }
-                        if (d.x < -10) d.x = W + 10;
-                        if (d.x > W + 10) d.x = -10;
-
-                        const twinkle = 0.11 + 0.09 * Math.sin((now || 0) * 0.0018 + d.phase);
-                        const col = auraCurrentWarmth > 0.35
-                            ? (d.warm ? '232, 189, 131' : '230, 154, 184')
-                            : '244, 239, 231';
-                        moteCtx.fillStyle = 'rgba(' + col + ',' + twinkle.toFixed(3) + ')';
-                        moteCtx.beginPath();
-                        moteCtx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
-                        moteCtx.fill();
-                    }
-                    ptrScreen.vx *= 0.9;
-                    ptrScreen.vy *= 0.9;
-
-                    /* Ondas de choque radiales (hairline shockwaves) */
                     for (let i = shockRings.length - 1; i >= 0; i--) {
                         const sr = shockRings[i];
                         sr.r += (sr.maxR - sr.r) * 0.11;
-                        sr.life -= 0.028;
+                        sr.life -= 0.032;
                         if (sr.life <= 0) {
                             shockRings.splice(i, 1);
                             continue;
                         }
-                        moteCtx.strokeStyle = 'rgba(' + sr.color + ',' + (sr.life * 0.46).toFixed(3) + ')';
-                        moteCtx.lineWidth = 1.25;
+                        moteCtx.strokeStyle = 'rgba(' + sr.color + ',' + (sr.life * 0.42).toFixed(3) + ')';
+                        moteCtx.lineWidth = 1.15;
                         moteCtx.beginPath();
                         moteCtx.arc(sr.x, sr.y, sr.r, 0, Math.PI * 2);
                         moteCtx.stroke();
                     }
-
-                    /* Partículas, gotas de condensación y pétalos botánicos */
-                    for (let i = motes.length - 1; i >= 0; i--) {
-                        const m = motes[i];
-                        m.vx *= m.drag;
-                        m.vy = m.vy * m.drag + m.gravity;
-                        m.x += m.vx;
-                        m.y += m.vy;
-                        m.rot += m.vRot;
-                        m.life -= m.decay;
-                        if (m.life <= 0) {
-                            motes.splice(i, 1);
-                            continue;
-                        }
-                        moteCtx.fillStyle = 'rgba(' + m.color + ',' + (m.life * 0.86).toFixed(3) + ')';
-                        if (m.petal) {
-                            moteCtx.save();
-                            moteCtx.translate(m.x, m.y);
-                            moteCtx.rotate(m.rot);
-                            moteCtx.beginPath();
-                            moteCtx.ellipse(0, 0, m.size * 1.35, m.size * 0.62, 0, 0, Math.PI * 2);
-                            moteCtx.fill();
-                            moteCtx.restore();
-                        } else {
-                            moteCtx.beginPath();
-                            moteCtx.arc(m.x, m.y, m.size, 0, Math.PI * 2);
-                            moteCtx.fill();
-                        }
-                    }
                 }
-                requestAnimationFrame(renderMotes);
-            })(performance.now());
+                requestAnimationFrame(renderShockRings);
+            })();
 
             /* ─── 4. Orquestador de los 10 Actos con dirección espacial coherente ─── */
             let currentAct = 1;
@@ -2937,6 +3108,15 @@
                 const dir = nextAct > currentAct ? 'forward' : 'back';
                 transitioningAct = true;
                 currentAct = nextAct;
+                shockRings.length = 0;
+
+                if (nextAct !== 11) {
+                    if (dir === 'forward') {
+                        DiaCeroSFX.play('sounds/navegarcarta.mp3', { volume: 0.18, rate: 1.0, cooldownKey: 'act_nav', cooldownMs: 180 });
+                    } else {
+                        DiaCeroSFX.play('sounds/dclf/pagina.wav', { volume: 0.15, rate: 0.96, cooldownKey: 'act_nav', cooldownMs: 150 });
+                    }
+                }
 
                 if (nextAct <= TOTAL_ACTS && nextAct > highestReachedAct) {
                     highestReachedAct = nextAct;
@@ -3046,6 +3226,7 @@
                 let unlocked = false;
                 let lastX = 0;
                 let lastT = 0;
+                let lastTickBand = 0;
 
                 function getMaxX() {
                     return Math.max(1, rail.clientWidth - thumb.offsetWidth - 10);
@@ -3062,6 +3243,19 @@
                     const clamped = Math.max(0, Math.min(maxX, rawX));
                     pos = clamped;
                     const ratio = clamped / maxX;
+
+                    if (dragging && !unlocked) {
+                        const band = Math.floor(ratio * 6);
+                        if (band !== lastTickBand) {
+                            lastTickBand = band;
+                            DiaCeroSFX.play('sounds/dclf/clock_tick.wav', {
+                                volume: 0.068,
+                                rate: 0.90 + ratio * 0.28,
+                                cooldownKey: 'act1_tick',
+                                cooldownMs: 65
+                            });
+                        }
+                    }
 
                     const stretch = prefersReducedMotion ? 1 : (1 + Math.min(0.075, Math.abs(vel) / 2800));
                     const squash = prefersReducedMotion ? 1 : (1 / Math.sqrt(stretch));
@@ -3085,11 +3279,9 @@
                     targetPos = getMaxX();
                     applyPos(targetPos);
                     pulseHaptic(14);
+                    DiaCeroSFX.play('sounds/entrarcarta.mp3', { volume: 0.25, rate: 1.0, cooldownKey: 'act1_unlock', cooldownMs: 300 });
                     const r = thumb.getBoundingClientRect();
-                    const cx = r.left + r.width / 2;
-                    const cy = r.top + r.height / 2;
-                    spawnRing(cx, cy, 96, 'amber');
-                    spawnMotes(cx, cy, 28, true, { petals: true });
+                    spawnRing(r.left + r.width / 2, r.top + r.height / 2, 96, 'amber');
                     setTimeout(() => goToAct(2), 250);
                 }
 
@@ -3120,6 +3312,7 @@
                     targetPos = 0;
                     pos = 0;
                     vel = 0;
+                    lastTickBand = 0;
                     applyPos(0);
                 };
 
@@ -3131,6 +3324,7 @@
                     if (unlocked) return;
                     dragging = true;
                     rail.setPointerCapture(e.pointerId);
+                    DiaCeroSFX.play('sounds/dclf/ui_click.wav', { volume: 0.085, rate: 0.96, cooldownKey: 'act1_grab', cooldownMs: 90 });
                     const thumbRect = thumb.getBoundingClientRect();
                     if (e.clientX >= thumbRect.left && e.clientX <= thumbRect.right) {
                         grabOffset = e.clientX - thumbRect.left;
@@ -3182,30 +3376,80 @@
                 });
             })();
 
-            /* ─── ACTO 2: Cristal empañado con microgotas de condensación y gravedad ─── */
+            /* ─── ACTO 2: Cristal empañado hiperrealista (vaho multicapa, refracción desenfocada, microgotas 3D y borde húmedo) ─── */
             (function setupAct2Frost() {
                 const frame = document.getElementById('frost-frame');
                 const canvas = document.getElementById('frost-canvas');
+                const wetCanvas = document.getElementById('frost-wet-canvas');
+                const truthEl = frame ? frame.querySelector('.frost-hidden-truth') : null;
                 const statusEl = document.getElementById('frost-status');
                 const nextBtn = document.getElementById('act2-next-btn');
                 if (!frame || !canvas) return;
 
                 const ctx = canvas.getContext('2d');
-                const COLS = 12;
-                const ROWS = 6;
-                let cells = new Uint8Array(COLS * ROWS);
-                let clearedCount = 0;
+                const wetCtx = wetCanvas ? wetCanvas.getContext('2d') : null;
+
+                /* Malla fina de densidad de vaho sobre la zona real de lectura */
+                const COLS = 36;
+                const ROWS = 18;
+                const C_START = 4;
+                const C_END = 31;
+                const R_START = 2;
+                const R_END = 15;
+                const READING_CELLS = (C_END - C_START + 1) * (R_END - R_START + 1);
+
+                let fogGrid = new Float32Array(COLS * ROWS);
+                let maxShownPct = 0;
                 let frostCleared = false;
                 let wiping = false;
                 let prevPt = null;
                 let cssW = 0;
                 let cssH = 0;
-                let lastDropT = 0;
+                let lastTrickleSpawn = 0;
 
-                function paintFrostSurface() {
+                const wetBeads = [];
+                const wetDrops = [];
+
+                function seeded(n) {
+                    const x = Math.sin(n * 127.1 + 311.7) * 43758.5453;
+                    return x - Math.floor(x);
+                }
+
+                function drawBlurredRefractedQuote(targetCtx, w, h) {
+                    /* Luminiscencia cálida profundamente desenfocada detrás del vaho (sin letras dobles) */
+                    const glowBands = [
+                        { y: 0.34, rx: 0.33, ry: 0.085, col: '244, 239, 231', a: 0.075 },
+                        { y: 0.45, rx: 0.36, ry: 0.085, col: '244, 239, 231', a: 0.082 },
+                        { y: 0.56, rx: 0.34, ry: 0.090, col: '232, 189, 131', a: 0.095 },
+                        { y: 0.67, rx: 0.30, ry: 0.085, col: '244, 239, 231', a: 0.072 }
+                    ];
+                    targetCtx.save();
+                    for (let i = 0; i < glowBands.length; i++) {
+                        const b = glowBands[i];
+                        targetCtx.save();
+                        targetCtx.translate(w * 0.5, h * b.y);
+                        targetCtx.scale(w * b.rx, h * b.ry);
+                        const rg = targetCtx.createRadialGradient(0, 0, 0.05, 0, 0, 1.0);
+                        rg.addColorStop(0, 'rgba(' + b.col + ',' + b.a + ')');
+                        rg.addColorStop(0.55, 'rgba(' + b.col + ',' + (b.a * 0.45).toFixed(3) + ')');
+                        rg.addColorStop(1, 'rgba(' + b.col + ',0)');
+                        targetCtx.fillStyle = rg;
+                        targetCtx.beginPath();
+                        targetCtx.arc(0, 0, 1.0, 0, Math.PI * 2);
+                        targetCtx.fill();
+                        targetCtx.restore();
+                    }
+                    targetCtx.restore();
+                }
+
+                function paintFrostSurface(forceReset) {
                     if (!ctx || frostCleared) return;
                     const rect = frame.getBoundingClientRect();
                     if (rect.width < 10 || rect.height < 10) return;
+                    if (!forceReset && cssW > 0 && Math.abs(rect.width - cssW) < 3 && Math.abs(rect.height - cssH) < 3) {
+                        return;
+                    }
+
                     const dpr = Math.min(window.devicePixelRatio || 1, 2);
                     cssW = rect.width;
                     cssH = rect.height;
@@ -3213,58 +3457,192 @@
                     canvas.height = Math.floor(cssH * dpr);
                     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
+                    if (wetCanvas && wetCtx) {
+                        wetCanvas.width = Math.floor(cssW * dpr);
+                        wetCanvas.height = Math.floor(cssH * dpr);
+                        wetCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+                        wetCtx.clearRect(0, 0, cssW, cssH);
+                    }
+
                     ctx.globalCompositeOperation = 'source-over';
-                    const grad = ctx.createLinearGradient(0, 0, cssW, cssH);
-                    grad.addColorStop(0, '#18181b');
-                    grad.addColorStop(0.5, '#222024');
-                    grad.addColorStop(1, '#151417');
-                    ctx.fillStyle = grad;
+
+                    /* 1. Base opaca de cristal oscuro condensado (impide fuga nítida antes de frotar) */
+                    const baseGrad = ctx.createLinearGradient(0, 0, cssW, cssH);
+                    baseGrad.addColorStop(0, '#14161c');
+                    baseGrad.addColorStop(0.52, '#1d2028');
+                    baseGrad.addColorStop(1, '#12141a');
+                    ctx.fillStyle = baseGrad;
                     ctx.fillRect(0, 0, cssW, cssH);
 
-                    /* Grano cristalino y microgotas de vaho */
-                    ctx.fillStyle = 'rgba(247, 244, 238, 0.05)';
-                    for (let i = 0; i < 260; i++) {
-                        const gx = (Math.sin(i * 91.7) * 0.5 + 0.5) * cssW;
-                        const gy = (Math.cos(i * 47.3) * 0.5 + 0.5) * cssH;
-                        ctx.fillRect(gx, gy, 1.5, 1.5);
-                    }
-                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.055)';
-                    ctx.lineWidth = 1;
-                    for (let j = 0; j < 26; j++) {
-                        const dx = (Math.sin(j * 37.2) * 0.44 + 0.5) * cssW;
-                        const dy = (Math.cos(j * 63.9) * 0.42 + 0.5) * cssH;
-                        const dr = 1.6 + (j % 3) * 0.9;
-                        ctx.beginPath();
-                        ctx.arc(dx, dy, dr, 0, Math.PI * 2);
-                        ctx.stroke();
+                    /* 2. Silueta óptica desenfocada de las letras reales detrás del vaho */
+                    drawBlurredRefractedQuote(ctx, cssW, cssH);
+
+                    /* 3. Nubes orgánicas de aliento/vapor (más densas al centro) */
+                    const clouds = [
+                        { x: 0.50, y: 0.50, r: 0.62, a: 0.11 },
+                        { x: 0.30, y: 0.42, r: 0.44, a: 0.085 },
+                        { x: 0.71, y: 0.56, r: 0.46, a: 0.085 },
+                        { x: 0.46, y: 0.28, r: 0.36, a: 0.065 },
+                        { x: 0.58, y: 0.74, r: 0.38, a: 0.065 },
+                        { x: 0.18, y: 0.66, r: 0.34, a: 0.05 },
+                        { x: 0.83, y: 0.32, r: 0.33, a: 0.05 }
+                    ];
+                    const maxDim = Math.max(cssW, cssH);
+                    for (let c = 0; c < clouds.length; c++) {
+                        const cl = clouds[c];
+                        const cx = cl.x * cssW;
+                        const cy = cl.y * cssH;
+                        const cr = cl.r * maxDim;
+                        const cg = ctx.createRadialGradient(cx, cy, cr * 0.06, cx, cy, cr);
+                        cg.addColorStop(0, 'rgba(222, 229, 240, ' + cl.a + ')');
+                        cg.addColorStop(0.55, 'rgba(205, 213, 226, ' + (cl.a * 0.52).toFixed(3) + ')');
+                        cg.addColorStop(1, 'rgba(180, 190, 206, 0)');
+                        ctx.fillStyle = cg;
+                        ctx.fillRect(0, 0, cssW, cssH);
                     }
 
-                    ctx.fillStyle = 'rgba(244, 239, 231, 0.62)';
-                    ctx.font = '500 13px "Plus Jakarta Sans", sans-serif';
-                    ctx.textAlign = 'center';
-                    ctx.textBaseline = 'middle';
-                    const promptTxt = isFinePointer
-                        ? 'Pasa el cursor aquí para desempañar'
-                        : 'Pasa tu dedo aquí para desempañar';
-                    ctx.fillText(promptTxt, cssW / 2, cssH / 2);
+                    /* 4. Reflejo diagonal sutil de lámina de vidrio */
+                    const sheen = ctx.createLinearGradient(0, 0, cssW * 0.85, cssH);
+                    sheen.addColorStop(0, 'rgba(255, 255, 255, 0.045)');
+                    sheen.addColorStop(0.36, 'rgba(255, 255, 255, 0.012)');
+                    sheen.addColorStop(0.52, 'rgba(255, 255, 255, 0.038)');
+                    sheen.addColorStop(1, 'rgba(255, 255, 255, 0.005)');
+                    ctx.fillStyle = sheen;
+                    ctx.fillRect(0, 0, cssW, cssH);
 
-                    cells = new Uint8Array(COLS * ROWS);
-                    clearedCount = 0;
+                    /* 5. Microgotas 3D de condensación real (rocío fino + gotas coalescidas con brillo especular) */
+                    for (let i = 0; i < 420; i++) {
+                        const rx = seeded(i * 3.17 + 1.1);
+                        const ry = seeded(i * 7.91 + 2.3);
+                        const tier = seeded(i * 13.37 + 5.7);
+                        const dx = (0.02 + rx * 0.96) * cssW;
+                        const dy = (0.04 + ry * 0.92) * cssH;
+
+                        if (tier < 0.67) {
+                            /* Rocío microscópico de vaho */
+                            const r = 0.52 + seeded(i * 2.1) * 0.48;
+                            ctx.fillStyle = 'rgba(238, 242, 248, 0.135)';
+                            ctx.beginPath();
+                            ctx.arc(dx, dy, r, 0, Math.PI * 2);
+                            ctx.fill();
+                        } else if (tier < 0.92) {
+                            /* Microgota media con sombra inferior y destello superior */
+                            const r = 1.05 + seeded(i * 4.7) * 0.65;
+                            ctx.fillStyle = 'rgba(7, 8, 12, 0.30)';
+                            ctx.beginPath();
+                            ctx.arc(dx + r * 0.24, dy + r * 0.30, r * 0.95, 0, Math.PI * 2);
+                            ctx.fill();
+
+                            ctx.fillStyle = 'rgba(228, 234, 244, 0.16)';
+                            ctx.beginPath();
+                            ctx.arc(dx, dy, r, 0, Math.PI * 2);
+                            ctx.fill();
+
+                            ctx.fillStyle = 'rgba(255, 253, 248, 0.30)';
+                            ctx.beginPath();
+                            ctx.arc(dx - r * 0.28, dy - r * 0.28, Math.max(0.45, r * 0.36), 0, Math.PI * 2);
+                            ctx.fill();
+                        } else {
+                            /* Gota de condensación mayor a punto de escurrir */
+                            const r = 1.75 + seeded(i * 9.3) * 0.85;
+                            ctx.fillStyle = 'rgba(6, 7, 11, 0.36)';
+                            ctx.beginPath();
+                            ctx.ellipse(dx + r * 0.2, dy + r * 0.34, r * 0.94, r * 1.04, 0, 0, Math.PI * 2);
+                            ctx.fill();
+
+                            ctx.fillStyle = 'rgba(225, 232, 242, 0.19)';
+                            ctx.beginPath();
+                            ctx.ellipse(dx, dy, r * 0.95, r * 1.06, 0, 0, Math.PI * 2);
+                            ctx.fill();
+
+                            ctx.fillStyle = 'rgba(255, 255, 255, 0.42)';
+                            ctx.beginPath();
+                            ctx.arc(dx - r * 0.3, dy - r * 0.32, Math.max(0.55, r * 0.32), 0, Math.PI * 2);
+                            ctx.fill();
+                        }
+                    }
+
+                    fogGrid.fill(1.0);
+                    maxShownPct = 0;
+                    wetBeads.length = 0;
+                    wetDrops.length = 0;
                 }
 
+                /* Bucle físico para el borde húmedo y gotas que escurren lentamente por gravedad */
+                let lastWetFrame = performance.now();
+                (function renderWetLayer(now) {
+                    const dt = Math.min(0.05, Math.max(0.001, (now - lastWetFrame) / 1000));
+                    lastWetFrame = now;
+                    if (currentAct === 2 && !frostCleared && wetCtx && cssW > 0 && cssH > 0 && !document.hidden) {
+                        wetCtx.clearRect(0, 0, cssW, cssH);
+
+                        for (let i = wetBeads.length - 1; i >= 0; i--) {
+                            const b = wetBeads[i];
+                            b.life -= dt * 0.38;
+                            if (b.life <= 0) {
+                                wetBeads.splice(i, 1);
+                                continue;
+                            }
+                            const a = b.life * 0.34;
+                            wetCtx.fillStyle = 'rgba(255, 252, 246,' + a.toFixed(3) + ')';
+                            wetCtx.beginPath();
+                            wetCtx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+                            wetCtx.fill();
+                        }
+
+                        for (let i = wetDrops.length - 1; i >= 0; i--) {
+                            const d = wetDrops[i];
+                            d.age += dt;
+                            if (d.age > d.holdSec && d.traveled < d.maxTravel) {
+                                const slip = d.speed * (0.65 + 0.35 * Math.sin(d.age * 9 + d.seed)) * dt;
+                                d.y += slip;
+                                d.x += Math.sin(d.y * 0.22 + d.seed) * 0.14;
+                                d.traveled += slip;
+                            } else if (d.traveled >= d.maxTravel) {
+                                d.life -= dt * 0.55;
+                            }
+                            if (d.life <= 0 || d.y > cssH - 4) {
+                                wetDrops.splice(i, 1);
+                                continue;
+                            }
+                            /* Rastro capilar muy tenue encima de la gota */
+                            if (d.traveled > 2) {
+                                wetCtx.strokeStyle = 'rgba(244, 239, 231,' + (d.life * 0.10).toFixed(3) + ')';
+                                wetCtx.lineWidth = d.r * 0.85;
+                                wetCtx.lineCap = 'round';
+                                wetCtx.beginPath();
+                                wetCtx.moveTo(d.x, d.y - Math.min(12, d.traveled));
+                                wetCtx.lineTo(d.x, d.y);
+                                wetCtx.stroke();
+                            }
+                            wetCtx.fillStyle = 'rgba(6, 7, 11,' + (d.life * 0.34).toFixed(3) + ')';
+                            wetCtx.beginPath();
+                            wetCtx.ellipse(d.x + 0.4, d.y + 0.65, d.r * 0.9, d.r * 1.15, 0, 0, Math.PI * 2);
+                            wetCtx.fill();
+
+                            wetCtx.fillStyle = 'rgba(255, 254, 250,' + (d.life * 0.46).toFixed(3) + ')';
+                            wetCtx.beginPath();
+                            wetCtx.arc(d.x - d.r * 0.25, d.y - d.r * 0.28, Math.max(0.6, d.r * 0.38), 0, Math.PI * 2);
+                            wetCtx.fill();
+                        }
+                    }
+                    requestAnimationFrame(renderWetLayer);
+                })(performance.now());
+
                 actMountHooks[2] = () => {
-                    if (!frostCleared) {
-                        requestAnimationFrame(paintFrostSurface);
+                    if (!frostCleared && cssW === 0) {
+                        requestAnimationFrame(() => paintFrostSurface(true));
                     }
                 };
                 window.addEventListener('resize', () => {
-                    if (currentAct === 2 && !frostCleared) paintFrostSurface();
+                    if (currentAct === 2 && !frostCleared) paintFrostSurface(false);
                 }, { passive: true });
 
                 function finishFrost() {
                     if (frostCleared) return;
                     frostCleared = true;
                     canvas.classList.add('is-cleared');
+                    wetCanvas?.classList.add('is-cleared');
                     frame.classList.add('is-revealed');
                     if (statusEl) {
                         statusEl.dataset.lockedCopy = '1';
@@ -3273,23 +3651,45 @@
                     }
                     if (nextBtn) nextBtn.disabled = false;
                     pulseHaptic(14);
+                    DiaCeroSFX.play('sounds/revelacion.wav', { volume: 0.24, rate: 1.0, cooldownKey: 'frost_done', cooldownMs: 400 });
                     const r = frame.getBoundingClientRect();
-                    const cx = r.left + r.width / 2;
-                    const cy = r.top + r.height / 2;
-                    spawnRing(cx, cy, 130, 'amber');
-                    spawnMotes(cx, cy, 30, true);
+                    spawnRing(r.left + r.width / 2, r.top + r.height / 2, 130, 'amber');
                 }
 
-                function eraseAt(localX, localY, radius, screenX, screenY) {
+                function computeReadingProgress() {
+                    let sumCleared = 0;
+                    let deepCount = 0;
+                    for (let r = R_START; r <= R_END; r++) {
+                        for (let c = C_START; c <= C_END; c++) {
+                            const f = fogGrid[r * COLS + c];
+                            sumCleared += (1 - f);
+                            if (f < 0.26) deepCount++;
+                        }
+                    }
+                    const meanCleared = sumCleared / READING_CELLS;
+                    const deepRatio = deepCount / READING_CELLS;
+                    return (meanCleared * 0.54 + deepRatio * 0.46) / 0.69;
+                }
+
+                function eraseAt(localX, localY, radius, visualAlpha, gridPower) {
                     if (!ctx || frostCleared || cssW <= 0 || cssH <= 0) return;
                     ctx.globalCompositeOperation = 'destination-out';
 
                     const pts = [];
+                    let dirX = 1;
+                    let dirY = 0;
+                    let strokeSpeed = 8;
+
                     if (prevPt) {
                         const dx = localX - prevPt.x;
                         const dy = localY - prevPt.y;
                         const dist = Math.hypot(dx, dy);
-                        const steps = Math.max(1, Math.ceil(dist / 9));
+                        strokeSpeed = dist;
+                        if (dist > 0.5) {
+                            dirX = dx / dist;
+                            dirY = dy / dist;
+                        }
+                        const steps = Math.max(1, Math.ceil(dist / 5));
                         for (let s = 1; s <= steps; s++) {
                             pts.push({ x: prevPt.x + (dx * s) / steps, y: prevPt.y + (dy * s) / steps });
                         }
@@ -3298,54 +3698,122 @@
                     }
                     prevPt = { x: localX, y: localY };
 
-                    const rad = radius || 34;
-                    const hitPad = rad * 0.65;
+                    /* Vector perpendicular para las estrías de la yema/cursor y el borde húmedo */
+                    const nx = -dirY;
+                    const ny = dirX;
+                    const rad = radius || 20;
+                    const lobes = [
+                        { off: 0, scale: 1.0, w: 1.0 },
+                        { off: -rad * 0.30, scale: 0.76, w: 0.62 },
+                        { off: rad * 0.28, scale: 0.74, w: 0.58 }
+                    ];
+
+                    let fogRemovedNow = 0;
+                    const hitR = rad * 0.92;
+
                     for (let i = 0; i < pts.length; i++) {
                         const p = pts[i];
-                        const g = ctx.createRadialGradient(p.x, p.y, 6, p.x, p.y, rad);
-                        g.addColorStop(0, 'rgba(0,0,0,1)');
-                        g.addColorStop(1, 'rgba(0,0,0,0)');
-                        ctx.fillStyle = g;
-                        ctx.beginPath();
-                        ctx.arc(p.x, p.y, rad, 0, Math.PI * 2);
-                        ctx.fill();
 
-                        const cMin = Math.max(0, Math.floor(((p.x - hitPad) / cssW) * COLS));
-                        const cMax = Math.min(COLS - 1, Math.floor(((p.x + hitPad) / cssW) * COLS));
-                        const rMin = Math.max(0, Math.floor(((p.y - hitPad) / cssH) * ROWS));
-                        const rMax = Math.min(ROWS - 1, Math.floor(((p.y + hitPad) / cssH) * ROWS));
+                        /* Borrado parcial por pasada: deja rastro realista en la 1ª pasada y despeja nítido al repasar */
+                        for (let l = 0; l < lobes.length; l++) {
+                            const lb = lobes[l];
+                            const lx = p.x + nx * lb.off;
+                            const ly = p.y + ny * lb.off;
+                            const lr = rad * lb.scale;
+                            const a0 = Math.min(0.75, visualAlpha * lb.w);
+                            const g = ctx.createRadialGradient(lx, ly, lr * 0.14, lx, ly, lr);
+                            g.addColorStop(0, 'rgba(0,0,0,' + a0.toFixed(3) + ')');
+                            g.addColorStop(0.58, 'rgba(0,0,0,' + (a0 * 0.52).toFixed(3) + ')');
+                            g.addColorStop(1, 'rgba(0,0,0,0)');
+                            ctx.fillStyle = g;
+                            ctx.beginPath();
+                            ctx.arc(lx, ly, lr, 0, Math.PI * 2);
+                            ctx.fill();
+                        }
+
+                        const cMin = Math.max(0, Math.floor(((p.x - hitR) / cssW) * COLS));
+                        const cMax = Math.min(COLS - 1, Math.floor(((p.x + hitR) / cssW) * COLS));
+                        const rMin = Math.max(0, Math.floor(((p.y - hitR) / cssH) * ROWS));
+                        const rMax = Math.min(ROWS - 1, Math.floor(((p.y + hitR) / cssH) * ROWS));
+
                         for (let r = rMin; r <= rMax; r++) {
+                            const cyCell = ((r + 0.5) / ROWS) * cssH;
                             for (let c = cMin; c <= cMax; c++) {
-                                const idx = r * COLS + c;
-                                if (!cells[idx]) {
-                                    cells[idx] = 1;
-                                    clearedCount++;
+                                const cxCell = ((c + 0.5) / COLS) * cssW;
+                                const dCell = Math.hypot(cxCell - p.x, cyCell - p.y);
+                                if (dCell < hitR) {
+                                    const falloff = Math.pow(1 - dCell / hitR, 1.35);
+                                    const idx = r * COLS + c;
+                                    const before = fogGrid[idx];
+                                    if (before > 0) {
+                                        const after = Math.max(0, before * (1 - gridPower * falloff * 0.52) - gridPower * falloff * 0.075);
+                                        fogRemovedNow += (before - after);
+                                        fogGrid[idx] = after;
+                                    }
                                 }
+                            }
+                        }
+
+                        /* Microperlas de agua desplazadas hacia las orillas del trazo */
+                        if (!prefersReducedMotion && fogRemovedNow > 0.08 && i % 3 === 0 && wetBeads.length < 88) {
+                            const side = (i % 2 === 0 ? 1 : -1) * rad * (0.78 + Math.random() * 0.22);
+                            const bx = p.x + nx * side;
+                            const by = p.y + ny * side;
+                            if (bx > 4 && bx < cssW - 4 && by > 4 && by < cssH - 4) {
+                                wetBeads.push({
+                                    x: bx,
+                                    y: by,
+                                    r: 0.7 + Math.random() * 0.85,
+                                    life: 0.85 + Math.random() * 0.35
+                                });
                             }
                         }
                     }
 
-                    /* Gotas sutiles de condensación con caída gravitatoria */
+                    /* Gota ocasional que se acumula en el borde inferior del trazo y escurre despacio */
                     const now = performance.now();
-                    if (screenX != null && now - lastDropT > 55) {
-                        lastDropT = now;
-                        spawnMotes(screenX, screenY, 2, false, {
-                            droplet: true,
-                            gravity: 0.055,
-                            spreadX: 14,
-                            spreadY: 8,
-                            speedBase: 0.15,
-                            speedRange: 0.55,
-                            decayBase: 0.024
+                    if (!prefersReducedMotion && fogRemovedNow > 0.22 && now - lastTrickleSpawn > 175 && wetDrops.length < 9) {
+                        lastTrickleSpawn = now;
+                        const dropX = localX + (Math.random() - 0.5) * rad * 0.9;
+                        const dropY = localY + rad * 0.58;
+                        if (dropX > 10 && dropX < cssW - 10 && dropY > 10 && dropY < cssH - 18) {
+                            wetDrops.push({
+                                x: dropX,
+                                y: dropY,
+                                r: 1.55 + Math.random() * 0.75,
+                                age: 0,
+                                holdSec: 0.16 + Math.random() * 0.24,
+                                speed: 12 + Math.random() * 11,
+                                traveled: 0,
+                                maxTravel: 14 + Math.random() * 20,
+                                life: 1,
+                                seed: Math.random() * 10
+                            });
+                        }
+                    }
+
+                    if (fogRemovedNow > 0.14 && strokeSpeed > 1.2) {
+                        DiaCeroSFX.play('sounds/dclf/pagina.wav', {
+                            volume: 0.048,
+                            rate: 0.82 + Math.min(0.30, strokeSpeed * 0.01),
+                            lowpassHz: 820,
+                            cooldownKey: 'frost_wipe',
+                            cooldownMs: 135
                         });
                     }
 
-                    const pct = Math.min(100, Math.round((clearedCount / (COLS * ROWS)) * 100));
-                    if (pct >= 46) {
+                    const rawProgress = computeReadingProgress();
+                    if (rawProgress >= 1.0) {
                         finishFrost();
                     } else if (statusEl) {
-                        statusEl.dataset.lockedCopy = '1';
-                        statusEl.textContent = 'Despejando… ' + Math.min(99, Math.round((pct / 46) * 100)) + '%';
+                        const pct = Math.min(99, Math.max(maxShownPct, Math.round(rawProgress * 100)));
+                        maxShownPct = pct;
+                        if (pct > 0) {
+                            statusEl.dataset.lockedCopy = '1';
+                            statusEl.textContent = pct < 35
+                                ? 'Desempañando el cristal… ' + pct + '%'
+                                : (pct < 78 ? 'Sigue frotando sobre las letras… ' + pct + '%' : 'Casi nítido… ' + pct + '%');
+                        }
                     }
                 }
 
@@ -3355,14 +3823,23 @@
                     prevPt = null;
                     canvas.setPointerCapture(e.pointerId);
                     const r = canvas.getBoundingClientRect();
-                    eraseAt(e.clientX - r.left, e.clientY - r.top, e.pointerType === 'mouse' ? 40 : 34, e.clientX, e.clientY);
+                    const pressRad = Math.max(23, Math.min(31, (cssH || r.height) * 0.16));
+                    eraseAt(e.clientX - r.left, e.clientY - r.top, pressRad, 0.44, 0.50);
                 });
 
                 canvas.addEventListener('pointermove', (e) => {
                     if (frostCleared) return;
                     if (!wiping && e.pointerType !== 'mouse') return;
                     const r = canvas.getBoundingClientRect();
-                    eraseAt(e.clientX - r.left, e.clientY - r.top, wiping ? 40 : 28, e.clientX, e.clientY);
+                    const hRef = cssH || r.height || 180;
+                    if (wiping) {
+                        const pressRad = Math.max(23, Math.min(31, hRef * 0.16));
+                        eraseAt(e.clientX - r.left, e.clientY - r.top, pressRad, 0.44, 0.50);
+                    } else {
+                        /* Al solo pasar el cursor sin presionar, el roce es más suave y requiere varias pasadas */
+                        const hoverRad = Math.max(20, Math.min(27, hRef * 0.138));
+                        eraseAt(e.clientX - r.left, e.clientY - r.top, hoverRad, 0.29, 0.36);
+                    }
                 });
 
                 canvas.addEventListener('pointerleave', () => {
@@ -3455,10 +3932,25 @@
                     }
 
                     spawnRing(cx, cy, 86, dissolvedSet.size >= 4 ? 'tulip' : 'amber');
-                    spawnMotes(cx, cy, 26, dissolvedSet.size >= 3, { petals: dissolvedSet.size === totalChips });
                     pulseHaptic(10);
 
                     const left = totalChips - dissolvedSet.size;
+                    if (left > 0) {
+                        DiaCeroSFX.play('sounds/toggle_off.wav', {
+                            volume: 0.145,
+                            rate: 0.92 + dissolvedSet.size * 0.045,
+                            cooldownKey: 'chip_' + id,
+                            cooldownMs: 35
+                        });
+                    } else {
+                        DiaCeroSFX.play('sounds/abrirtusecreto.mp3', {
+                            volume: 0.23,
+                            rate: 1.0,
+                            cooldownKey: 'chip_all_done',
+                            cooldownMs: 250
+                        });
+                    }
+
                     if (noiseCaption) {
                         noiseCaption.dataset.lockedCopy = '1';
                         if (left > 0) {
@@ -3530,6 +4022,7 @@
                 let orbScale = 1;
                 let orbVel = 0;
                 let done = false;
+                let midChimePlayed = false;
                 let lastT = performance.now();
 
                 function renderBreath(p, nowMs) {
@@ -3562,16 +4055,14 @@
                     btn.classList.remove('is-holding');
                     renderBreath(1, performance.now());
                     pulseHaptic([14, 30, 18]);
+                    DiaCeroSFX.play('sounds/dedicatoriacarta.mp3', { volume: 0.24, rate: 1.0, cooldownKey: 'breath_done', cooldownMs: 400 });
                     if (statusEl) {
                         statusEl.dataset.lockedCopy = '1';
                         statusEl.textContent = 'Así quiero tratarte incluso cuando pensemos distinto.';
                         statusEl.classList.add('is-lit');
                     }
                     const r = btn.getBoundingClientRect();
-                    const cx = r.left + r.width / 2;
-                    const cy = r.top + r.height / 2;
-                    spawnRing(cx, cy, 130, 'amber');
-                    spawnMotes(cx, cy, 32, true, { petals: true });
+                    spawnRing(r.left + r.width / 2, r.top + r.height / 2, 130, 'amber');
                     setTimeout(() => goToAct(5), 740);
                 }
 
@@ -3583,6 +4074,10 @@
                         if (!done) {
                             if (holding) {
                                 progress = Math.min(1, progress + dtMs / DURATION);
+                                if (progress >= 0.5 && !midChimePlayed) {
+                                    midChimePlayed = true;
+                                    DiaCeroSFX.play('sounds/dclf/wood_tap.wav', { volume: 0.085, rate: 0.86, lowpassHz: 480, cooldownKey: 'breath_mid', cooldownMs: 300 });
+                                }
                                 if (statusEl) {
                                     statusEl.textContent = progress < 0.5
                                         ? 'Respirando primero… sin suponer'
@@ -3591,6 +4086,7 @@
                                 if (progress >= 1) finishBreath();
                             } else if (progress > 0) {
                                 progress = Math.max(0, progress - dtMs / 720);
+                                if (progress < 0.35) midChimePlayed = false;
                             }
                         }
 
@@ -3614,6 +4110,7 @@
                     holding = true;
                     orbVel -= 0.45;
                     btn.classList.add('is-holding');
+                    DiaCeroSFX.play('sounds/sliderbajo.wav', { volume: 0.125, rate: 0.88, lowpassHz: 1400, cooldownKey: 'breath_start', cooldownMs: 180 });
                 }
                 function stopHold() {
                     if (done || !holding) return;
@@ -3663,6 +4160,7 @@
                 let lastX = 0;
                 let lastMoveT = performance.now();
                 let prevLoopT = performance.now();
+                let lastTickStep = 0;
 
                 function applyVisualRatio(raw) {
                     let r = Math.max(0, Math.min(1, raw));
@@ -3676,6 +4174,17 @@
                     if (usEl) usEl.textContent = pct + '%';
                     track.setAttribute('aria-valuenow', String(pct));
                     if (currentAct === 5) auraTargetBoost = r * 0.24;
+
+                    const stepBand = Math.floor(pct / 14);
+                    if (stepBand !== lastTickStep && pct < 100) {
+                        lastTickStep = stepBand;
+                        DiaCeroSFX.play('sounds/dclf/clock_tick.wav', {
+                            volume: 0.072,
+                            rate: 0.88 + r * 0.32,
+                            cooldownKey: 'act5_tick',
+                            cooldownMs: 58
+                        });
+                    }
 
                     if (fulcrum) {
                         const isLevel = pct === 100;
@@ -3698,11 +4207,9 @@
                         ratioVel = 0;
                         if (nextBtn) nextBtn.disabled = false;
                         pulseHaptic(14);
+                        DiaCeroSFX.play('sounds/slideralto.wav', { volume: 0.22, rate: 1.0, cooldownKey: 'act5_done', cooldownMs: 350 });
                         const kr = knob.getBoundingClientRect();
-                        const cx = kr.left + kr.width / 2;
-                        const cy = kr.top + kr.height / 2;
-                        spawnRing(cx, cy, 92, 'amber');
-                        spawnMotes(cx, cy, 28, true);
+                        spawnRing(kr.left + kr.width / 2, kr.top + kr.height / 2, 92, 'amber');
                     }
                 }
 
@@ -3743,6 +4250,7 @@
                     lastX = e.clientX;
                     lastMoveT = performance.now();
                     track.setPointerCapture(e.pointerId);
+                    DiaCeroSFX.play('sounds/dclf/ui_click.wav', { volume: 0.08, rate: 0.98, cooldownKey: 'act5_grab', cooldownMs: 90 });
                     updateFromPointer(e.clientX);
                 });
                 track.addEventListener('pointermove', (e) => {
@@ -3864,11 +4372,9 @@
                     }
                     if (nextBtn) nextBtn.disabled = false;
                     pulseHaptic([12, 28, 16]);
+                    DiaCeroSFX.play('sounds/revelacion.wav', { volume: 0.25, rate: 1.03, cooldownKey: 'bridge_union', cooldownMs: 400 });
                     const r = arena.getBoundingClientRect();
-                    const cx = r.left + r.width / 2;
-                    const cy = r.top + r.height / 2;
-                    spawnRing(cx, cy, 120, 'tulip');
-                    spawnMotes(cx, cy, 38, true, { petals: true });
+                    spawnRing(r.left + r.width / 2, r.top + r.height / 2, 120, 'tulip');
                 }
 
                 function onDrag(clientX) {
@@ -3904,6 +4410,7 @@
                     const nr = nodeYai.getBoundingClientRect();
                     grabDx = e.clientX - (nr.left + nr.width / 2);
                     nodeYai.setPointerCapture(e.pointerId);
+                    DiaCeroSFX.play('sounds/toggle_on.wav', { volume: 0.115, rate: 0.98, cooldownKey: 'bridge_grab', cooldownMs: 90 });
                 });
                 nodeYo.addEventListener('pointerdown', (e) => {
                     if (united) return;
@@ -3911,14 +4418,16 @@
                     const nr = nodeYo.getBoundingClientRect();
                     grabDx = e.clientX - (nr.left + nr.width / 2);
                     nodeYo.setPointerCapture(e.pointerId);
+                    DiaCeroSFX.play('sounds/toggle_on.wav', { volume: 0.115, rate: 1.03, cooldownKey: 'bridge_grab', cooldownMs: 90 });
                 });
                 arena.addEventListener('pointermove', (e) => onDrag(e.clientX));
 
                 function releaseNode() {
                     if (!activeNode) return;
                     activeNode = null;
-                    if (!united && !prefersReducedMotion) {
-                        stringVel = 135;
+                    if (!united) {
+                        if (!prefersReducedMotion) stringVel = 135;
+                        DiaCeroSFX.play('sounds/dclf/wood_tap.wav', { volume: 0.095, rate: 1.15, lowpassHz: 920, cooldownKey: 'bridge_pluck', cooldownMs: 120 });
                     }
                 }
                 window.addEventListener('pointerup', releaseNode);
@@ -3934,7 +4443,7 @@
                 });
             })();
 
-            /* ─── ACTO 7: Tres certezas con emblemas trazados y arrastre con mouse en PC ─── */
+            /* ─── ACTO 7: Tres certezas con emblemas trazados y arrastre con mouse en PC (0 confeti) ─── */
             (function setupAct7Truths() {
                 const track = document.getElementById('truths-track');
                 const slides = Array.from(document.querySelectorAll('#truths-track .truth-slide'));
@@ -3960,12 +4469,13 @@
                     if (prevArrow) prevArrow.disabled = activeIdx <= 0;
                     if (nextArrow) nextArrow.disabled = activeIdx >= 2;
 
-                    if (prevIdx !== activeIdx && slides[activeIdx]) {
-                        const em = slides[activeIdx].querySelector('.truth-emblem');
-                        if (em) {
-                            const r = em.getBoundingClientRect();
-                            spawnMotes(r.left + r.width / 2, r.top + r.height / 2, 10, true);
-                        }
+                    if (prevIdx !== activeIdx) {
+                        DiaCeroSFX.play('sounds/clickgirasol.wav', {
+                            volume: 0.16,
+                            rate: 0.96 + activeIdx * 0.05,
+                            cooldownKey: 'truth_slide',
+                            cooldownMs: 140
+                        });
                     }
 
                     if (seen.size >= 3 && nextBtn) {
@@ -4076,8 +4586,13 @@
                             row.classList.add('is-lit');
                             const rect = row.getBoundingClientRect();
                             spawnRing(rect.left + 14, rect.top + 22, 54, 'amber');
-                            spawnMotes(rect.left + 14, rect.top + 22, 16, true);
                             pulseHaptic(10);
+                            DiaCeroSFX.play('sounds/clickgirasol.wav', {
+                                volume: 0.185,
+                                rate: 0.92 + idx * 0.055,
+                                cooldownKey: 'promise_' + idx,
+                                cooldownMs: 60
+                            });
 
                             const rem = total - litPromises.size;
                             if (rem > 0) {
@@ -4085,9 +4600,17 @@
                             } else if (nextBtn) {
                                 nextBtn.disabled = false;
                                 if (nextLabel) nextLabel.textContent = 'Poner el reloj en cero';
+                                DiaCeroSFX.play('sounds/correcto.wav', {
+                                    volume: 0.17,
+                                    rate: 1.0,
+                                    delaySec: 0.09,
+                                    cooldownKey: 'promises_all',
+                                    cooldownMs: 300
+                                });
                             }
                         } else {
                             pulseHaptic(6);
+                            DiaCeroSFX.play('sounds/dclf/ui_click.wav', { volume: 0.095, rate: 1.02, cooldownKey: 'promise_toggle', cooldownMs: 70 });
                         }
 
                         if (isDesktopSplit) {
@@ -4146,6 +4669,14 @@
                     if (d !== lastTickInt) {
                         lastTickInt = d;
                         pulseHaptic(4);
+                        if (r > 0) {
+                            DiaCeroSFX.play('sounds/dclf/clock_tick.wav', {
+                                volume: 0.085,
+                                rate: 0.90 + (1 - r) * 0.26,
+                                cooldownKey: 'rewind_tick',
+                                cooldownMs: 42
+                            });
+                        }
                     }
 
                     if (!prefersReducedMotion) {
@@ -4160,11 +4691,9 @@
                         if (captionEl) captionEl.textContent = 'Día Cero · Cuenta limpia para Yaire y para mí';
                         if (nextBtn) nextBtn.disabled = false;
                         pulseHaptic([14, 26, 18]);
+                        DiaCeroSFX.play('sounds/correcto.wav', { volume: 0.23, rate: 1.0, cooldownKey: 'rewind_zero', cooldownMs: 400 });
                         const dr = digitsEl.getBoundingClientRect();
-                        const cx = dr.left + dr.width / 2;
-                        const cy = dr.top + dr.height / 2;
-                        spawnRing(cx, cy, 128, 'amber');
-                        spawnMotes(cx, cy, 38, true, { petals: true });
+                        spawnRing(dr.left + dr.width / 2, dr.top + dr.height / 2, 128, 'amber');
                     }
                 }
 
@@ -4193,6 +4722,7 @@
                     lastX = e.clientX;
                     lastMoveT = performance.now();
                     track.setPointerCapture(e.pointerId);
+                    DiaCeroSFX.play('sounds/dclf/ui_click.wav', { volume: 0.08, rate: 0.96, cooldownKey: 'rewind_grab', cooldownMs: 90 });
                     updateFromPointer(e.clientX);
                 });
                 track.addEventListener('pointermove', (e) => {
@@ -4219,7 +4749,7 @@
                 });
             })();
 
-            /* ─── ACTO 10 + EPÍLOGO: Sello con magnetismo orbital, pétalos y multi-mensaje ─── */
+            /* ─── ACTO 10 + EPÍLOGO: Sello con magnetismo orbital y multi-mensaje (0 confeti) ─── */
             const sealOrbitWrap = document.getElementById('seal-orbit-wrap');
             const sealBtn = document.getElementById('seal-btn');
             const sealCircle = document.getElementById('seal-progress-circle');
@@ -4235,6 +4765,7 @@
             let magY = 0;
             let magTargetX = 0;
             let magTargetY = 0;
+            let lastSealBeatStep = 0;
 
             if (sealOrbitWrap) {
                 sealOrbitWrap.addEventListener('pointermove', (e) => {
@@ -4279,13 +4810,15 @@
                     }
                 } catch (_) {}
 
+                DiaCeroSFX.play('sounds/secret.wav', { volume: 0.27, rate: 1.0, cooldownKey: 'seal_done', cooldownMs: 500 });
+                DiaCeroSFX.play('sounds/celebration.wav', { volume: 0.14, rate: 1.0, delaySec: 0.15, cooldownKey: 'seal_chime', cooldownMs: 500 });
+
                 if (sealBtn) {
                     const r = sealBtn.getBoundingClientRect();
                     const cx = r.left + r.width / 2;
                     const cy = r.top + r.height / 2;
                     spawnRing(cx, cy, 180, 'amber');
                     spawnRing(cx, cy, 125, 'tulip');
-                    spawnMotes(cx, cy, 76, true, { petals: true, spreadX: 54, spreadY: 54, speedRange: 3.2 });
                 }
                 pulseHaptic([24, 40, 36]);
 
@@ -4315,13 +4848,24 @@
                         if (holdingSeal) {
                             holdProgress = Math.min(1, holdProgress + dt / HOLD_DURATION_MS);
                             setSealVisual(holdProgress, now);
-                            if (Math.random() < 0.34 && sealBtn) {
-                                const r = sealBtn.getBoundingClientRect();
-                                spawnMotes(r.left + r.width / 2, r.top + r.height / 2, 2, true, { petals: true });
+
+                            const beatStep = Math.floor(holdProgress * 3);
+                            if (beatStep > lastSealBeatStep && beatStep < 3) {
+                                lastSealBeatStep = beatStep;
+                                DiaCeroSFX.play('sounds/dclf/wood_tap.wav', {
+                                    volume: 0.11,
+                                    rate: 0.82 + beatStep * 0.08,
+                                    lowpassHz: 420,
+                                    cooldownKey: 'seal_beat',
+                                    cooldownMs: 220
+                                });
+                                pulseHaptic(6);
                             }
+
                             if (holdProgress >= 1) completeSeal();
                         } else if (holdProgress > 0) {
                             holdProgress = Math.max(0, holdProgress - dt / 620);
+                            if (holdProgress < 0.25) lastSealBeatStep = 0;
                             setSealVisual(holdProgress, now);
                         }
                     }
@@ -4333,8 +4877,10 @@
                 if (sealCompleted) return;
                 if (e && e.cancelable) e.preventDefault();
                 holdingSeal = true;
+                lastSealBeatStep = 0;
                 sealBtn?.classList.add('is-holding');
                 sealOrbitWrap?.classList.add('is-holding');
+                DiaCeroSFX.play('sounds/dclf/wood_tap.wav', { volume: 0.105, rate: 0.80, lowpassHz: 420, cooldownKey: 'seal_start', cooldownMs: 180 });
                 if (sealHint) sealHint.textContent = 'Sigue manteniendo… empezando nuestro Día Cero';
             }
 
@@ -4380,6 +4926,12 @@
                 openTalkFirstBtn.addEventListener('click', () => {
                     const open = talkFirstDrawer.classList.toggle('is-open');
                     openTalkFirstBtn.textContent = open ? 'Ocultar mensaje' : 'Quiero decirte algo antes de responder';
+                    DiaCeroSFX.play(open ? 'sounds/dclf/phone_open.wav' : 'sounds/dclf/phone_close.wav', {
+                        volume: 0.13,
+                        rate: 1.0,
+                        cooldownKey: 'drawer_toggle',
+                        cooldownMs: 120
+                    });
                     if (open) {
                         setTimeout(() => {
                             talkFirstInput?.focus();
@@ -4416,8 +4968,9 @@
                     });
                     lastSentBeforeText = text;
                     pulseHaptic(14);
+                    DiaCeroSFX.play('sounds/dclf/phone_msg.wav', { volume: 0.21, rate: 1.0, cooldownKey: 'msg_sent', cooldownMs: 250 });
                     const br = sendTalkFirstBtn.getBoundingClientRect();
-                    spawnMotes(br.left + br.width / 2, br.top + br.height / 2, 18, true);
+                    spawnRing(br.left + br.width / 2, br.top + br.height / 2, 72, 'amber');
                     if (sendTalkFirstLabel) sendTalkFirstLabel.textContent = 'Mensaje enviado · Te leo ahora mismo';
                 });
             }
@@ -4449,6 +5002,7 @@
             }
 
             function navigateToMainWeb() {
+                DiaCeroSFX.play('sounds/entrarcarta.mp3', { volume: 0.22, rate: 1.0, cooldownKey: 'enter_main', cooldownMs: 400 });
                 try {
                     if (!isPreview) {
                         localStorage.setItem('yaire_dia_cero_done', '1');
@@ -4473,6 +5027,7 @@
                     const note = acceptedNoteInput ? acceptedNoteInput.value.trim() : '';
                     if (finishEnterLabel) finishEnterLabel.textContent = note ? 'Guardando tus palabras…' : 'Entrando a 28E…';
                     if (note) {
+                        DiaCeroSFX.play('sounds/dclf/phone_msg.wav', { volume: 0.20, rate: 1.0, cooldownKey: 'epilogue_msg', cooldownMs: 250 });
                         await appendDiaCeroMessage(note, 'Al decir que sí (Epílogo)', {
                             status: 'accepted',
                             accepted: true,
