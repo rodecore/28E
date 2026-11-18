@@ -681,6 +681,12 @@
 
     // ── CSS ────────────────────────────────────────────────────────────────
     _injectCSS() {
+      if (!document.getElementById('vc-boot-guard')) {
+        const guard = document.createElement('style');
+        guard.id = 'vc-boot-guard';
+        guard.textContent = '#vc-panel.vc-boot-hidden,#vc-backdrop.vc-boot-hidden,#vc-bar.vc-boot-hidden{opacity:0!important;visibility:hidden!important;pointer-events:none!important;transition:none!important;}';
+        document.head.appendChild(guard);
+      }
       if (document.getElementById('vc-styles')) return;
       const s = document.createElement('link');
       s.id = 'vc-styles';
@@ -907,6 +913,7 @@
       // Dark blurred backdrop matching #drawer-overlay
       this._backdrop = document.createElement('div');
       this._backdrop.id = 'vc-backdrop';
+      this._backdrop.className = 'vc-boot-hidden';
       this._backdrop.addEventListener('click', () => this._toggle());
       document.body.appendChild(this._backdrop);
 
@@ -924,7 +931,7 @@
 
       this.panel = document.createElement('div');
       this.panel.id = 'vc-panel';
-      this.panel.className = 'vc-panel-base';
+      this.panel.className = 'vc-panel-base opacity-0 pointer-events-none vc-boot-hidden';
       this.panel.setAttribute('role', 'dialog');
       this.panel.setAttribute('aria-modal', 'true');
       this.panel.setAttribute('aria-label', _t('vc_title'));
@@ -944,7 +951,7 @@
 
       this._bar = document.createElement('div');
       this._bar.id = 'vc-bar';
-      this._bar.className = 'vc-dock opacity-0';
+      this._bar.className = 'vc-dock opacity-0 vc-boot-hidden';
       this._bar.inert = true;
       this._bar.setAttribute('role', 'group');
       this._bar.setAttribute('aria-label', 'Afterglow');
@@ -967,6 +974,24 @@
       document.body.appendChild(this.panel);
       document.body.appendChild(this._bar);
       this._bar.querySelectorAll('button').forEach(button => this._bindGsapButton(button));
+
+      const releaseBootHidden = () => {
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            this._backdrop?.classList.remove('vc-boot-hidden');
+            this.panel?.classList.remove('vc-boot-hidden');
+            this._bar?.classList.remove('vc-boot-hidden');
+          });
+        });
+      };
+      const vcStyleEl = document.getElementById('vc-styles');
+      if (!vcStyleEl || vcStyleEl.sheet) {
+        releaseBootHidden();
+      } else {
+        vcStyleEl.addEventListener('load', releaseBootHidden, { once: true });
+        vcStyleEl.addEventListener('error', releaseBootHidden, { once: true });
+        setTimeout(releaseBootHidden, 600);
+      }
 
       this._updateBarLayout();
       window.addEventListener('resize', () => { this._updateBarLayout(); this._positionTabIndicator(); });
@@ -1162,6 +1187,9 @@
     }
 
     _toggle() {
+      this._backdrop?.classList.remove('vc-boot-hidden');
+      this.panel?.classList.remove('vc-boot-hidden');
+      this._bar?.classList.remove('vc-boot-hidden');
       this._dismissParticipantMenu?.();
       const willOpen = !this.panel.classList.contains('open') && !this.panel.classList.contains('scale-100');
       const panelStyle = window.gsap ? getComputedStyle(this.panel) : null;
