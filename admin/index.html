@@ -860,25 +860,25 @@
                                         <div class="flex gap-3 mb-4">
                                             <button type="button" id="maint-pill-indefinite"
                                                 onclick="setMaintDuration('indefinite')"
-                                                class="maint-pill flex-1 py-2.5 px-4 rounded-xl text-sm font-bold border transition-all duration-200 border-amber-500 bg-amber-500/10 text-amber-400">
+                                                class="maint-pill flex-1 py-2.5 px-4 rounded-xl text-sm font-bold border transition-all duration-200 border-white/10 bg-white/5 text-zinc-400">
                                                 <i class="ph-bold ph-infinity mr-1.5"></i>Indefinido
                                             </button>
                                             <button type="button" id="maint-pill-scheduled"
                                                 onclick="setMaintDuration('scheduled')"
-                                                class="maint-pill flex-1 py-2.5 px-4 rounded-xl text-sm font-bold border transition-all duration-200 border-white/10 bg-white/5 text-zinc-400">
+                                                class="maint-pill flex-1 py-2.5 px-4 rounded-xl text-sm font-bold border transition-all duration-200 border-amber-500 bg-amber-500/10 text-amber-400">
                                                 <i class="ph-bold ph-clock mr-1.5"></i>Programado
                                             </button>
                                         </div>
                                         <!-- Input oculto para compatibilidad -->
-                                        <input type="hidden" id="maint-type" value="indefinite">
+                                        <input type="hidden" id="maint-type" value="scheduled">
 
                                         <!-- Selector de fecha -->
-                                        <div id="maint-date-container" class="hidden">
+                                        <div id="maint-date-container">
                                             <div class="p-5 bg-black/40 border border-white/10 rounded-2xl">
                                                 <label
                                                     class="block text-[10px] font-bold text-zinc-500 mb-3 uppercase tracking-widest">Fecha
                                                     y hora límite</label>
-                                                <input type="datetime-local" id="maint-date"
+                                                <input type="datetime-local" id="maint-date" value="2026-11-21T00:00"
                                                     class="w-full bg-transparent text-white text-sm focus:outline-none mb-4 tracking-wider"
                                                     style="color-scheme: dark;" onchange="checkDirtyState()">
                                                 <div class="h-px w-full bg-white/10 my-4"></div>
@@ -3295,9 +3295,25 @@
             if (voiceOrb) voiceOrb.style.opacity = target === 'voice' ? '1' : '0';
         }
 
+        function parseMaintDateMs(maintDate) {
+            if (!maintDate || typeof maintDate !== 'string') return null;
+            const trimmed = maintDate.trim();
+            if (!trimmed) return null;
+            if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(trimmed)) {
+                const ms = Date.parse(trimmed + ':00-04:00');
+                if (!Number.isNaN(ms)) return ms;
+            }
+            const fallback = Date.parse(trimmed);
+            return Number.isNaN(fallback) ? null : fallback;
+        }
+
         // LOAD DATA
         async function loadData() {
             let cfg = JSON.parse(localStorage.getItem('yaire_config') || '{}');
+            const OFFICIAL_OPENING_LOCAL = '2026-11-21T00:00';
+            const OFFICIAL_OPENING_MS = Date.parse('2026-11-21T00:00:00-04:00');
+            const OPENING_SETUP_CUTOFF_MS = Date.parse('2026-11-17T22:20:00-04:00');
+            let shouldSyncOpeningToFirebase = false;
 
             // Fetch config desde Firebase para sincronizar el estado real del servidor al cargar
             try {
@@ -3308,13 +3324,22 @@
                         // Mezclar config de Firebase con la local (ghToken y ghRepo no están en Firebase)
                         cfg = { ...cfg, ...fbCfg };
 
+                        // Sincronizar con la apertura programada oficial (21 nov 2026, 12:00 a. m. VE)
+                        // si en Firebase seguía el estado viejo de octubre ("indefinite" / "special").
+                        const updatedMs = cfg.lastUpdated ? Date.parse(cfg.lastUpdated) : 0;
+                        if (Date.now() < OFFICIAL_OPENING_MS && (!updatedMs || updatedMs < OPENING_SETUP_CUTOFF_MS)) {
+                            cfg.mantenimiento = true;
+                            cfg.maintType = 'scheduled';
+                            cfg.maintDate = OFFICIAL_OPENING_LOCAL;
+                            cfg.maintScreen = 'cinematic';
+                            cfg.lastUpdated = new Date().toISOString();
+                            shouldSyncOpeningToFirebase = true;
+                        }
+
                         // Auto-desactivar si la fecha del mantenimiento programado expiró
                         if (cfg.mantenimiento && cfg.maintType === 'scheduled' && cfg.maintDate) {
-                            const [dPart, tPart] = cfg.maintDate.split('T');
-                            const [yyyy, mm, dd] = dPart.split('-');
-                            const [hh, min] = tPart.split(':');
-                            const targetTime = new Date(yyyy, mm - 1, dd, hh, min).getTime();
-                            if (Date.now() >= targetTime) {
+                            const targetTime = parseMaintDateMs(cfg.maintDate);
+                            if (targetTime && Date.now() >= targetTime) {
                                 cfg.mantenimiento = false;
                             }
                         }
@@ -3326,14 +3351,31 @@
                 console.error("Error al cargar configuración desde Firebase:", e);
             }
 
+            if (shouldSyncOpeningToFirebase) {
+                firebaseFetch('https://yaire-591ca-default-rtdb.firebaseio.com/config.json', {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        mantenimiento: true,
+                        maintType: 'scheduled',
+                        maintDate: OFFICIAL_OPENING_LOCAL,
+                        maintScreen: 'cinematic',
+                        lastUpdated: cfg.lastUpdated
+                    })
+                }).catch(() => {});
+            }
 
-
-
+            if (Date.now() < OFFICIAL_OPENING_MS && (!cfg.lastUpdated || Date.parse(cfg.lastUpdated) < OPENING_SETUP_CUTOFF_MS)) {
+                cfg.mantenimiento = true;
+                cfg.maintType = 'scheduled';
+                cfg.maintDate = OFFICIAL_OPENING_LOCAL;
+                cfg.maintScreen = 'cinematic';
+            }
 
             document.getElementById('maint-toggle').checked = cfg.mantenimiento || false;
-            document.getElementById('maint-date').value = cfg.maintDate || '';
+            document.getElementById('maint-date').value = cfg.maintDate || (Date.now() < OFFICIAL_OPENING_MS ? OFFICIAL_OPENING_LOCAL : '');
             setMaintScreen('cinematic');
-            setMaintDuration(cfg.maintType || 'indefinite');
+            setMaintDuration(cfg.maintType || (Date.now() < OFFICIAL_OPENING_MS ? 'scheduled' : 'indefinite'));
             toggleMaintOptions(false);
 
             // Actualizar la insignia de estado según el estado de mantenimiento real en el servidor
@@ -4452,11 +4494,8 @@
                 const dInput = document.getElementById('maint-date').value;
                 let isExpired = false;
                 if (dInput) {
-                    const [dPart, tPart] = dInput.split('T');
-                    const [yyyy, mm, dd] = dPart.split('-');
-                    const [hh, min] = tPart.split(':');
-                    const tTime = new Date(yyyy, mm - 1, dd, hh, min).getTime();
-                    if (Date.now() >= tTime) isExpired = true;
+                    const tTime = parseMaintDateMs(dInput);
+                    if (tTime && Date.now() >= tTime) isExpired = true;
                 }
                 if (!dInput || isExpired) { setMaintTimeOffset(60); }
 
@@ -4514,12 +4553,9 @@
 
             // 1. Auto-desactivar si la fecha del mantenimiento programado guardada expiró
             if (isMaint && maintType === 'scheduled' && maintDate) {
-                const [dPart, tPart] = maintDate.split('T');
-                const [yyyy, mm, dd] = dPart.split('-');
-                const [hh, min] = tPart.split(':');
-                const targetTime = new Date(yyyy, mm - 1, dd, hh, min).getTime();
+                const targetTime = parseMaintDateMs(maintDate);
 
-                if (Date.now() >= targetTime) {
+                if (targetTime && Date.now() >= targetTime) {
                     // Actualizar localStorage
                     cfg.mantenimiento = false;
                     localStorage.setItem('yaire_config', JSON.stringify(cfg));

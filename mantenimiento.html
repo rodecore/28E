@@ -1320,7 +1320,8 @@
                 }
                 const parsedPreviewMs = parseAdminMaintDate(pDate);
                 if (parsedPreviewMs && parsedPreviewMs > nowMs) {
-                    return { locked: true, kind: 'scheduled', targetMs: parsedPreviewMs };
+                    const previewKind = parsedPreviewMs === OFFICIAL_OPENING_MS ? 'opening' : 'scheduled';
+                    return { locked: true, kind: previewKind, targetMs: parsedPreviewMs };
                 }
                 if (nowMs < OFFICIAL_OPENING_MS) {
                     return { locked: true, kind: 'opening', targetMs: OFFICIAL_OPENING_MS };
