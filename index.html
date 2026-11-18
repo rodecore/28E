@@ -2754,28 +2754,6 @@
 
             if (!p) return;
 
-            let lastHover = 0;
-
-            p.addEventListener('mouseover', function (e) {
-
-                const item = e.target.closest('a, button, .menu-link-item, .vault-btn');
-
-                if (!item || !p.contains(item)) return;
-
-                const now = Date.now();
-
-                if (now - lastHover < 50) return;
-
-                lastHover = now;
-
-                if (typeof AudioManager !== 'undefined' && AudioManager && typeof AudioManager.play === 'function') {
-
-                    AudioManager.play('hover.wav', 0.22);
-
-                }
-
-            });
-
             p.addEventListener('click', function (e) {
 
                 const vault = e.target.closest('.vault-btn, a[href="#secreto"]');
@@ -3655,12 +3633,6 @@
 
                             container.classList.add('has-active');
 
-                            if (typeof AudioManager !== 'undefined' && AudioManager && typeof AudioManager.play === 'function') {
-
-                                try { AudioManager.play('hover.wav', 0.2); } catch (e) { }
-
-                            }
-
                         }
 
                         function deactivate() {
@@ -3676,20 +3648,6 @@
                             }, 450);
 
                         }
-
-                        letter.addEventListener('pointerenter', function (e) {
-
-                            if (e.pointerType === 'mouse') {
-
-                                if (typeof AudioManager !== 'undefined' && AudioManager && typeof AudioManager.play === 'function') {
-
-                                    try { AudioManager.play('hover.wav', 0.15); } catch (e) { }
-
-                                }
-
-                            }
-
-                        });
 
                         letter.addEventListener('pointerdown', function () {
 
@@ -8861,8 +8819,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6 mb-16 overflow-visible items-stretch">
                     <!-- Tarjeta 1: El Concepto -->
                     <div class="relative rounded-2xl sm:rounded-[24px] p-5 sm:p-6 flex flex-col justify-between overflow-hidden group transition-all duration-300 hover:-translate-y-1"
-                        style="background: radial-gradient(circle at 15% 15%, rgba(255, 255, 255, 0.04) 0%, transparent 60%), rgba(16, 16, 22, 0.75); border: 1px solid rgba(255, 255, 255, 0.09); box-shadow: 0 15px 35px -15px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.1); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);"
-                        onmouseenter="if(typeof AudioManager !== 'undefined') AudioManager.play('hover.wav', 0.2)">
+                        style="background: radial-gradient(circle at 15% 15%, rgba(255, 255, 255, 0.04) 0%, transparent 60%), rgba(16, 16, 22, 0.75); border: 1px solid rgba(255, 255, 255, 0.09); box-shadow: 0 15px 35px -15px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.1); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);">
                         <!-- Marca de agua sutil: Foco / Concepto -->
                         <div style="position: absolute; top: 1rem; right: 1.25rem; color: rgba(255, 255, 255, 0.035); pointer-events: none; user-select: none;">
                             <svg class="w-12 h-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
@@ -8897,8 +8854,7 @@
                     </div>
                     <!-- Tarjeta 1: El Concepto -->
                     <div class="relative rounded-2xl sm:rounded-[24px] p-5 sm:p-6 flex flex-col justify-between overflow-hidden group transition-all duration-300 hover:-translate-y-1"
-                        style="background: radial-gradient(circle at 85% 15%, rgba(251, 191, 36, 0.08) 0%, rgba(244, 63, 94, 0.03) 40%, transparent 70%), rgba(16, 16, 22, 0.75); border: 1px solid rgba(255, 255, 255, 0.09); box-shadow: 0 15px 35px -15px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.1); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);"
-                        onmouseenter="if(typeof AudioManager !== 'undefined') AudioManager.play('hover.wav', 0.2)">
+                        style="background: radial-gradient(circle at 85% 15%, rgba(251, 191, 36, 0.08) 0%, rgba(244, 63, 94, 0.03) 40%, transparent 70%), rgba(16, 16, 22, 0.75); border: 1px solid rgba(255, 255, 255, 0.09); box-shadow: 0 15px 35px -15px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.1); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);">
                         <!-- Marca de agua sutil: Auriculares -->
                         <div style="position: absolute; top: 0.875rem; right: 1rem; color: rgba(251, 191, 36, 0.04); user-select: none; pointer-events: none;">
                             <svg class="w-12 h-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
@@ -8933,8 +8889,7 @@
                     </div>
                     <!-- Tarjeta 3: La Dedicatoria (Hero Card con resplandor rosa) -->
                     <div class="relative rounded-2xl sm:rounded-[24px] p-5 sm:p-6 flex flex-col justify-between overflow-hidden group transition-all duration-300 hover:-translate-y-1"
-                        style="background: radial-gradient(circle at 20% 0%, rgba(244, 63, 94, 0.18) 0%, transparent 60%), linear-gradient(165deg, rgba(255, 255, 255, 0.04) 0%, rgba(18, 18, 24, 0.85) 100%); border: 1px solid rgba(244, 63, 94, 0.35); box-shadow: 0 15px 35px -12px rgba(244, 63, 94, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.16); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);"
-                        onmouseenter="if(typeof AudioManager !== 'undefined') AudioManager.play('hover.wav', 0.2)">
+                        style="background: radial-gradient(circle at 20% 0%, rgba(244, 63, 94, 0.18) 0%, transparent 60%), linear-gradient(165deg, rgba(255, 255, 255, 0.04) 0%, rgba(18, 18, 24, 0.85) 100%); border: 1px solid rgba(244, 63, 94, 0.35); box-shadow: 0 15px 35px -12px rgba(244, 63, 94, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.16); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);">
                         <!-- Aura de fondo sutil integrada -->
                         <div style="position: absolute; top: -15px; right: -15px; width: 110px; height: 110px; background: radial-gradient(circle, rgba(244, 63, 94, 0.22) 0%, transparent 70%); filter: blur(18px); pointer-events: none;">
                         </div>
@@ -11260,7 +11215,7 @@
             };
         }
     </script>
-    <script src="assets/js/i18n-dictionary.js?v=20261117_perf"></script>
+    <script src="assets/js/i18n-dictionary.js?v=20261118_nohover"></script>
     <!-- ---------- CAPÍTULO V: CINEMASCOPE V (5 MESES) ---------- -->
     <!-- --------------------------------------------------------------- -->
     <script src="assets/js/paleta-yaire.js?v=1793311199028"></script>
@@ -12266,6 +12221,6 @@
 
     </script>
     <!-- 28E Console Gamepad Spatial Navigation & Haptics Engine -->
-    <script src="assets/js/gamepad-controller.js?v=20261114_compact"></script>
+    <script src="assets/js/gamepad-controller.js?v=20261118_nohover"></script>
 </body>
 </html>

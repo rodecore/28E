@@ -3034,16 +3034,6 @@ var logDebug = window.logDebug;
 
             document.querySelectorAll('#menu-links .menu-link').forEach(link => {
 
-                link.addEventListener('mouseenter', () => {
-
-                    if (typeof AudioManager !== 'undefined' && AudioManager && AudioManager.play) {
-
-                        try { AudioManager.play('hover.wav', 0.2); } catch (e) { }
-
-                    }
-
-                });
-
                 link.addEventListener('click', (e) => {
 
                     const isVault = link.classList.contains('vault-btn') || link.getAttribute('href') === '#secreto';

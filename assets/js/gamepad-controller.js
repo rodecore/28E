@@ -2193,9 +2193,6 @@
                 });
             }
             nextEl.classList.add('is-active');
-            if (typeof window.AudioManager !== 'undefined' && window.AudioManager && typeof window.AudioManager.play === 'function') {
-                try { window.AudioManager.play('hover.wav', 0.22); } catch (e) {}
-            }
         }
     }
 
