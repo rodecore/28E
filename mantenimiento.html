@@ -759,6 +759,82 @@
             const OPENING_WINDOW_START_MS = Date.parse('2026-11-01T00:00:00-04:00');
             const FIREBASE_CFG_URL = 'https://yaire-591ca-default-rtdb.firebaseio.com/config.json';
 
+            /* Verificación exclusiva de cuenta de Yaire (por hash de correo en sesión o IndexedDB de Firebase Auth) */
+            function isYaireAccountEmail(raw) {
+                const s = String(raw || '').trim().toLowerCase();
+                if (!s) return false;
+                let h1 = 0x811c9dc5;
+                let h2 = 0x01000193;
+                for (let i = 0; i < s.length; i++) {
+                    const b = s.charCodeAt(i) & 0xff;
+                    h1 = Math.imul(h1 ^ b, 0x01000193) >>> 0;
+                    h2 = Math.imul(h2 ^ ((b + 17) & 0xff), 0x85ebca6b) >>> 0;
+                }
+                return (h1.toString(16).padStart(8, '0') + h2.toString(16).padStart(8, '0')) === '409e602eba69e041';
+            }
+
+            function checkStoredYaireSession() {
+                try {
+                    let raw = localStorage.getItem('yaire_auth_user');
+                    if (!raw) {
+                        const cm = document.cookie.match(/(?:^|;\s*)yaire_auth_user=([^;]+)/);
+                        if (cm) raw = decodeURIComponent(cm[1]);
+                    }
+                    if (!raw) return false;
+                    const parsed = JSON.parse(raw);
+                    return isYaireAccountEmail(parsed && parsed.email);
+                } catch (_) {
+                    return false;
+                }
+            }
+
+            let yaireIndexedDbVerified = checkStoredYaireSession();
+            if (!yaireIndexedDbVerified && window.indexedDB) {
+                try {
+                    let dbAborted = false;
+                    const openReq = window.indexedDB.open('firebaseLocalStorageDb');
+                    openReq.onupgradeneeded = (ev) => {
+                        dbAborted = true;
+                        try { ev.target.transaction.abort(); } catch (_) {}
+                    };
+                    openReq.onsuccess = () => {
+                        const idb = openReq.result;
+                        if (dbAborted || !idb.objectStoreNames.contains('firebaseLocalStorage')) {
+                            try { idb.close(); } catch (_) {}
+                            return;
+                        }
+                        try {
+                            const tx = idb.transaction('firebaseLocalStorage', 'readonly');
+                            const getAllReq = tx.objectStore('firebaseLocalStorage').getAll();
+                            getAllReq.onsuccess = () => {
+                                const rows = getAllReq.result || [];
+                                for (let i = 0; i < rows.length; i++) {
+                                    const val = rows[i] && rows[i].value;
+                                    if (val && isYaireAccountEmail(val.email)) {
+                                        yaireIndexedDbVerified = true;
+                                        try {
+                                            localStorage.setItem('yaire_auth_user', JSON.stringify({
+                                                uid: val.uid || '',
+                                                displayName: val.displayName || 'Yaire',
+                                                firstName: (val.displayName || 'Yaire').split(' ')[0],
+                                                email: val.email,
+                                                photoURL: val.photoURL || '',
+                                                updatedAt: Date.now()
+                                            }));
+                                        } catch (_) {}
+                                        break;
+                                    }
+                                }
+                                try { idb.close(); } catch (_) {}
+                            };
+                            getAllReq.onerror = () => { try { idb.close(); } catch (_) {} };
+                        } catch (_) {
+                            try { idb.close(); } catch (_) {}
+                        }
+                    };
+                } catch (_) {}
+            }
+
         const reducedMotionMedia = window.matchMedia('(prefers-reduced-motion: reduce)');
         let prefersReducedMotion = reducedMotionMedia.matches;
         reducedMotionMedia.addEventListener?.('change', (e) => {
@@ -1452,7 +1528,8 @@
                 sessionStorage.removeItem('yaire_reloaded');
                 const diaCeroDone = localStorage.getItem('yaire_dia_cero_done') === '1';
                 const diaCeroEnabled = !liveCfg || liveCfg.diaCeroEnabled !== false;
-                if (!diaCeroDone && diaCeroEnabled) {
+                const isYaire = yaireIndexedDbVerified || checkStoredYaireSession();
+                if (isYaire && !diaCeroDone && diaCeroEnabled) {
                     nextTarget = 'empezar.html?auto=1';
                 }
             } catch (_) {}

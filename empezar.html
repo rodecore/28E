@@ -9,6 +9,116 @@
     <meta name="darkreader-lock">
     <meta name="google" content="notranslate">
     <title>28E · Día Cero</title>
+    <script>
+        (function () {
+            try {
+                var host = window.location.hostname;
+                var isLocal = host === 'localhost' || host === '127.0.0.1';
+                var qp = new URLSearchParams(window.location.search);
+                var pv = qp.get('preview');
+                var isPreview = pv === 'dc_28e_k9x7' || (isLocal && (pv === '1' || pv === 'true'));
+                if (isLocal || isPreview) return;
+
+                /* Antes del 21 de noviembre a las 00:00 (UTC-4), mantener bloqueado tras el contador */
+                var serverOffset = Number(localStorage.getItem('yaire_server_offset')) || 0;
+                if (Date.now() + serverOffset < Date.parse('2026-11-21T00:00:00-04:00')) {
+                    window.location.replace('mantenimiento.html');
+                    return;
+                }
+
+                function isYaireEmail(raw) {
+                    var s = String(raw || '').trim().toLowerCase();
+                    if (!s) return false;
+                    var h1 = 0x811c9dc5, h2 = 0x01000193;
+                    for (var i = 0; i < s.length; i++) {
+                        var b = s.charCodeAt(i) & 0xff;
+                        h1 = Math.imul(h1 ^ b, 0x01000193) >>> 0;
+                        h2 = Math.imul(h2 ^ ((b + 17) & 0xff), 0x85ebca6b) >>> 0;
+                    }
+                    return (('00000000' + h1.toString(16)).slice(-8) + ('00000000' + h2.toString(16)).slice(-8)) === '409e602eba69e041';
+                }
+
+                var storedEmail = '';
+                try {
+                    var rawAuth = localStorage.getItem('yaire_auth_user');
+                    if (!rawAuth) {
+                        var cm = document.cookie.match(/(?:^|;\s*)yaire_auth_user=([^;]+)/);
+                        if (cm) rawAuth = decodeURIComponent(cm[1]);
+                    }
+                    if (rawAuth) {
+                        var parsed = JSON.parse(rawAuth);
+                        storedEmail = String((parsed && parsed.email) || '').trim();
+                    }
+                } catch (_) {}
+
+                if (isYaireEmail(storedEmail)) return;
+                if (storedEmail) {
+                    window.location.replace('index.html');
+                    return;
+                }
+
+                /* Si no hay caché en localStorage/cookie, verificar sesión persistente en IndexedDB de Firebase Auth antes de mostrar nada */
+                document.documentElement.style.visibility = 'hidden';
+                if (!window.indexedDB) {
+                    window.location.replace('index.html');
+                    return;
+                }
+                var aborted = false;
+                var openReq = window.indexedDB.open('firebaseLocalStorageDb');
+                openReq.onupgradeneeded = function (ev) {
+                    aborted = true;
+                    try { ev.target.transaction.abort(); } catch (_) {}
+                };
+                openReq.onerror = function () { window.location.replace('index.html'); };
+                openReq.onsuccess = function () {
+                    var idb = openReq.result;
+                    if (aborted || !idb.objectStoreNames.contains('firebaseLocalStorage')) {
+                        try { idb.close(); } catch (_) {}
+                        window.location.replace('index.html');
+                        return;
+                    }
+                    try {
+                        var tx = idb.transaction('firebaseLocalStorage', 'readonly');
+                        var allReq = tx.objectStore('firebaseLocalStorage').getAll();
+                        allReq.onsuccess = function () {
+                            var rows = allReq.result || [];
+                            var matched = false;
+                            for (var j = 0; j < rows.length; j++) {
+                                var v = rows[j] && rows[j].value;
+                                if (v && isYaireEmail(v.email)) {
+                                    matched = true;
+                                    try {
+                                        localStorage.setItem('yaire_auth_user', JSON.stringify({
+                                            uid: v.uid || '',
+                                            displayName: v.displayName || 'Yaire',
+                                            firstName: (v.displayName || 'Yaire').split(' ')[0],
+                                            email: v.email,
+                                            photoURL: v.photoURL || '',
+                                            updatedAt: Date.now()
+                                        }));
+                                    } catch (_) {}
+                                    break;
+                                }
+                            }
+                            try { idb.close(); } catch (_) {}
+                            if (matched) {
+                                document.documentElement.style.visibility = '';
+                            } else {
+                                window.location.replace('index.html');
+                            }
+                        };
+                        allReq.onerror = function () {
+                            try { idb.close(); } catch (_) {}
+                            window.location.replace('index.html');
+                        };
+                    } catch (_) {
+                        try { idb.close(); } catch (_) {}
+                        window.location.replace('index.html');
+                    }
+                };
+            } catch (_) {}
+        })();
+    </script>
     <link rel="icon" type="image/x-icon" href="./icons/dclf_game.ico?v=2">
     <link rel="preload" href="./fonts/Sebenta-Medium.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="./fonts/Sebenta-MediumItalic.woff2" as="font" type="font/woff2" crossorigin>
@@ -2551,7 +2661,8 @@
             const FIREBASE_DIA_CERO_URL = 'https://yaire-591ca-default-rtdb.firebaseio.com/dia_cero.json';
 
             const urlParams = new URLSearchParams(window.location.search);
-            const isPreview = urlParams.get('preview') === '1' || urlParams.get('preview') === 'true';
+            const pvParam = urlParams.get('preview');
+            const isPreview = pvParam === 'dc_28e_k9x7' || pvParam === '1' || pvParam === 'true';
             const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
             const finePointerMql = window.matchMedia('(pointer: fine)');
 

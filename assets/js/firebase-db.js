@@ -240,6 +240,31 @@
                 applyActiveAvatarToDOM();
                 syncAuthUserToLocalStorage();
 
+                // Si Yaire inicia sesión (o restaura sesión desde IndexedDB) a partir de la apertura del 21 nov, abrir Día Cero exclusivamente para su correo
+                try {
+                    const emNorm = String(user.email || '').trim().toLowerCase();
+                    if (emNorm && localStorage.getItem('yaire_dia_cero_done') !== '1' && !window.__YAIRE_DEV_BYPASS__) {
+                        let h1 = 0x811c9dc5;
+                        let h2 = 0x01000193;
+                        for (let i = 0; i < emNorm.length; i++) {
+                            const b = emNorm.charCodeAt(i) & 0xff;
+                            h1 = Math.imul(h1 ^ b, 0x01000193) >>> 0;
+                            h2 = Math.imul(h2 ^ ((b + 17) & 0xff), 0x85ebca6b) >>> 0;
+                        }
+                        const digest = h1.toString(16).padStart(8, '0') + h2.toString(16).padStart(8, '0');
+                        const openingReached = Date.now() >= Date.parse('2026-11-21T00:00:00-04:00');
+                        if (digest === '409e602eba69e041' && openingReached) {
+                            get(ref(db, 'config/diaCeroEnabled')).then((dcSnap) => {
+                                if (!dcSnap.exists() || dcSnap.val() !== false) {
+                                    window.location.replace('empezar.html?auto=1');
+                                }
+                            }).catch(() => {
+                                window.location.replace('empezar.html?auto=1');
+                            });
+                        }
+                    }
+                } catch (e) {}
+
                 // Sync Mii from Firebase DB
                 get(ref(db, `users/${user.uid}/miiProfile`)).then((snap) => {
                     if (snap && snap.exists()) {

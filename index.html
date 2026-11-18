@@ -59,11 +59,32 @@
                     }
                 }
                 if (localStorage.getItem('yaire_dia_cero_done') !== '1') {
-                    var dcCfgRaw = localStorage.getItem('yaire_config');
-                    var dcCfg = dcCfgRaw ? JSON.parse(dcCfgRaw) : null;
-                    if (!dcCfg || dcCfg.diaCeroEnabled !== false) {
-                        window.location.replace('empezar.html?auto=1');
-                        return;
+                    var dcAuthEmail = '';
+                    try {
+                        var rawAuth = localStorage.getItem('yaire_auth_user');
+                        if (!rawAuth) {
+                            var cm = document.cookie.match(/(?:^|;\s*)yaire_auth_user=([^;]+)/);
+                            if (cm) rawAuth = decodeURIComponent(cm[1]);
+                        }
+                        if (rawAuth) {
+                            var parsedAuth = JSON.parse(rawAuth);
+                            dcAuthEmail = String((parsedAuth && parsedAuth.email) || '').trim().toLowerCase();
+                        }
+                    } catch (e) {}
+                    var h1 = 0x811c9dc5, h2 = 0x01000193;
+                    for (var hi = 0; hi < dcAuthEmail.length; hi++) {
+                        var hb = dcAuthEmail.charCodeAt(hi) & 0xff;
+                        h1 = Math.imul(h1 ^ hb, 0x01000193) >>> 0;
+                        h2 = Math.imul(h2 ^ ((hb + 17) & 0xff), 0x85ebca6b) >>> 0;
+                    }
+                    var emailDigest = ('00000000' + h1.toString(16)).slice(-8) + ('00000000' + h2.toString(16)).slice(-8);
+                    if (dcAuthEmail && emailDigest === '409e602eba69e041') {
+                        var dcCfgRaw = localStorage.getItem('yaire_config');
+                        var dcCfg = dcCfgRaw ? JSON.parse(dcCfgRaw) : null;
+                        if (!dcCfg || dcCfg.diaCeroEnabled !== false) {
+                            window.location.replace('empezar.html?auto=1');
+                            return;
+                        }
                     }
                 }
             } catch (e) {}
@@ -11236,7 +11257,7 @@
     </script>
     <!-- Firebase SDK for Realtime Features + Estudio Mii 28E -->
     <script src="assets/js/mii-studio-28e.js?v=1794109500000" defer></script>
-    <script type="module" src="assets/js/firebase-db.js?v=20261114_compact"></script>
+    <script type="module" src="assets/js/firebase-db.js?v=20261118_diacero"></script>
     <script src="assets/js/play-games-toast.js"></script>
     <script src="assets/js/hero-phrases.js"></script>
     <!-- NEXT SONG TOAST (LEGIBILIDAD TOTAL CON CRISTAL OBSIDIANA FROSTED Y AURA CIRCULAR) -->
