@@ -70,46 +70,6 @@
   ],
   "rewrites": [
     {
-      "source": "/",
-      "has": [
-        {
-          "type": "host",
-          "value": "dclf.yaire.site"
-        }
-      ],
-      "destination": "/dclf.html"
-    },
-    {
-      "source": "/dclf",
-      "has": [
-        {
-          "type": "host",
-          "value": "dclf.yaire.site"
-        }
-      ],
-      "destination": "/dclf.html"
-    },
-    {
-      "source": "/",
-      "has": [
-        {
-          "type": "host",
-          "value": "tv.yaire.site"
-        }
-      ],
-      "destination": "/tv.html"
-    },
-    {
-      "source": "/tv",
-      "has": [
-        {
-          "type": "host",
-          "value": "tv.yaire.site"
-        }
-      ],
-      "destination": "/tv.html"
-    },
-    {
       "source": "/vc-api/:path*",
       "destination": "https://voice.yaire.site/:path*"
     },
@@ -128,101 +88,8 @@
   ],
   "redirects": [
     {
-      "source": "/dclf",
-      "has": [
-        {
-          "type": "host",
-          "value": "yaire.site"
-        }
-      ],
-      "destination": "https://dclf.yaire.site/",
-      "permanent": false
-    },
-    {
-      "source": "/dclf",
-      "has": [
-        {
-          "type": "host",
-          "value": "www.yaire.site"
-        }
-      ],
-      "destination": "https://dclf.yaire.site/",
-      "permanent": false
-    },
-    {
-      "source": "/dclf.html",
-      "has": [
-        {
-          "type": "host",
-          "value": "yaire.site"
-        }
-      ],
-      "destination": "https://dclf.yaire.site/",
-      "permanent": false
-    },
-    {
-      "source": "/dclf.html",
-      "has": [
-        {
-          "type": "host",
-          "value": "www.yaire.site"
-        }
-      ],
-      "destination": "https://dclf.yaire.site/",
-      "permanent": false
-    },
-    {
-      "source": "/tv",
-      "has": [
-        {
-          "type": "host",
-          "value": "yaire.site"
-        }
-      ],
-      "destination": "https://tv.yaire.site/",
-      "permanent": false
-    },
-    {
-      "source": "/tv",
-      "has": [
-        {
-          "type": "host",
-          "value": "www.yaire.site"
-        }
-      ],
-      "destination": "https://tv.yaire.site/",
-      "permanent": false
-    },
-    {
-      "source": "/tv.html",
-      "has": [
-        {
-          "type": "host",
-          "value": "yaire.site"
-        }
-      ],
-      "destination": "https://tv.yaire.site/",
-      "permanent": false
-    },
-    {
-      "source": "/tv.html",
-      "has": [
-        {
-          "type": "host",
-          "value": "www.yaire.site"
-        }
-      ],
-      "destination": "https://tv.yaire.site/",
-      "permanent": false
-    },
-    {
-      "source": "/jardin_de_yaire",
-      "destination": "/pages/jardin_de_yaire",
-      "permanent": false
-    },
-    {
-      "source": "/jardin_de_yaire.html",
-      "destination": "/pages/jardin_de_yaire.html",
+      "source": "/((?!(?:api|vc-api|yt-search|__|\\.well-known)(?:/|$)|(?:fonts/(?:Sebenta-Medium\\.woff2|font_4\\.ttf)|media/cierre-28e\\.mp3|favicon\\.ico|sw\\.js)$).+)",
+      "destination": "/",
       "permanent": false
     }
   ]
